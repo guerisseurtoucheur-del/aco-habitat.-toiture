@@ -1,0 +1,5 @@
+{
+  "name": "ACO-HABITAT | Diagnostic Toiture Satellite",
+  "description": "Analyse de toiture haute précision par satellite, sans aucun déplacement.",
+  "requestFramePermissions": []
+}
