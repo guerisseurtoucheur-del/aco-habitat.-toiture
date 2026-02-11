@@ -2,8 +2,9 @@ import { Navbar } from "@/components/navbar"
 import { DiagnosticForm } from "@/components/diagnostic-form"
 
 export default function Home() {
+  console.log("[v0] Home page rendering")
   return (
-    <>
+    <div className="min-h-screen bg-background text-foreground">
       <Navbar />
       <main className="container mx-auto max-w-2xl pt-12 px-4 pb-16">
         <div className="text-center mb-12">
@@ -16,6 +17,6 @@ export default function Home() {
         </div>
         <DiagnosticForm />
       </main>
-    </>
+    </div>
   )
 }
