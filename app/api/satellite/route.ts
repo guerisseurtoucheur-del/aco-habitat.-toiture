@@ -16,12 +16,8 @@ export async function POST(req: Request) {
   try {
     // Step 1: Geocode the address to get lat/lng
     const geocodeUrl = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}&region=fr&language=fr`
-    console.log("[v0] Geocode URL:", geocodeUrl.replace(apiKey, "HIDDEN"))
     const geocodeRes = await fetch(geocodeUrl)
     const geocodeData = await geocodeRes.json()
-    console.log("[v0] Geocode response status:", geocodeData.status)
-    console.log("[v0] Geocode error_message:", geocodeData.error_message || "none")
-    console.log("[v0] Geocode results count:", geocodeData.results?.length || 0)
 
     if (geocodeData.status !== "OK" || !geocodeData.results?.[0]) {
       return Response.json(
