@@ -1,6 +1,6 @@
 "use client"
 
-import { useState, useRef, useCallback } from "react"
+import { useState, useRef, useCallback, useEffect } from "react"
 import {
   MapPin,
   Search,
@@ -23,12 +23,168 @@ import {
   Zap,
   ZoomIn,
   ZoomOut,
+  Phone,
+  Send,
 } from "lucide-react"
 import type { DiagnosticResult, DiagnosticZone } from "@/lib/diagnostic-types"
 
-type Step = "address" | "satellite" | "analyzing" | "results"
+type Step = "address" | "satellite" | "scanning" | "analyzing" | "results"
 type SatelliteImage = { zoom: number; label: string; image: string }
 
+/* ── Scanning Overlay ── */
+function ScannerOverlay({ phase }: { phase: "scanning" | "analyzing" }) {
+  return (
+    <div className="pointer-events-none absolute inset-0 z-10">
+      {/* Tech grid */}
+      <div
+        className="absolute inset-0 animate-grid-pulse"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(59,130,246,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(59,130,246,0.1) 1px, transparent 1px)",
+          backgroundSize: "40px 40px",
+        }}
+      />
+
+      {/* Laser line */}
+      {phase === "scanning" && (
+        <>
+          <div
+            className="absolute left-0 right-0 h-[2px] animate-scan-line"
+            style={{
+              background:
+                "linear-gradient(90deg, transparent, #3b82f6, #06b6d4, #3b82f6, transparent)",
+              boxShadow: "0 0 20px 4px rgba(59,130,246,0.6), 0 0 60px 10px rgba(59,130,246,0.3)",
+            }}
+          />
+          <div
+            className="absolute left-0 right-0 h-[40px] animate-scan-glow"
+            style={{
+              background:
+                "linear-gradient(to bottom, transparent, rgba(59,130,246,0.15), transparent)",
+            }}
+          />
+        </>
+      )}
+
+      {/* Corner brackets */}
+      <div className="animate-corner-blink">
+        {[
+          "top-2 left-2",
+          "top-2 right-2 rotate-90",
+          "bottom-2 left-2 -rotate-90",
+          "bottom-2 right-2 rotate-180",
+        ].map((pos) => (
+          <div key={pos} className={`absolute ${pos}`}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+              <path d="M2 8V2h6" stroke="#3b82f6" strokeWidth="2" strokeLinecap="round" />
+            </svg>
+          </div>
+        ))}
+      </div>
+
+      {/* Status HUD */}
+      <div className="absolute bottom-3 left-3 flex items-center gap-2 rounded-md bg-background/80 px-3 py-1.5 backdrop-blur-sm">
+        <div className="h-2 w-2 animate-pulse rounded-full bg-primary" />
+        <span className="font-mono text-[10px] font-medium text-primary">
+          {phase === "scanning" ? "SCAN EN COURS..." : "ANALYSE IA..."}
+        </span>
+      </div>
+
+      {/* Coordinates HUD */}
+      <div className="absolute top-3 right-3 rounded-md bg-background/80 px-3 py-1.5 backdrop-blur-sm">
+        <span className="font-mono text-[10px] text-muted-foreground">
+          SAT-VIEW HD / {phase === "scanning" ? "LIDAR-SIM" : "AI-PROC"}
+        </span>
+      </div>
+    </div>
+  )
+}
+
+/* ── Zone Polygon Overlay ── */
+function ZonePolygon({
+  zone,
+  color,
+  visible,
+  label,
+  delay = 0,
+}: {
+  zone: DiagnosticZone
+  color: string
+  visible: boolean
+  label: string
+  delay?: number
+}) {
+  if (!visible) return null
+
+  const severityColor =
+    zone.severity === "severe"
+      ? "#ef4444"
+      : zone.severity === "modere"
+        ? "#f59e0b"
+        : color
+
+  return (
+    <div
+      className="animate-zone-reveal absolute"
+      style={{
+        left: `${zone.x}%`,
+        top: `${zone.y}%`,
+        width: `${zone.width}%`,
+        height: `${zone.height}%`,
+        animationDelay: `${delay}ms`,
+      }}
+    >
+      {/* Border with glow */}
+      <div
+        className="absolute inset-0 rounded-sm border-2"
+        style={{
+          borderColor: severityColor,
+          boxShadow: `0 0 12px 2px ${severityColor}40, inset 0 0 12px 2px ${severityColor}15`,
+          backgroundColor: `${severityColor}10`,
+        }}
+      />
+
+      {/* Pulsing corner dots */}
+      {["top-0 left-0", "top-0 right-0", "bottom-0 left-0", "bottom-0 right-0"].map((pos) => (
+        <div
+          key={pos}
+          className={`absolute ${pos} -translate-x-1/2 -translate-y-1/2`}
+          style={{
+            width: 6,
+            height: 6,
+            borderRadius: "50%",
+            backgroundColor: severityColor,
+            boxShadow: `0 0 6px 2px ${severityColor}60`,
+          }}
+        />
+      ))}
+
+      {/* Animated pulse ring */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+        <div
+          className="animate-pulse-ring h-3 w-3 rounded-full"
+          style={{ backgroundColor: `${severityColor}30`, border: `1px solid ${severityColor}50` }}
+        />
+      </div>
+
+      {/* Label tag */}
+      <div
+        className="absolute -top-7 left-0 flex items-center gap-1.5 whitespace-nowrap rounded px-2 py-1"
+        style={{
+          backgroundColor: severityColor,
+          boxShadow: `0 2px 8px ${severityColor}50`,
+        }}
+      >
+        <div className="h-1.5 w-1.5 rounded-full bg-white/80" />
+        <span className="text-[9px] font-bold tracking-wide text-white uppercase">
+          {label}
+        </span>
+      </div>
+    </div>
+  )
+}
+
+/* ── Score Gauge ── */
 function ScoreGauge({
   score,
   label,
@@ -47,30 +203,15 @@ function ScoreGauge({
     if (s >= 50) return "#f59e0b"
     return "#ef4444"
   }
-
   return (
     <div className="flex flex-col items-center gap-3">
       <div className="relative h-24 w-24">
         <svg className="h-24 w-24 -rotate-90" viewBox="0 0 80 80">
+          <circle cx="40" cy="40" r="36" fill="none" stroke="currentColor" strokeWidth="6" className="text-border" />
           <circle
-            cx="40"
-            cy="40"
-            r="36"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="6"
-            className="text-border"
-          />
-          <circle
-            cx="40"
-            cy="40"
-            r="36"
-            fill="none"
-            stroke={getColor(score)}
-            strokeWidth="6"
-            strokeLinecap="round"
-            strokeDasharray={circumference}
-            strokeDashoffset={offset}
+            cx="40" cy="40" r="36" fill="none"
+            stroke={getColor(score)} strokeWidth="6" strokeLinecap="round"
+            strokeDasharray={circumference} strokeDashoffset={offset}
             style={{ transition: "stroke-dashoffset 1.5s ease-out" }}
           />
         </svg>
@@ -86,38 +227,66 @@ function ScoreGauge({
   )
 }
 
-function ZoneOverlay({
+/* ── Anomaly Card (sidebar) ── */
+function AnomalyCard({
   zone,
   color,
-  visible,
+  category,
+  icon: Icon,
 }: {
   zone: DiagnosticZone
   color: string
-  visible: boolean
+  category: string
+  icon: React.ElementType
 }) {
-  if (!visible) return null
+  const severityLabel =
+    zone.severity === "severe" ? "Critique" : zone.severity === "modere" ? "Modere" : "Faible"
+  const severityColor =
+    zone.severity === "severe" ? "#ef4444" : zone.severity === "modere" ? "#f59e0b" : "#22c55e"
+
   return (
-    <div
-      className="absolute rounded-sm border-2 transition-opacity duration-300"
-      style={{
-        left: `${zone.x}%`,
-        top: `${zone.y}%`,
-        width: `${zone.width}%`,
-        height: `${zone.height}%`,
-        borderColor: color,
-        backgroundColor: `${color}20`,
-      }}
-    >
-      <span
-        className="absolute -top-5 left-0 whitespace-nowrap rounded px-1.5 py-0.5 text-[10px] font-medium text-white"
+    <div className="rounded-xl border border-border bg-card/80 p-3 backdrop-blur-sm">
+      <div className="mb-2 flex items-center gap-2">
+        <div className="flex h-6 w-6 items-center justify-center rounded-md" style={{ backgroundColor: `${color}20` }}>
+          <Icon size={12} style={{ color }} />
+        </div>
+        <span className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{category}</span>
+        <span
+          className="ml-auto rounded px-1.5 py-0.5 text-[9px] font-bold text-white"
+          style={{ backgroundColor: severityColor }}
+        >
+          {severityLabel}
+        </span>
+      </div>
+      <p className="mb-3 text-xs leading-relaxed text-foreground/80">{zone.label}</p>
+      <a
+        href="#contact"
+        className="flex items-center justify-center gap-1.5 rounded-lg py-2 text-[10px] font-semibold text-primary-foreground transition-colors"
         style={{ backgroundColor: color }}
       >
-        {zone.label}
+        <Send size={10} />
+        Demander un devis
+      </a>
+    </div>
+  )
+}
+
+/* ── Material Badge ── */
+function MaterialBadge({ type }: { type: string }) {
+  return (
+    <div className="inline-flex items-center gap-2 rounded-lg border border-primary/30 bg-primary/10 px-3 py-1.5 backdrop-blur-sm">
+      <div className="relative flex h-2 w-2 items-center justify-center">
+        <div className="absolute h-full w-full animate-pulse rounded-full bg-primary" />
+        <div className="h-1.5 w-1.5 rounded-full bg-primary" />
+      </div>
+      <span className="font-mono text-[11px] font-semibold tracking-wide text-primary uppercase">
+        Materiau detecte : {type}
       </span>
     </div>
   )
 }
 
+/* ── Main Component ── */
 export function DiagnosticTool() {
   const [step, setStep] = useState<Step>("address")
   const [address, setAddress] = useState("")
@@ -126,9 +295,6 @@ export function DiagnosticTool() {
   const [formattedAddress, setFormattedAddress] = useState("")
   const [diagnostic, setDiagnostic] = useState<DiagnosticResult | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [activeTab, setActiveTab] = useState<
-    "overview" | "vegetal" | "structure" | "etancheite"
-  >("overview")
   const [layerState, setLayerState] = useState({
     vegetal: true,
     structure: true,
@@ -150,10 +316,7 @@ export function DiagnosticTool() {
       const satData = await satRes.json()
 
       if (!satRes.ok) {
-        setError(
-          satData.error ||
-            "Erreur lors de la recuperation de l'image satellite."
-        )
+        setError(satData.error || "Erreur lors de la recuperation de l'image satellite.")
         setStep("address")
         return
       }
@@ -161,11 +324,14 @@ export function DiagnosticTool() {
       setSatelliteImages(satData.images || [{ zoom: 20, label: "Standard", image: satData.primaryImage }])
       setActiveZoom(0)
       setFormattedAddress(satData.formattedAddress)
+
+      // Show scanning animation for 3 seconds
+      setStep("scanning")
+      await new Promise((r) => setTimeout(r, 3000))
+
       setStep("analyzing")
 
-      // Use the highest zoom image for analysis (best detail)
       const analysisImage = satData.images?.[0]?.image || satData.primaryImage
-
       const diagRes = await fetch("/api/diagnostic", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -186,15 +352,10 @@ export function DiagnosticTool() {
       setStep("results")
 
       setTimeout(() => {
-        resultsRef.current?.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        })
+        resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
       }, 300)
     } catch {
-      setError(
-        "Une erreur est survenue. Verifiez votre connexion et reessayez."
-      )
+      setError("Une erreur est survenue. Verifiez votre connexion et reessayez.")
       setStep("address")
     }
   }, [address])
@@ -206,7 +367,6 @@ export function DiagnosticTool() {
     setActiveZoom(0)
     setDiagnostic(null)
     setError(null)
-    setActiveTab("overview")
     setLayerState({ vegetal: true, structure: true, etancheite: true })
   }
 
@@ -215,10 +375,8 @@ export function DiagnosticTool() {
   }
 
   const getSeverityIcon = (score: number) => {
-    if (score >= 75)
-      return <CheckCircle2 size={16} className="text-green-500" />
-    if (score >= 50)
-      return <AlertTriangle size={16} className="text-amber-500" />
+    if (score >= 75) return <CheckCircle2 size={16} className="text-green-500" />
+    if (score >= 50) return <AlertTriangle size={16} className="text-amber-500" />
     return <XCircle size={16} className="text-red-500" />
   }
 
@@ -228,13 +386,22 @@ export function DiagnosticTool() {
     return "Intervention requise"
   }
 
+  const allZones = diagnostic
+    ? [
+        ...diagnostic.vegetal.zones.map((z) => ({ ...z, category: "Vegetal" as const, color: "#22c55e", icon: Leaf })),
+        ...diagnostic.structure.zones.map((z) => ({ ...z, category: "Structure" as const, color: "#ef4444", icon: Wrench })),
+        ...diagnostic.etancheite.zones.map((z) => ({ ...z, category: "Etancheite" as const, color: "#3b82f6", icon: Droplets })),
+      ]
+    : []
+
   const progressSteps = [
     { key: "address", label: "Adresse", icon: MapPin },
     { key: "satellite", label: "Satellite", icon: Satellite },
+    { key: "scanning", label: "Scan", icon: Zap },
     { key: "analyzing", label: "Analyse IA", icon: Brain },
     { key: "results", label: "Resultats", icon: FileText },
   ]
-  const stepsOrder: Step[] = ["address", "satellite", "analyzing", "results"]
+  const stepsOrder: Step[] = ["address", "satellite", "scanning", "analyzing", "results"]
   const currentIndex = stepsOrder.indexOf(step)
 
   return (
@@ -255,39 +422,28 @@ export function DiagnosticTool() {
             <span className="text-gradient">par satellite</span>
           </h2>
           <p className="text-lg leading-relaxed text-muted-foreground">
-            Entrez simplement votre adresse. Notre IA analyse l{"'"}image
-            satellite de votre toit et vous fournit un diagnostic complet en
-            quelques secondes. Pas besoin d{"'"}echafaudage, d{"'"}echelle ou de
-            drone.
+            Entrez simplement votre adresse. Notre IA analyse l{"'"}image satellite
+            de votre toit et vous fournit un diagnostic complet en quelques secondes.
           </p>
         </div>
 
         {/* Progress Steps */}
-        <div className="mx-auto mb-12 flex max-w-2xl items-center justify-center gap-2">
+        <div className="mx-auto mb-12 flex max-w-3xl items-center justify-center gap-1">
           {progressSteps.map((s, i, arr) => {
             const stepIndex = stepsOrder.indexOf(s.key as Step)
             const isActive = stepIndex <= currentIndex
             return (
-              <div key={s.key} className="flex items-center gap-2">
+              <div key={s.key} className="flex items-center gap-1">
                 <div
-                  className={`flex items-center gap-2 rounded-full px-3 py-1.5 text-xs font-medium transition-all ${
-                    isActive
-                      ? "bg-primary/20 text-primary"
-                      : "bg-secondary text-muted-foreground"
+                  className={`flex items-center gap-1.5 rounded-full px-3 py-1.5 text-[10px] font-medium transition-all ${
+                    isActive ? "bg-primary/20 text-primary" : "bg-secondary text-muted-foreground"
                   }`}
                 >
-                  <s.icon size={12} />
+                  <s.icon size={10} />
                   <span className="hidden sm:inline">{s.label}</span>
                 </div>
                 {i < arr.length - 1 && (
-                  <ChevronRight
-                    size={14}
-                    className={
-                      isActive
-                        ? "text-primary"
-                        : "text-muted-foreground/30"
-                    }
-                  />
+                  <ChevronRight size={12} className={isActive ? "text-primary" : "text-muted-foreground/30"} />
                 )}
               </div>
             )
@@ -295,7 +451,7 @@ export function DiagnosticTool() {
         </div>
 
         {/* Address Input */}
-        {step !== "results" && (
+        {(step === "address" || step === "satellite") && (
           <div className="mx-auto max-w-2xl">
             <div className="rounded-2xl border border-border bg-card p-8">
               <div className="mb-6 flex items-center gap-3">
@@ -303,10 +459,7 @@ export function DiagnosticTool() {
                   <MapPin size={20} className="text-primary" />
                 </div>
                 <div>
-                  <h3
-                    className="text-lg font-semibold text-foreground"
-                    style={{ fontFamily: "var(--font-heading)" }}
-                  >
+                  <h3 className="text-lg font-semibold text-foreground" style={{ fontFamily: "var(--font-heading)" }}>
                     Entrez votre adresse
                   </h3>
                   <p className="text-sm text-muted-foreground">
@@ -317,19 +470,12 @@ export function DiagnosticTool() {
 
               <div className="flex gap-3">
                 <div className="relative flex-1">
-                  <Search
-                    size={16}
-                    className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground"
-                  />
+                  <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
                   <input
                     type="text"
                     value={address}
                     onChange={(e) => setAddress(e.target.value)}
-                    onKeyDown={(e) =>
-                      e.key === "Enter" &&
-                      step === "address" &&
-                      handleSearch()
-                    }
+                    onKeyDown={(e) => e.key === "Enter" && step === "address" && handleSearch()}
                     placeholder="12 rue de la Paix, 75002 Paris"
                     disabled={step !== "address"}
                     className="h-12 w-full rounded-xl border border-border bg-background pl-11 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
@@ -345,11 +491,6 @@ export function DiagnosticTool() {
                       <Loader2 size={16} className="animate-spin" />
                       <span className="hidden sm:inline">Satellite...</span>
                     </>
-                  ) : step === "analyzing" ? (
-                    <>
-                      <Loader2 size={16} className="animate-spin" />
-                      <span className="hidden sm:inline">Analyse...</span>
-                    </>
                   ) : (
                     <>
                       <Satellite size={16} />
@@ -359,7 +500,6 @@ export function DiagnosticTool() {
                 </button>
               </div>
 
-              {/* Loading: fetching satellite */}
               {step === "satellite" && (
                 <div className="mt-6 flex items-center gap-3 rounded-xl border border-primary/20 bg-primary/5 p-4">
                   <Loader2 size={20} className="animate-spin text-primary" />
@@ -374,32 +514,6 @@ export function DiagnosticTool() {
                 </div>
               )}
 
-              {/* Loading: analyzing */}
-              {step === "analyzing" && satelliteImages.length > 0 && (
-                <div className="mt-6 space-y-4">
-                  <div className="overflow-hidden rounded-xl border border-border">
-                    <img
-                      src={satelliteImages[0]?.image}
-                      alt="Vue satellite de la toiture"
-                      className="h-64 w-full object-cover"
-                    />
-                  </div>
-                  <div className="flex items-center gap-3 rounded-xl border border-primary/20 bg-primary/5 p-4">
-                    <Brain size={20} className="animate-pulse text-primary" />
-                    <div>
-                      <p className="text-sm font-medium text-foreground">
-                        Analyse IA en cours...
-                      </p>
-                      <p className="text-xs text-muted-foreground">
-                        Notre IA examine votre toiture : vegetation, structure,
-                        etancheite
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {/* Error */}
               {error && (
                 <div className="mt-4 flex items-center gap-3 rounded-xl border border-destructive/30 bg-destructive/10 p-4">
                   <XCircle size={20} className="shrink-0 text-destructive" />
@@ -407,38 +521,63 @@ export function DiagnosticTool() {
                 </div>
               )}
 
-              {/* Features */}
               <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
                 {[
-                  {
-                    icon: Satellite,
-                    label: "Vue satellite HD",
-                    desc: "Image haute resolution",
-                  },
-                  {
-                    icon: Shield,
-                    label: "Sans deplacement",
-                    desc: "100% a distance",
-                  },
-                  {
-                    icon: Zap,
-                    label: "Resultat en 30s",
-                    desc: "Analyse instantanee",
-                  },
+                  { icon: Satellite, label: "Vue satellite HD", desc: "Resolution x2 doublee" },
+                  { icon: Shield, label: "Sans deplacement", desc: "100% a distance" },
+                  { icon: Zap, label: "Resultat en 30s", desc: "Analyse instantanee" },
                 ].map((f) => (
-                  <div
-                    key={f.label}
-                    className="flex flex-col items-center gap-2 rounded-xl border border-border/50 bg-secondary/30 p-4 text-center"
-                  >
+                  <div key={f.label} className="flex flex-col items-center gap-2 rounded-xl border border-border/50 bg-secondary/30 p-4 text-center">
                     <f.icon size={20} className="text-primary" />
-                    <p className="text-xs font-medium text-foreground">
-                      {f.label}
-                    </p>
-                    <p className="text-[10px] text-muted-foreground">
-                      {f.desc}
-                    </p>
+                    <p className="text-xs font-medium text-foreground">{f.label}</p>
+                    <p className="text-[10px] text-muted-foreground">{f.desc}</p>
                   </div>
                 ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Scanning / Analyzing View */}
+        {(step === "scanning" || step === "analyzing") && satelliteImages.length > 0 && (
+          <div className="mx-auto max-w-4xl">
+            <div className="overflow-hidden rounded-2xl border border-primary/30 bg-card">
+              {/* Top HUD bar */}
+              <div className="flex items-center justify-between border-b border-border px-4 py-3">
+                <div className="flex items-center gap-3">
+                  <div className="h-2 w-2 animate-pulse rounded-full bg-primary" />
+                  <span className="font-mono text-xs font-medium text-primary">
+                    {step === "scanning" ? "SCAN TOITURE EN COURS" : "ANALYSE IA EN COURS"}
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <span className="font-mono text-[10px] text-muted-foreground">{formattedAddress}</span>
+                </div>
+              </div>
+
+              {/* Image with scanner */}
+              <div className="relative">
+                <img
+                  src={satelliteImages[0]?.image}
+                  alt="Vue satellite"
+                  className="w-full"
+                />
+                <ScannerOverlay phase={step} />
+              </div>
+
+              {/* Bottom status bar */}
+              <div className="flex items-center gap-4 border-t border-border px-4 py-3">
+                <div className="flex items-center gap-2">
+                  <Brain size={14} className="animate-pulse text-primary" />
+                  <span className="text-xs text-muted-foreground">
+                    {step === "scanning"
+                      ? "Scan lidar simule... Detection des contours de la toiture"
+                      : "Analyse IA multi-calques : vegetation, structure, etancheite"}
+                  </span>
+                </div>
+                <div className="ml-auto">
+                  <Loader2 size={14} className="animate-spin text-primary" />
+                </div>
               </div>
             </div>
           </div>
@@ -447,97 +586,63 @@ export function DiagnosticTool() {
         {/* Results */}
         {step === "results" && diagnostic && satelliteImages.length > 0 && (
           <div ref={resultsRef} className="animate-fade-up space-y-8">
-            {/* Address bar */}
+            {/* Address bar + Material detection */}
             <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-border bg-card p-4">
               <div className="flex items-center gap-3">
                 <MapPin size={18} className="text-primary" />
                 <div>
-                  <p className="text-sm font-medium text-foreground">
-                    {formattedAddress}
+                  <p className="text-sm font-medium text-foreground">{formattedAddress}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Diagnostic satellite - {new Date().toLocaleDateString("fr-FR")}
                   </p>
-                  <p className="text-xs text-muted-foreground">
-                    {diagnostic.toitureType && (
-                      <span className="mr-2 inline-flex items-center rounded-md bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
-                        {diagnostic.toitureType}
-                      </span>
-                    )}
-                    Diagnostic satellite -{" "}
-                    {new Date().toLocaleDateString("fr-FR")}
-                  </p>
-                  {diagnostic.toitureDescription && (
-                    <p className="mt-1 text-[11px] text-muted-foreground/70">
-                      {diagnostic.toitureDescription}
-                    </p>
-                  )}
                 </div>
               </div>
-              <button
-                onClick={handleReset}
-                className="flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
-              >
-                <RotateCcw size={12} />
-                Nouvelle analyse
-              </button>
+              <div className="flex items-center gap-3">
+                {diagnostic.toitureType && <MaterialBadge type={diagnostic.toitureType} />}
+                <button
+                  onClick={handleReset}
+                  className="flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-xs font-medium text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  <RotateCcw size={12} />
+                  Nouvelle analyse
+                </button>
+              </div>
             </div>
+
+            {/* Material description */}
+            {diagnostic.toitureDescription && (
+              <div className="rounded-xl border border-primary/20 bg-primary/5 p-4">
+                <p className="text-sm leading-relaxed text-foreground/80">
+                  {diagnostic.toitureDescription}
+                </p>
+              </div>
+            )}
 
             {/* Score global */}
             <div className="rounded-2xl border border-border bg-card p-8">
               <div className="mb-6 flex items-center gap-3">
                 <Shield size={20} className="text-primary" />
-                <h3
-                  className="text-xl font-bold text-foreground"
-                  style={{ fontFamily: "var(--font-heading)" }}
-                >
+                <h3 className="text-xl font-bold text-foreground" style={{ fontFamily: "var(--font-heading)" }}>
                   Score global de votre toiture
                 </h3>
               </div>
               <div className="grid gap-8 md:grid-cols-5">
                 <div className="flex flex-col items-center justify-center gap-3 md:col-span-2">
                   <div className="relative h-36 w-36">
-                    <svg
-                      className="h-36 w-36 -rotate-90"
-                      viewBox="0 0 120 120"
-                    >
+                    <svg className="h-36 w-36 -rotate-90" viewBox="0 0 120 120">
+                      <circle cx="60" cy="60" r="52" fill="none" stroke="currentColor" strokeWidth="8" className="text-border" />
                       <circle
-                        cx="60"
-                        cy="60"
-                        r="52"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="8"
-                        className="text-border"
-                      />
-                      <circle
-                        cx="60"
-                        cy="60"
-                        r="52"
-                        fill="none"
-                        stroke={
-                          diagnostic.scoreGlobal >= 75
-                            ? "#22c55e"
-                            : diagnostic.scoreGlobal >= 50
-                              ? "#f59e0b"
-                              : "#ef4444"
-                        }
-                        strokeWidth="8"
-                        strokeLinecap="round"
+                        cx="60" cy="60" r="52" fill="none"
+                        stroke={diagnostic.scoreGlobal >= 75 ? "#22c55e" : diagnostic.scoreGlobal >= 50 ? "#f59e0b" : "#ef4444"}
+                        strokeWidth="8" strokeLinecap="round"
                         strokeDasharray={2 * Math.PI * 52}
-                        strokeDashoffset={
-                          2 * Math.PI * 52 -
-                          (diagnostic.scoreGlobal / 100) * 2 * Math.PI * 52
-                        }
-                        style={{
-                          transition: "stroke-dashoffset 1.5s ease-out",
-                        }}
+                        strokeDashoffset={2 * Math.PI * 52 - (diagnostic.scoreGlobal / 100) * 2 * Math.PI * 52}
+                        style={{ transition: "stroke-dashoffset 1.5s ease-out" }}
                       />
                     </svg>
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
-                      <span className="text-4xl font-bold text-foreground">
-                        {diagnostic.scoreGlobal}
-                      </span>
-                      <span className="text-xs text-muted-foreground">
-                        /100
-                      </span>
+                      <span className="text-4xl font-bold text-foreground">{diagnostic.scoreGlobal}</span>
+                      <span className="text-xs text-muted-foreground">/100</span>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
@@ -548,24 +653,9 @@ export function DiagnosticTool() {
                   </div>
                 </div>
                 <div className="flex items-center justify-center gap-8 md:col-span-3">
-                  <ScoreGauge
-                    score={diagnostic.vegetal.score}
-                    label="Vegetal"
-                    icon={Leaf}
-                    color="#22c55e"
-                  />
-                  <ScoreGauge
-                    score={diagnostic.structure.score}
-                    label="Structure"
-                    icon={Wrench}
-                    color="#3b82f6"
-                  />
-                  <ScoreGauge
-                    score={diagnostic.etancheite.score}
-                    label="Etancheite"
-                    icon={Droplets}
-                    color="#06b6d4"
-                  />
+                  <ScoreGauge score={diagnostic.vegetal.score} label="Vegetal" icon={Leaf} color="#22c55e" />
+                  <ScoreGauge score={diagnostic.structure.score} label="Structure" icon={Wrench} color="#ef4444" />
+                  <ScoreGauge score={diagnostic.etancheite.score} label="Etancheite" icon={Droplets} color="#3b82f6" />
                 </div>
               </div>
               <p className="mt-6 rounded-xl bg-secondary/50 p-4 text-sm leading-relaxed text-muted-foreground">
@@ -573,29 +663,27 @@ export function DiagnosticTool() {
               </p>
             </div>
 
-            {/* Image + Layers + Details */}
-            <div className="grid gap-8 lg:grid-cols-3">
+            {/* Image + Zones + Sidebar */}
+            <div className="grid gap-6 lg:grid-cols-3">
+              {/* Satellite image with overlay zones */}
               <div className="lg:col-span-2">
-                <div className="rounded-2xl border border-border bg-card p-4">
-                  <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
+                <div className="overflow-hidden rounded-2xl border border-border bg-card">
+                  {/* Toolbar */}
+                  <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-4 py-3">
                     <div className="flex items-center gap-3">
-                      <Layers size={16} className="text-primary" />
-                      <span className="text-sm font-medium text-foreground">
-                        Vue satellite avec calques
-                      </span>
+                      <Layers size={14} className="text-primary" />
+                      <span className="text-xs font-medium text-foreground">Vue satellite avec calques</span>
                       {satelliteImages.length > 1 && (
-                        <div className="flex items-center gap-1 rounded-lg border border-border bg-secondary/50 p-0.5">
+                        <div className="flex items-center gap-0.5 rounded-lg border border-border bg-secondary/50 p-0.5">
                           {satelliteImages.map((img, i) => (
                             <button
                               key={img.zoom}
                               onClick={() => setActiveZoom(i)}
-                              className={`flex items-center gap-1 rounded-md px-2 py-1 text-[10px] font-medium transition-all ${
-                                activeZoom === i
-                                  ? "bg-primary text-primary-foreground"
-                                  : "text-muted-foreground hover:text-foreground"
+                              className={`flex items-center gap-1 rounded-md px-2 py-1 text-[9px] font-medium transition-all ${
+                                activeZoom === i ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
                               }`}
                             >
-                              {i === 0 ? <ZoomIn size={10} /> : i === satelliteImages.length - 1 ? <ZoomOut size={10} /> : null}
+                              {i === 0 ? <ZoomIn size={8} /> : i === satelliteImages.length - 1 ? <ZoomOut size={8} /> : null}
                               {img.label}
                             </button>
                           ))}
@@ -604,271 +692,122 @@ export function DiagnosticTool() {
                     </div>
                     <div className="flex items-center gap-1">
                       {[
-                        {
-                          key: "vegetal" as const,
-                          label: "Vegetal",
-                          color: "#22c55e",
-                        },
-                        {
-                          key: "structure" as const,
-                          label: "Structure",
-                          color: "#3b82f6",
-                        },
-                        {
-                          key: "etancheite" as const,
-                          label: "Etancheite",
-                          color: "#06b6d4",
-                        },
+                        { key: "vegetal" as const, label: "Vegetal", color: "#22c55e" },
+                        { key: "structure" as const, label: "Structure", color: "#ef4444" },
+                        { key: "etancheite" as const, label: "Etancheite", color: "#3b82f6" },
                       ].map((l) => (
                         <button
                           key={l.key}
                           onClick={() => toggleLayer(l.key)}
-                          className="flex items-center gap-1.5 rounded-lg px-2.5 py-1.5 text-xs font-medium transition-all"
+                          className="flex items-center gap-1 rounded-lg px-2 py-1.5 text-[10px] font-medium transition-all"
                           style={{
-                            backgroundColor: layerState[l.key]
-                              ? `${l.color}20`
-                              : "transparent",
-                            color: layerState[l.key]
-                              ? l.color
-                              : "var(--color-muted-foreground)",
+                            backgroundColor: layerState[l.key] ? `${l.color}20` : "transparent",
+                            color: layerState[l.key] ? l.color : "var(--color-muted-foreground)",
                             border: `1px solid ${layerState[l.key] ? l.color : "var(--color-border)"}`,
                           }}
                         >
-                          {layerState[l.key] ? (
-                            <Eye size={10} />
-                          ) : (
-                            <EyeOff size={10} />
-                          )}
+                          {layerState[l.key] ? <Eye size={10} /> : <EyeOff size={10} />}
                           {l.label}
                         </button>
                       ))}
                     </div>
                   </div>
-                  <div className="relative overflow-hidden rounded-xl">
+
+                  {/* Image with polygon overlays */}
+                  <div className="relative">
                     <img
                       src={satelliteImages[activeZoom]?.image || satelliteImages[0]?.image}
                       alt="Vue satellite de la toiture"
                       className="w-full"
                       crossOrigin="anonymous"
                     />
+                    {/* Tech grid overlay */}
+                    <div
+                      className="pointer-events-none absolute inset-0"
+                      style={{
+                        backgroundImage:
+                          "linear-gradient(rgba(59,130,246,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(59,130,246,0.04) 1px, transparent 1px)",
+                        backgroundSize: "30px 30px",
+                      }}
+                    />
+
+                    {/* Zone overlays with colored borders */}
                     {diagnostic.vegetal.zones.map((z, i) => (
-                      <ZoneOverlay
+                      <ZonePolygon
                         key={`v-${i}`}
                         zone={z}
                         color="#22c55e"
                         visible={layerState.vegetal}
+                        label={z.label}
+                        delay={i * 200}
                       />
                     ))}
                     {diagnostic.structure.zones.map((z, i) => (
-                      <ZoneOverlay
+                      <ZonePolygon
                         key={`s-${i}`}
                         zone={z}
-                        color="#3b82f6"
+                        color="#ef4444"
                         visible={layerState.structure}
+                        label={z.label}
+                        delay={(diagnostic.vegetal.zones.length + i) * 200}
                       />
                     ))}
                     {diagnostic.etancheite.zones.map((z, i) => (
-                      <ZoneOverlay
+                      <ZonePolygon
                         key={`e-${i}`}
                         zone={z}
-                        color="#06b6d4"
+                        color="#3b82f6"
                         visible={layerState.etancheite}
+                        label={z.label}
+                        delay={(diagnostic.vegetal.zones.length + diagnostic.structure.zones.length + i) * 200}
                       />
                     ))}
                   </div>
                 </div>
               </div>
 
-              {/* Detail tabs */}
-              <div className="space-y-4">
-                <div className="flex rounded-xl border border-border bg-card p-1">
-                  {(
-                    [
-                      { key: "overview", label: "Apercu" },
-                      { key: "vegetal", label: "Vegetal" },
-                      { key: "structure", label: "Structure" },
-                      { key: "etancheite", label: "Etancheite" },
-                    ] as const
-                  ).map((t) => (
-                    <button
-                      key={t.key}
-                      onClick={() => setActiveTab(t.key)}
-                      className={`flex-1 rounded-lg px-2 py-2 text-xs font-medium transition-all ${
-                        activeTab === t.key
-                          ? "bg-primary text-primary-foreground"
-                          : "text-muted-foreground hover:text-foreground"
-                      }`}
-                    >
-                      {t.label}
-                    </button>
-                  ))}
+              {/* Sidebar: Anomaly list with quote buttons */}
+              <div className="space-y-3">
+                <div className="rounded-xl border border-border bg-card p-4">
+                  <div className="mb-3 flex items-center gap-2">
+                    <AlertTriangle size={14} className="text-accent" />
+                    <span className="text-sm font-bold text-foreground">
+                      Anomalies detectees ({allZones.length})
+                    </span>
+                  </div>
+                  {allZones.length === 0 && (
+                    <div className="flex flex-col items-center gap-2 py-6">
+                      <CheckCircle2 size={24} className="text-green-500" />
+                      <p className="text-center text-sm text-green-500">Aucune anomalie detectee</p>
+                      <p className="text-center text-[10px] text-muted-foreground">
+                        Votre toiture semble en bon etat
+                      </p>
+                    </div>
+                  )}
                 </div>
 
-                {activeTab === "overview" && (
-                  <div className="space-y-3">
-                    <p className="rounded-xl border border-border bg-card p-4 text-sm font-medium text-foreground">
-                      Recommandations prioritaires
-                    </p>
+                {allZones.map((z, i) => (
+                  <AnomalyCard
+                    key={i}
+                    zone={z}
+                    color={z.color}
+                    category={z.category}
+                    icon={z.icon}
+                  />
+                ))}
+
+                {/* Recommendations */}
+                {diagnostic.recommandations.length > 0 && (
+                  <div className="rounded-xl border border-border bg-card p-4">
+                    <p className="mb-3 text-sm font-bold text-foreground">Recommandations</p>
                     {diagnostic.recommandations.map((r, i) => (
-                      <div
-                        key={i}
-                        className="flex gap-3 rounded-xl border border-border bg-card p-4"
-                      >
-                        <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-primary/10 text-xs font-bold text-primary">
+                      <div key={i} className="mb-2 flex gap-2 last:mb-0">
+                        <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-primary/10 text-[10px] font-bold text-primary">
                           {i + 1}
                         </span>
-                        <p className="text-sm leading-relaxed text-muted-foreground">
-                          {r}
-                        </p>
+                        <p className="text-xs leading-relaxed text-muted-foreground">{r}</p>
                       </div>
                     ))}
-                  </div>
-                )}
-
-                {activeTab === "vegetal" && (
-                  <div className="space-y-3">
-                    <div className="rounded-xl border border-border bg-card p-4">
-                      <div className="mb-2 flex items-center gap-2">
-                        <Leaf size={14} className="text-green-500" />
-                        <span className="text-sm font-semibold text-foreground">
-                          Diagnostic vegetal
-                        </span>
-                        <span
-                          className="ml-auto text-xs font-medium"
-                          style={{
-                            color:
-                              diagnostic.vegetal.score >= 75
-                                ? "#22c55e"
-                                : diagnostic.vegetal.score >= 50
-                                  ? "#f59e0b"
-                                  : "#ef4444",
-                          }}
-                        >
-                          {diagnostic.vegetal.score}/100
-                        </span>
-                      </div>
-                      <p className="text-sm leading-relaxed text-muted-foreground">
-                        {diagnostic.vegetal.description}
-                      </p>
-                    </div>
-                    {diagnostic.vegetal.zones.map((z, i) => (
-                      <div
-                        key={i}
-                        className="flex items-start gap-3 rounded-xl border border-green-500/20 bg-green-500/5 p-3"
-                      >
-                        <span
-                          className={`mt-0.5 rounded px-1.5 py-0.5 text-[10px] font-bold text-white ${z.severity === "severe" ? "bg-red-500" : z.severity === "modere" ? "bg-amber-500" : "bg-green-500"}`}
-                        >
-                          {z.severity.toUpperCase()}
-                        </span>
-                        <span className="text-xs text-muted-foreground">
-                          {z.label}
-                        </span>
-                      </div>
-                    ))}
-                    {diagnostic.vegetal.zones.length === 0 && (
-                      <p className="rounded-xl bg-green-500/5 p-4 text-center text-sm text-green-500">
-                        Aucun probleme vegetal detecte
-                      </p>
-                    )}
-                  </div>
-                )}
-
-                {activeTab === "structure" && (
-                  <div className="space-y-3">
-                    <div className="rounded-xl border border-border bg-card p-4">
-                      <div className="mb-2 flex items-center gap-2">
-                        <Wrench size={14} className="text-blue-500" />
-                        <span className="text-sm font-semibold text-foreground">
-                          Diagnostic structurel
-                        </span>
-                        <span
-                          className="ml-auto text-xs font-medium"
-                          style={{
-                            color:
-                              diagnostic.structure.score >= 75
-                                ? "#22c55e"
-                                : diagnostic.structure.score >= 50
-                                  ? "#f59e0b"
-                                  : "#ef4444",
-                          }}
-                        >
-                          {diagnostic.structure.score}/100
-                        </span>
-                      </div>
-                      <p className="text-sm leading-relaxed text-muted-foreground">
-                        {diagnostic.structure.description}
-                      </p>
-                    </div>
-                    {diagnostic.structure.zones.map((z, i) => (
-                      <div
-                        key={i}
-                        className="flex items-start gap-3 rounded-xl border border-blue-500/20 bg-blue-500/5 p-3"
-                      >
-                        <span
-                          className={`mt-0.5 rounded px-1.5 py-0.5 text-[10px] font-bold text-white ${z.severity === "severe" ? "bg-red-500" : z.severity === "modere" ? "bg-amber-500" : "bg-blue-500"}`}
-                        >
-                          {z.severity.toUpperCase()}
-                        </span>
-                        <span className="text-xs text-muted-foreground">
-                          {z.label}
-                        </span>
-                      </div>
-                    ))}
-                    {diagnostic.structure.zones.length === 0 && (
-                      <p className="rounded-xl bg-blue-500/5 p-4 text-center text-sm text-blue-500">
-                        Aucun probleme structurel detecte
-                      </p>
-                    )}
-                  </div>
-                )}
-
-                {activeTab === "etancheite" && (
-                  <div className="space-y-3">
-                    <div className="rounded-xl border border-border bg-card p-4">
-                      <div className="mb-2 flex items-center gap-2">
-                        <Droplets size={14} className="text-cyan-500" />
-                        <span className="text-sm font-semibold text-foreground">
-                          Diagnostic etancheite
-                        </span>
-                        <span
-                          className="ml-auto text-xs font-medium"
-                          style={{
-                            color:
-                              diagnostic.etancheite.score >= 75
-                                ? "#22c55e"
-                                : diagnostic.etancheite.score >= 50
-                                  ? "#f59e0b"
-                                  : "#ef4444",
-                          }}
-                        >
-                          {diagnostic.etancheite.score}/100
-                        </span>
-                      </div>
-                      <p className="text-sm leading-relaxed text-muted-foreground">
-                        {diagnostic.etancheite.description}
-                      </p>
-                    </div>
-                    {diagnostic.etancheite.zones.map((z, i) => (
-                      <div
-                        key={i}
-                        className="flex items-start gap-3 rounded-xl border border-cyan-500/20 bg-cyan-500/5 p-3"
-                      >
-                        <span
-                          className={`mt-0.5 rounded px-1.5 py-0.5 text-[10px] font-bold text-white ${z.severity === "severe" ? "bg-red-500" : z.severity === "modere" ? "bg-amber-500" : "bg-cyan-500"}`}
-                        >
-                          {z.severity.toUpperCase()}
-                        </span>
-                        <span className="text-xs text-muted-foreground">
-                          {z.label}
-                        </span>
-                      </div>
-                    ))}
-                    {diagnostic.etancheite.zones.length === 0 && (
-                      <p className="rounded-xl bg-cyan-500/5 p-4 text-center text-sm text-cyan-500">
-                        Aucun probleme d{"'"}etancheite detecte
-                      </p>
-                    )}
                   </div>
                 )}
               </div>
@@ -876,27 +815,25 @@ export function DiagnosticTool() {
 
             {/* CTA */}
             <div className="rounded-2xl border border-primary/30 bg-gradient-to-r from-primary/10 to-transparent p-8 text-center">
-              <h3
-                className="mb-2 text-2xl font-bold text-foreground"
-                style={{ fontFamily: "var(--font-heading)" }}
-              >
+              <h3 className="mb-2 text-2xl font-bold text-foreground" style={{ fontFamily: "var(--font-heading)" }}>
                 Besoin d{"'"}une intervention ?
               </h3>
               <p className="mb-6 text-muted-foreground">
-                Nos experts peuvent intervenir sur toute la France pour reparer
-                votre toiture.
+                Nos experts peuvent intervenir sur toute la France pour reparer votre toiture.
               </p>
               <div className="flex flex-wrap items-center justify-center gap-4">
                 <a
                   href="tel:+33233311979"
                   className="flex items-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90"
                 >
+                  <Phone size={16} />
                   Appeler le 02 33 31 19 79
                 </a>
                 <a
                   href="#contact"
                   className="flex items-center gap-2 rounded-xl border border-border px-6 py-3 text-sm font-medium text-foreground transition-all hover:bg-secondary"
                 >
+                  <Send size={16} />
                   Demander un devis
                 </a>
               </div>
