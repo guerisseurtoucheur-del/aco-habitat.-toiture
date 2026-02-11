@@ -29,6 +29,8 @@ import {
   ScanLine,
   Crosshair,
   Navigation,
+  Thermometer,
+  Flame,
 } from "lucide-react"
 import type { DiagnosticResult, DiagnosticZone } from "@/lib/diagnostic-types"
 
@@ -410,6 +412,165 @@ function MaterialBadge({ type }: { type: string }) {
   )
 }
 
+/* ── Thermal Overlay ── */
+function ThermalOverlay({
+  zones,
+  visible,
+}: {
+  zones: { x: number; y: number; width: number; height: number; intensite: number; label: string }[]
+  visible: boolean
+}) {
+  if (!visible) return null
+  return (
+    <div className="pointer-events-none absolute inset-0 z-10">
+      {/* Full image thermal tint: blue-to-red gradient */}
+      <div
+        className="absolute inset-0 mix-blend-multiply"
+        style={{
+          background: "linear-gradient(135deg, rgba(59,130,246,0.35) 0%, rgba(139,92,246,0.2) 30%, rgba(249,115,22,0.25) 60%, rgba(239,68,68,0.35) 100%)",
+        }}
+      />
+      {/* Cool zones = blue tinted areas */}
+      <div
+        className="absolute inset-0 mix-blend-screen"
+        style={{
+          background: "radial-gradient(ellipse at 30% 30%, rgba(59,130,246,0.15), transparent 50%), radial-gradient(ellipse at 70% 70%, rgba(59,130,246,0.1), transparent 50%)",
+        }}
+      />
+
+      {/* Hot zones with labels */}
+      {zones.map((zone, i) => (
+        <div
+          key={i}
+          className="animate-zone-reveal absolute"
+          style={{
+            left: `${zone.x}%`,
+            top: `${zone.y}%`,
+            width: `${zone.width}%`,
+            height: `${zone.height}%`,
+            animationDelay: `${i * 300}ms`,
+          }}
+        >
+          {/* Hot zone radial glow */}
+          <div
+            className="absolute inset-0 rounded-md"
+            style={{
+              background: `radial-gradient(ellipse at center, rgba(239,68,68,${0.2 + zone.intensite / 100}), rgba(249,115,22,${0.1 + zone.intensite / 200}), transparent 70%)`,
+              boxShadow: `inset 0 0 20px rgba(239,68,68,${0.15 + zone.intensite / 150})`,
+            }}
+          />
+          {/* Pulsing border */}
+          <div
+            className="absolute inset-0 animate-pulse rounded-md border-2"
+            style={{ borderColor: `rgba(239,68,68,${0.4 + zone.intensite / 100})` }}
+          />
+
+          {/* Label */}
+          <div className="absolute -top-8 left-0 flex items-center gap-1.5 whitespace-nowrap rounded bg-red-600 px-2 py-1 shadow-lg shadow-red-900/40">
+            <Flame size={9} className="text-white" />
+            <span className="text-[9px] font-bold tracking-wide text-white">
+              Perte de chaleur : +{zone.intensite}%
+            </span>
+          </div>
+
+          {/* Center heat indicator */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+            <div className="animate-hotspot-ping flex h-6 w-6 items-center justify-center rounded-full bg-red-500/30 ring-2 ring-red-500/50">
+              <Thermometer size={10} className="text-red-400" />
+            </div>
+          </div>
+        </div>
+      ))}
+
+      {/* Thermal scale legend */}
+      <div className="absolute bottom-3 right-3 flex items-center gap-2 rounded-lg bg-background/90 px-3 py-2 backdrop-blur-md">
+        <span className="text-[9px] font-semibold text-blue-400">Froid</span>
+        <div
+          className="h-2 w-20 rounded-full"
+          style={{ background: "linear-gradient(to right, #3b82f6, #8b5cf6, #f97316, #ef4444)" }}
+        />
+        <span className="text-[9px] font-semibold text-red-400">Chaud</span>
+      </div>
+    </div>
+  )
+}
+
+/* ── Thermal Score Card ── */
+function ThermalScoreCard({
+  scoreIsolation,
+  economieEstimee,
+  commentaire,
+  surface,
+}: {
+  scoreIsolation: number
+  economieEstimee: number
+  commentaire: string
+  surface: number
+}) {
+  const scoreColor = scoreIsolation >= 70 ? "#22c55e" : scoreIsolation >= 40 ? "#f59e0b" : "#ef4444"
+  const scoreLabel = scoreIsolation >= 70 ? "Bonne isolation" : scoreIsolation >= 40 ? "Isolation moyenne" : "Isolation insuffisante"
+
+  return (
+    <div className="overflow-hidden rounded-xl border border-orange-500/30 bg-card">
+      {/* Header */}
+      <div className="flex items-center gap-2 border-b border-border bg-gradient-to-r from-orange-500/10 to-red-500/10 px-4 py-3">
+        <Thermometer size={14} className="text-orange-400" />
+        <span className="text-sm font-bold text-foreground">Analyse Thermique</span>
+      </div>
+
+      <div className="space-y-4 p-4">
+        {/* Isolation Score */}
+        <div className="flex items-center gap-4">
+          <div className="relative h-16 w-16 shrink-0">
+            <svg className="h-16 w-16 -rotate-90" viewBox="0 0 60 60">
+              <circle cx="30" cy="30" r="24" fill="none" stroke="currentColor" strokeWidth="5" className="text-border" />
+              <circle
+                cx="30" cy="30" r="24" fill="none"
+                stroke={scoreColor}
+                strokeWidth="5" strokeLinecap="round"
+                strokeDasharray={2 * Math.PI * 24}
+                strokeDashoffset={2 * Math.PI * 24 - (scoreIsolation / 100) * 2 * Math.PI * 24}
+                style={{ transition: "stroke-dashoffset 1.5s ease-out" }}
+              />
+            </svg>
+            <div className="absolute inset-0 flex flex-col items-center justify-center">
+              <span className="text-lg font-bold text-foreground">{scoreIsolation}</span>
+            </div>
+          </div>
+          <div>
+            <p className="text-xs text-muted-foreground">Score d{"'"}isolation</p>
+            <p className="text-sm font-semibold" style={{ color: scoreColor }}>{scoreLabel}</p>
+          </div>
+        </div>
+
+        {/* Estimated savings */}
+        <div className="rounded-lg bg-gradient-to-r from-green-500/10 to-emerald-500/10 p-3">
+          <p className="text-[10px] font-medium text-muted-foreground">Economie annuelle estimee avec renovation</p>
+          <div className="mt-1 flex items-baseline gap-1">
+            <span className="text-2xl font-bold text-green-500">{economieEstimee.toLocaleString("fr-FR")}</span>
+            <span className="text-sm font-semibold text-green-500">{"\u20AC/an"}</span>
+          </div>
+          <p className="mt-1 text-[10px] text-muted-foreground">
+            Base sur {surface} m{"\u00B2"} de toiture
+          </p>
+        </div>
+
+        {/* Comment */}
+        <p className="text-xs leading-relaxed text-muted-foreground">{commentaire}</p>
+
+        {/* CTA */}
+        <a
+          href="#contact"
+          className="flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-orange-500 to-red-500 px-4 py-2.5 text-xs font-semibold text-white transition-all hover:shadow-lg hover:shadow-orange-500/25"
+        >
+          <Flame size={12} />
+          Demander un bilan energetique
+        </a>
+      </div>
+    </div>
+  )
+}
+
 /* ── Main Component ── */
 export function DiagnosticTool() {
   const [step, setStep] = useState<Step>("address")
@@ -421,6 +582,7 @@ export function DiagnosticTool() {
   const dropdownRef = useRef<HTMLDivElement>(null)
   const [satelliteImages, setSatelliteImages] = useState<SatelliteImage[]>([])
   const [activeZoom, setActiveZoom] = useState(0)
+  const [thermalMode, setThermalMode] = useState(false)
   const [formattedAddress, setFormattedAddress] = useState("")
   const [diagnostic, setDiagnostic] = useState<DiagnosticResult | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -598,7 +760,8 @@ export function DiagnosticTool() {
   setShowDropdown(false)
   setSatelliteImages([])
   setActiveZoom(0)
-    setDiagnostic(null)
+  setThermalMode(false)
+  setDiagnostic(null)
     setError(null)
     setLayerState({ vegetal: true, structure: true, etancheite: true })
   }
@@ -1060,6 +1223,18 @@ export function DiagnosticTool() {
                           {l.label}
                         </button>
                       ))}
+                      <div className="mx-1 h-4 w-px bg-border" />
+                      <button
+                        onClick={() => setThermalMode(!thermalMode)}
+                        className={`flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-[10px] font-semibold transition-all ${
+                          thermalMode
+                            ? "border border-orange-500 bg-gradient-to-r from-orange-500/20 to-red-500/20 text-orange-400"
+                            : "border border-border text-muted-foreground hover:border-orange-500/30 hover:text-orange-400"
+                        }`}
+                      >
+                        <Thermometer size={10} />
+                        Thermique
+                      </button>
                     </div>
                   </div>
 
@@ -1113,6 +1288,14 @@ export function DiagnosticTool() {
                         delay={(diagnostic.vegetal.zones.length + diagnostic.structure.zones.length + i) * 200}
                       />
                     ))}
+
+                    {/* Thermal overlay */}
+                    {diagnostic.thermique && (
+                      <ThermalOverlay
+                        zones={diagnostic.thermique.pertesChaleur}
+                        visible={thermalMode}
+                      />
+                    )}
 
                     {/* Confidence Badge - bottom of image */}
                     <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
@@ -1180,6 +1363,16 @@ export function DiagnosticTool() {
                       </div>
                     ))}
                   </div>
+                )}
+
+                {/* Thermal Score Card */}
+                {diagnostic.thermique && (
+                  <ThermalScoreCard
+                    scoreIsolation={diagnostic.thermique.scoreIsolation}
+                    economieEstimee={diagnostic.thermique.economieEstimee}
+                    commentaire={diagnostic.thermique.commentaire}
+                    surface={diagnostic.surfaceEstimeeM2 || 80}
+                  />
                 )}
               </div>
             </div>

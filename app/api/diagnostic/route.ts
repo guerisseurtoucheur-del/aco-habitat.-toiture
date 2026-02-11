@@ -86,6 +86,17 @@ CALQUES :
 2. STRUCTURE : problemes physiques adaptes au type identifie
 3. ETANCHEITE : humidite, eau stagnante, joints deteriores
 
+ANALYSE THERMIQUE :
+- Evalue le score d'isolation (0-100) selon le type de toiture et son etat apparent :
+  * Tuiles anciennes sans renovation = 30-50
+  * Terrasse plate non isolee = 20-40
+  * Toiture recente ou bien entretenue = 60-85
+  * Batiment ancien visible = penalise le score
+- Identifie 1-4 zones de perte de chaleur (jonctions, zones deteriorees, rives, points faibles)
+- Chaque zone a une intensite de perte en % (5-30%)
+- Calcule l'economie annuelle estimee : (100 - scoreIsolation) * surfaceM2 * 0.8 euros environ
+- Donne un commentaire adapte au type de toiture
+
 Les coordonnees (x, y, width, height) doivent pointer sur des zones REELLES de la toiture.
 Le champ "toitureType" doit reprendre exactement le type identifie dans l'observation.
 Reponds en francais.
