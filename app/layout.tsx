@@ -1,12 +1,8 @@
 import type { Metadata, Viewport } from "next"
-import { Inter, Space_Grotesk } from "next/font/google"
+import { Inter } from "next/font/google"
 import "./globals.css"
 
 const inter = Inter({
-  subsets: ["latin"],
-})
-
-const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
 })
 
@@ -28,7 +24,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="fr" className="dark" suppressHydrationWarning>
+    <html lang="fr" suppressHydrationWarning>
       <body className="font-sans min-h-screen">
         {children}
       </body>

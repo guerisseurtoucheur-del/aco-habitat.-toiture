@@ -1,30 +1,28 @@
 @import "tailwindcss";
 
-@custom-variant dark (&:is(.dark *));
-
 @theme inline {
   --font-sans: 'Inter', 'Inter Fallback', ui-sans-serif, system-ui, sans-serif;
   --font-heading: 'Space Grotesk', 'Space Grotesk Fallback', ui-sans-serif, system-ui, sans-serif;
 
-  --color-background: var(--bg);
-  --color-foreground: var(--fg);
-  --color-card: var(--card-bg);
-  --color-card-foreground: var(--card-fg);
-  --color-popover: var(--popover-bg);
-  --color-popover-foreground: var(--popover-fg);
-  --color-primary: var(--primary-bg);
-  --color-primary-foreground: var(--primary-fg);
-  --color-secondary: var(--secondary-bg);
-  --color-secondary-foreground: var(--secondary-fg);
-  --color-muted: var(--muted-bg);
-  --color-muted-foreground: var(--muted-fg);
-  --color-accent: var(--accent-bg);
-  --color-accent-foreground: var(--accent-fg);
-  --color-destructive: var(--destructive-bg);
-  --color-destructive-foreground: var(--destructive-fg);
-  --color-border: var(--border-color);
-  --color-input: var(--input-color);
-  --color-ring: var(--ring-color);
+  --color-background: #0a0f1a;
+  --color-foreground: #e2e8f0;
+  --color-card: #111827;
+  --color-card-foreground: #e2e8f0;
+  --color-popover: #111827;
+  --color-popover-foreground: #e2e8f0;
+  --color-primary: #3b82f6;
+  --color-primary-foreground: #ffffff;
+  --color-secondary: #1e293b;
+  --color-secondary-foreground: #cbd5e1;
+  --color-muted: #1a2332;
+  --color-muted-foreground: #8896a8;
+  --color-accent: #e8872a;
+  --color-accent-foreground: #ffffff;
+  --color-destructive: #dc2626;
+  --color-destructive-foreground: #ffffff;
+  --color-border: #1e293b;
+  --color-input: #1e293b;
+  --color-ring: #3b82f6;
 
   --color-vegetal-red: #dc3545;
   --color-vegetal-orange: #e8872a;
@@ -35,50 +33,6 @@
   --radius-md: 0.5rem;
   --radius-lg: 0.625rem;
   --radius-xl: 1rem;
-}
-
-:root {
-  --bg: #ffffff;
-  --fg: #1a1f2e;
-  --card-bg: #f8f9fb;
-  --card-fg: #1a1f2e;
-  --popover-bg: #ffffff;
-  --popover-fg: #1a1f2e;
-  --primary-bg: #2563eb;
-  --primary-fg: #ffffff;
-  --secondary-bg: #e8ecf1;
-  --secondary-fg: #2a3040;
-  --muted-bg: #f0f2f5;
-  --muted-fg: #6b7280;
-  --accent-bg: #e8872a;
-  --accent-fg: #ffffff;
-  --destructive-bg: #dc2626;
-  --destructive-fg: #ffffff;
-  --border-color: #dde1e8;
-  --input-color: #dde1e8;
-  --ring-color: #2563eb;
-}
-
-.dark {
-  --bg: #0a0f1a;
-  --fg: #e2e8f0;
-  --card-bg: #111827;
-  --card-fg: #e2e8f0;
-  --popover-bg: #111827;
-  --popover-fg: #e2e8f0;
-  --primary-bg: #3b82f6;
-  --primary-fg: #ffffff;
-  --secondary-bg: #1e293b;
-  --secondary-fg: #cbd5e1;
-  --muted-bg: #1a2332;
-  --muted-fg: #8896a8;
-  --accent-bg: #e8872a;
-  --accent-fg: #ffffff;
-  --destructive-bg: #dc2626;
-  --destructive-fg: #ffffff;
-  --border-color: #1e293b;
-  --input-color: #1e293b;
-  --ring-color: #3b82f6;
 }
 
 @layer base {
