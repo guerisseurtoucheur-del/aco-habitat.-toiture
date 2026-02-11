@@ -8,6 +8,42 @@ export async function POST(req: Request) {
     return Response.json({ error: "Aucune image fournie" }, { status: 400 })
   }
 
+  // Step 1: First pass - ask the AI to describe what it ACTUALLY sees (no structured output)
+  // This forces honest observation before diagnosis
+  const { text: observation } = await generateText({
+    model: "openai/gpt-4o",
+    messages: [
+      {
+        role: "system",
+        content: `Tu es un observateur expert en batiment. Ton UNIQUE travail est de DECRIRE factuellement ce que tu vois sur cette image satellite vue du dessus. Tu ne fais AUCUN diagnostic, AUCUNE supposition.
+
+Reponds EXACTEMENT dans ce format :
+FORME DU TOIT : [plat / en pente / multi-pans / arrondi / autre]
+SURFACE : [ce que tu vois : lisse et uniforme / avec des rangees regulieres / ondulee / etc.]
+COULEUR DOMINANTE : [gris fonce / rouge-orange / gris clair / noir / etc.]
+MATERIAU PROBABLE : [terrasse plate bitume-membrane / tuiles terre cuite / ardoises / zinc / bac acier / fibrociment / indetermine]
+ELEMENTS VISIBLES : [liste de ce que tu vois reellement : antennes, cheminees, bouches d'aeration, panneaux solaires, etc.]
+ANOMALIES VISIBLES : [liste de ce que tu vois d'anormal, ou "aucune anomalie visible a cette resolution"]
+VEGETATION SUR LE TOIT : [oui avec description / non / impossible a determiner]
+QUALITE IMAGE : [bonne / moyenne / faible - la resolution permet-elle de voir des details ?]`,
+      },
+      {
+        role: "user",
+        content: [
+          {
+            type: "text",
+            text: "Decris FACTUELLEMENT ce que tu vois sur cette image satellite. Ne suppose rien, ne diagnostique rien. Decris seulement.",
+          },
+          {
+            type: "image",
+            image: image,
+          },
+        ],
+      },
+    ],
+  })
+
+  // Step 2: Use the factual observation to produce an accurate diagnostic
   const { output } = await generateText({
     model: "openai/gpt-4o",
     output: Output.object({
@@ -16,48 +52,43 @@ export async function POST(req: Request) {
     messages: [
       {
         role: "system",
-        content: `Tu es un expert en diagnostic de toiture pour ACO-HABITAT. Tu analyses des images SATELLITE vues du dessus.
+        content: `Tu es un expert en diagnostic de toiture pour ACO-HABITAT.
 
-REGLE ABSOLUE N1 : NE JAMAIS INVENTER. Tu ne rapportes QUE ce que tu vois REELLEMENT sur l'image. Si tu ne vois pas un probleme clairement, tu ne le mentionnes pas. Mieux vaut un rapport avec peu de problemes qu'un rapport avec des faux positifs.
+VOICI L'OBSERVATION FACTUELLE DE L'IMAGE (faite par un observateur independant) :
+---
+${observation}
+---
 
-ETAPE 1 - IDENTIFICATION OBLIGATOIRE DU TYPE DE TOITURE :
-Avant toute analyse, tu DOIS identifier le type de toiture visible :
-- Tuiles (terre cuite, beton) : motif regulier en rangees, couleur rouge/orange/brun/gris
-- Ardoises : petites plaques sombres/grises, motif regulier
-- Zinc/metal : surface lisse et reflechissante, grise/argentee
-- Bac acier : lignes paralleles, surface metallique ondulee
-- Terrasse plate / bitume / membrane : surface plane, souvent grise/noire, sans pente visible
-- Toit vegetalise : surface verte, vegetation intentionnelle
-- Fibrociment : plaques ondulees grises
-- Chaume : surface epaisse, texture irreguliere, brun/jaune
+REGLES ABSOLUES :
+1. Ton diagnostic DOIT etre 100% coherent avec l'observation ci-dessus.
+2. Si l'observation dit "FORME DU TOIT : plat" -> c'est une TERRASSE PLATE. INTERDIT de parler de tuiles, ardoises, ou faitage.
+3. Si l'observation dit "MATERIAU PROBABLE : tuiles" -> c'est un toit en TUILES. Adapte ton vocabulaire.
+4. NE JAMAIS INVENTER de problemes non mentionnes dans l'observation.
+5. Si "ANOMALIES VISIBLES : aucune" -> mets des scores eleves (80-100) et dis que le toit semble en bon etat.
+6. Si "QUALITE IMAGE : faible" -> sois prudent, mets des scores moyens-hauts et precise que la resolution limite l'analyse.
 
-ETAPE 2 - ANALYSE ADAPTEE AU TYPE :
-Ton diagnostic DOIT etre coherent avec le type de toiture identifie :
-- Sur une TERRASSE PLATE : PAS de "tuiles deplacees", PAS de "faitage". Cherche plutot : fissures de membrane, eau stagnante, decollement, mousse/lichen, joints deteriores.
-- Sur des TUILES : cherche tuiles deplacees/cassees, mousse entre les tuiles, faitage abime.
-- Sur de l'ARDOISE : cherche ardoises manquantes/glissees, mousse, decoloration.
-- Sur du ZINC/METAL : cherche rouille, joints ouverts, bosses, deformation.
+ADAPTATION PAR TYPE :
+- TERRASSE PLATE : problemes possibles = fissures membrane, eau stagnante, decollement, mousse. JAMAIS "tuiles deplacees" ou "faitage".
+- TUILES : problemes possibles = tuiles deplacees/cassees, mousse entre tuiles, faitage abime.
+- ARDOISES : problemes possibles = ardoises glissees, mousse, decoloration.
+- ZINC/METAL : problemes possibles = rouille, joints ouverts, bosses.
 
-ETAPE 3 - CALQUES D'ANALYSE :
-1. VEGETAL : Mousse, lichen, vegetation sur la toiture (zones vertes/sombres anormales)
-2. STRUCTURE : Problemes physiques adaptes au type de toit (tuiles deplacees OU membrane fissuree OU rouille, etc.)
-3. ETANCHEITE : Traces d'humidite, eau stagnante, zones sombres suspectes, joints deteriores
+CALQUES :
+1. VEGETAL : mousse, lichen, vegetation parasite SUR le toit (pas les arbres a cote)
+2. STRUCTURE : problemes physiques adaptes au type identifie
+3. ETANCHEITE : humidite, eau stagnante, joints deteriores
 
-REGLES STRICTES :
-- Image SATELLITE vue du dessus. Resolution limitee = sois honnete sur ce que tu peux/ne peux pas voir.
-- Coordonnees des zones en pourcentage de l'image (x, y, width, height) pointant REELLEMENT sur la toiture visible.
-- Si l'image est floue ou la toiture peu visible, dis-le clairement et mets des scores eleves (pas de probleme invente).
-- Si tu vois des arbres ou vegetation A COTE du toit (pas dessus), ne les compte PAS comme probleme vegetal.
-- Un client PAYE pour cette analyse : sois rigoureux, honnete et professionnel.
-- Reponds en francais.
-${address ? `- Adresse : ${address}` : ""}`,
+Les coordonnees (x, y, width, height) doivent pointer sur des zones REELLES de la toiture.
+Le champ "toitureType" doit reprendre exactement le type identifie dans l'observation.
+Reponds en francais.
+${address ? `Adresse : ${address}` : ""}`,
       },
       {
         role: "user",
         content: [
           {
             type: "text",
-            text: `Analyse cette image satellite de toiture${address ? ` situee au ${address}` : ""}. COMMENCE par identifier le type de toiture (tuiles, ardoises, terrasse plate, zinc, etc.) puis adapte ton diagnostic en consequence. Ne rapporte QUE les problemes que tu vois REELLEMENT sur l'image. Si l'image est trop floue pour detecter des details, sois honnete et attribue des scores corrects. Fournis les zones problematiques detectees avec des coordonnees precises pointant sur la toiture.`,
+            text: `Produis le diagnostic structure base UNIQUEMENT sur l'observation factuelle fournie. Ne contredis jamais l'observation. Adapte ton vocabulaire au type de toiture identifie.`,
           },
           {
             type: "image",
