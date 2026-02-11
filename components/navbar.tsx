@@ -61,10 +61,10 @@ export function Navbar() {
 
         <div className="hidden lg:flex items-center gap-3">
           <a
-            href="tel:+33600000000"
+            href="tel:+33233311979"
             className="rounded-lg border border-border px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-secondary"
           >
-            06 XX XX XX XX
+            02 33 31 19 79
           </a>
           <a
             href="#diagnostic"
@@ -99,11 +99,11 @@ export function Navbar() {
             ))}
             <div className="mt-4 flex flex-col gap-3">
               <a
-                href="tel:+33600000000"
+                href="tel:+33233311979"
                 onClick={() => setMobileOpen(false)}
                 className="rounded-lg border border-border px-4 py-3 text-center text-sm font-medium text-foreground"
               >
-                06 XX XX XX XX
+                02 33 31 19 79
               </a>
               <a
                 href="#diagnostic"

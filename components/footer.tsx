@@ -91,6 +91,14 @@ export function Footer() {
                 Expert en diagnostic et travaux de toiture en Ile-de-France.
                 Technologie IA pour un diagnostic precis et rapide.
               </p>
+              <div className="flex flex-col gap-2 text-sm text-muted-foreground">
+                <a href="tel:+33233311979" className="hover:text-foreground transition-colors">
+                  02 33 31 19 79
+                </a>
+                <a href="mailto:aco.habitat@orange.fr" className="hover:text-foreground transition-colors">
+                  aco.habitat@orange.fr
+                </a>
+              </div>
             </div>
 
             {/* Links */}
