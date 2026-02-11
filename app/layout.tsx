@@ -1,19 +1,26 @@
 import type { Metadata, Viewport } from "next"
-import { Inter } from "next/font/google"
+import { Inter, Space_Grotesk } from "next/font/google"
 import "./globals.css"
 
-const inter = Inter({
+const _inter = Inter({
   subsets: ["latin"],
+  variable: "--font-inter",
+})
+
+const _spaceGrotesk = Space_Grotesk({
+  subsets: ["latin"],
+  variable: "--font-space-grotesk",
 })
 
 export const metadata: Metadata = {
-  title: "ACO-HABITAT | Diagnostic Toiture par IA",
+  title: "ACO-HABITAT | Diagnostic Toiture par IA - Expert Couverture Ile-de-France",
   description:
-    "Analysez l'etat de votre toiture grace a l'intelligence artificielle. Diagnostic vegetal, structurel et etancheite en quelques secondes. ACO-HABITAT, expert toiture.",
+    "Analysez l'etat de votre toiture en quelques secondes grace a l'intelligence artificielle. Diagnostic vegetal, structurel et etancheite. Devis gratuit. Expert toiture Ile-de-France.",
+  keywords: ["diagnostic toiture", "IA", "couverture", "renovation toiture", "Ile-de-France", "ACO-HABITAT"],
 }
 
 export const viewport: Viewport = {
-  themeColor: "#0a0f1a",
+  themeColor: "#060a13",
   width: "device-width",
   initialScale: 1,
 }
@@ -25,7 +32,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="fr" suppressHydrationWarning>
-      <body className="font-sans min-h-screen">
+      <body className="font-sans min-h-screen overflow-x-hidden">
         {children}
       </body>
     </html>
