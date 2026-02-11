@@ -9,7 +9,7 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "ACO-HABITAT | Diagnostic Toiture par IA",
   description:
-    "Analysez l'etat de votre toiture grace a l'intelligence artificielle. Diagnostic vegetal, structurel et etancheite en quelques secondes.",
+    "Analysez l'etat de votre toiture grace a l'intelligence artificielle. Diagnostic vegetal, structurel et etancheite en quelques secondes. ACO-HABITAT, expert toiture.",
 }
 
 export const viewport: Viewport = {
