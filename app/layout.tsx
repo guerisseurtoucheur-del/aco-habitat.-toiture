@@ -4,12 +4,10 @@ import "./globals.css"
 
 const inter = Inter({
   subsets: ["latin"],
-  variable: "--font-inter",
 })
 
 const spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
-  variable: "--font-space-grotesk",
 })
 
 export const metadata: Metadata = {
@@ -30,10 +28,8 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="fr" className="dark">
-      <body
-        className={`${inter.variable} ${spaceGrotesk.variable} font-sans min-h-screen`}
-      >
+    <html lang="fr" className="dark" suppressHydrationWarning>
+      <body className="font-sans min-h-screen">
         {children}
       </body>
     </html>
