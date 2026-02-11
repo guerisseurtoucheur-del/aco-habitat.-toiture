@@ -29,18 +29,26 @@ export async function POST(req: Request) {
     const { lat, lng } = geocodeData.results[0].geometry.location
     const formattedAddress = geocodeData.results[0].formatted_address
 
-    // Step 2: Get multiple satellite images at different zoom levels
+    // Step 2: Get satellite images at multiple zoom levels
     // scale=2 doubles resolution (1280x1280 effective pixels)
-    // Zoom 20 = close view, Zoom 21 = max zoom (best detail on rooftop)
     const size = "640x640"
     const scale = 2
     const mapType = "satellite"
 
+    // Start with zoom 20 (safe max for most areas), then 19 and 18
     const zoomLevels = [
-      { zoom: 21, label: "Max (tuiles visibles)" },
-      { zoom: 20, label: "Rapproche (toiture complete)" },
-      { zoom: 19, label: "Vue large (batiment + environs)" },
+      { zoom: 20, label: "Rapproche (toiture)" },
+      { zoom: 19, label: "Standard (batiment)" },
+      { zoom: 18, label: "Vue large (quartier)" },
     ]
+
+    // Helper: check if Google returned a "no imagery" placeholder
+    // Google returns a small gray image with text when no imagery exists
+    const isValidImagery = (buffer: ArrayBuffer) => {
+      // Valid satellite imagery is typically > 15KB
+      // "No imagery" placeholders are very small
+      return buffer.byteLength > 15000
+    }
 
     const images = await Promise.all(
       zoomLevels.map(async ({ zoom, label }) => {
@@ -48,6 +56,7 @@ export async function POST(req: Request) {
         const res = await fetch(url)
         if (!res.ok) return null
         const buffer = await res.arrayBuffer()
+        if (!isValidImagery(buffer)) return null
         return {
           zoom,
           label,
@@ -59,8 +68,8 @@ export async function POST(req: Request) {
     const validImages = images.filter(Boolean)
     if (validImages.length === 0) {
       return Response.json(
-        { error: "Impossible de recuperer les images satellite." },
-        { status: 500 }
+        { error: "Aucune imagerie satellite disponible pour cette adresse. Essayez une adresse plus precise." },
+        { status: 404 }
       )
     }
 
