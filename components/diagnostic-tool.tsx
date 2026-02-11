@@ -456,9 +456,19 @@ export function DiagnosticTool() {
                     {formattedAddress}
                   </p>
                   <p className="text-xs text-muted-foreground">
+                    {diagnostic.toitureType && (
+                      <span className="mr-2 inline-flex items-center rounded-md bg-primary/10 px-2 py-0.5 text-[10px] font-semibold text-primary">
+                        {diagnostic.toitureType}
+                      </span>
+                    )}
                     Diagnostic satellite -{" "}
                     {new Date().toLocaleDateString("fr-FR")}
                   </p>
+                  {diagnostic.toitureDescription && (
+                    <p className="mt-1 text-[11px] text-muted-foreground/70">
+                      {diagnostic.toitureDescription}
+                    </p>
+                  )}
                 </div>
               </div>
               <button

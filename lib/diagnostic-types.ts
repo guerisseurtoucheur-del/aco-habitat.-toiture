@@ -10,9 +10,15 @@ export const zoneSchema = z.object({
 })
 
 export const diagnosticSchema = z.object({
+  toitureType: z
+    .string()
+    .describe("Type de toiture identifie : tuiles, ardoises, zinc, bac acier, terrasse plate/bitume, toit vegetalise, fibrociment, chaume, autre. DOIT correspondre a ce qui est reellement visible sur l'image."),
+  toitureDescription: z
+    .string()
+    .describe("Description factuelle de ce que l'on voit sur l'image satellite : forme du toit, couleur, materiaux visibles, orientation. 1-2 phrases."),
   summary: z
     .string()
-    .describe("Overall summary of the roof condition in French, 2-3 sentences"),
+    .describe("Overall summary of the roof condition in French, 2-3 sentences. Must be coherent with the roof type identified."),
   scoreGlobal: z
     .number()
     .describe("Overall roof health score from 0 (very bad) to 100 (perfect)"),
