@@ -406,6 +406,18 @@ export function DiagnosticTool() {
 
   return (
     <section id="diagnostic" className="relative py-24">
+      {/* SVG sharpening filter for satellite images */}
+      <svg className="absolute h-0 w-0" aria-hidden="true">
+        <defs>
+          <filter id="sharpen">
+            <feConvolveMatrix
+              order="3"
+              kernelMatrix="0 -0.5 0  -0.5 3 -0.5  0 -0.5 0"
+              preserveAlpha="true"
+            />
+          </filter>
+        </defs>
+      </svg>
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,_var(--color-glow-blue),_transparent_50%)]" />
       <div className="relative mx-auto max-w-7xl px-6">
         {/* Header */}
@@ -558,9 +570,10 @@ export function DiagnosticTool() {
               {/* Image with scanner */}
               <div className="relative">
                 <img
-                  src={satelliteImages[0]?.image}
-                  alt="Vue satellite"
-                  className="w-full"
+                    src={satelliteImages[0]?.image}
+                    alt="Vue satellite"
+                    className="w-full"
+                    style={{ filter: "url(#sharpen) contrast(1.15) saturate(1.1) brightness(1.05)" }}
                 />
                 <ScannerOverlay phase={step} />
               </div>
@@ -716,10 +729,11 @@ export function DiagnosticTool() {
                   {/* Image with polygon overlays */}
                   <div className="relative">
                     <img
-                      src={satelliteImages[activeZoom]?.image || satelliteImages[0]?.image}
-                      alt="Vue satellite de la toiture"
-                      className="w-full"
-                      crossOrigin="anonymous"
+                    src={satelliteImages[activeZoom]?.image || satelliteImages[0]?.image}
+                    alt="Vue satellite de la toiture"
+                    className="w-full"
+                    crossOrigin="anonymous"
+                    style={{ filter: "url(#sharpen) contrast(1.15) saturate(1.1) brightness(1.05)" }}
                     />
                     {/* Tech grid overlay */}
                     <div

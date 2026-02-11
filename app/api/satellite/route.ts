@@ -30,29 +30,28 @@ export async function POST(req: Request) {
     const formattedAddress = geocodeData.results[0].formatted_address
 
     // Step 2: Get satellite images at multiple zoom levels
-    // scale=2 doubles resolution (1280x1280 effective pixels)
+    // scale=2 = 1280x1280 effective pixels (max allowed by Static Maps API)
+    // size=640x640 is the max free-tier size, scale=2 doubles it
+    // maptype=satellite (NOT hybrid) avoids street labels that blur the image
+    // style=feature:all|element:labels|visibility:off removes any remaining labels
     const size = "640x640"
     const scale = 2
     const mapType = "satellite"
 
-    // Start with zoom 20 (safe max for most areas), then 19 and 18
+    // Zoom levels: try 20 first (best detail), fallback to 19 and 18
     const zoomLevels = [
-      { zoom: 20, label: "Rapproche (toiture)" },
+      { zoom: 20, label: "Haute resolution (toiture)" },
       { zoom: 19, label: "Standard (batiment)" },
       { zoom: 18, label: "Vue large (quartier)" },
     ]
 
-    // Helper: check if Google returned a "no imagery" placeholder
-    // Google returns a small gray image with text when no imagery exists
-    const isValidImagery = (buffer: ArrayBuffer) => {
-      // Valid satellite imagery is typically > 15KB
-      // "No imagery" placeholders are very small
-      return buffer.byteLength > 15000
-    }
+    // Google returns a tiny "no imagery" placeholder for unavailable zoom levels
+    const isValidImagery = (buffer: ArrayBuffer) => buffer.byteLength > 15000
 
     const images = await Promise.all(
       zoomLevels.map(async ({ zoom, label }) => {
-        const url = `https://maps.googleapis.com/maps/api/staticmap?center=${lat},${lng}&zoom=${zoom}&size=${size}&scale=${scale}&maptype=${mapType}&key=${apiKey}`
+        // style removes all map labels for a cleaner satellite-only image
+        const url = `https://maps.googleapis.com/maps/api/staticmap?center=${lat},${lng}&zoom=${zoom}&size=${size}&scale=${scale}&maptype=${mapType}&style=feature:all|element:labels|visibility:off&key=${apiKey}`
         const res = await fetch(url)
         if (!res.ok) return null
         const buffer = await res.arrayBuffer()
