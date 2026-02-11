@@ -27,11 +27,19 @@ import {
   Send,
   Download,
   ScanLine,
+  Crosshair,
+  Navigation,
 } from "lucide-react"
 import type { DiagnosticResult, DiagnosticZone } from "@/lib/diagnostic-types"
 
 type Step = "address" | "satellite" | "scanning" | "analyzing" | "results"
 type SatelliteImage = { zoom: number; label: string; image: string }
+type PlacePrediction = {
+  placeId: string
+  description: string
+  mainText: string
+  secondaryText: string
+}
 
 /* ── Scanning Overlay with Radar ── */
 function ScannerOverlay({ phase }: { phase: "scanning" | "analyzing" }) {
@@ -404,6 +412,11 @@ function MaterialBadge({ type }: { type: string }) {
 export function DiagnosticTool() {
   const [step, setStep] = useState<Step>("address")
   const [address, setAddress] = useState("")
+  const [predictions, setPredictions] = useState<PlacePrediction[]>([])
+  const [showDropdown, setShowDropdown] = useState(false)
+  const [geolocating, setGeolocating] = useState(false)
+  const autocompleteTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const dropdownRef = useRef<HTMLDivElement>(null)
   const [satelliteImages, setSatelliteImages] = useState<SatelliteImage[]>([])
   const [activeZoom, setActiveZoom] = useState(0)
   const [formattedAddress, setFormattedAddress] = useState("")
@@ -415,6 +428,91 @@ export function DiagnosticTool() {
     etancheite: true,
   })
   const resultsRef = useRef<HTMLDivElement>(null)
+
+  // Close dropdown on outside click
+  useEffect(() => {
+    const handleClickOutside = (e: MouseEvent) => {
+      if (dropdownRef.current && !dropdownRef.current.contains(e.target as Node)) {
+        setShowDropdown(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [])
+
+  // Fetch autocomplete predictions
+  const fetchPredictions = useCallback((input: string) => {
+    if (autocompleteTimer.current) clearTimeout(autocompleteTimer.current)
+    if (input.length < 3) {
+      setPredictions([])
+      setShowDropdown(false)
+      return
+    }
+    autocompleteTimer.current = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/places?input=${encodeURIComponent(input)}`)
+        const data = await res.json()
+        if (data.predictions?.length > 0) {
+          setPredictions(data.predictions)
+          setShowDropdown(true)
+        } else {
+          setPredictions([])
+          setShowDropdown(false)
+        }
+      } catch {
+        setPredictions([])
+      }
+    }, 300)
+  }, [])
+
+  // Handle address input change
+  const handleAddressChange = useCallback(
+    (value: string) => {
+      setAddress(value)
+      fetchPredictions(value)
+    },
+    [fetchPredictions]
+  )
+
+  // Select a prediction
+  const handleSelectPrediction = useCallback((prediction: PlacePrediction) => {
+    setAddress(prediction.description)
+    setShowDropdown(false)
+    setPredictions([])
+  }, [])
+
+  // Geolocation
+  const handleGeolocate = useCallback(async () => {
+    if (!navigator.geolocation) {
+      setError("La geolocalisation n'est pas supportee par votre navigateur.")
+      return
+    }
+    setGeolocating(true)
+    setError(null)
+    navigator.geolocation.getCurrentPosition(
+      async (position) => {
+        try {
+          const { latitude, longitude } = position.coords
+          const res = await fetch(`/api/geocode?lat=${latitude}&lng=${longitude}`)
+          const data = await res.json()
+          if (data.address) {
+            setAddress(data.address)
+          } else {
+            setError("Impossible de trouver votre adresse.")
+          }
+        } catch {
+          setError("Erreur lors de la geolocalisation.")
+        } finally {
+          setGeolocating(false)
+        }
+      },
+      () => {
+        setError("Geolocalisation refusee. Autorisez l'acces a votre position.")
+        setGeolocating(false)
+      },
+      { enableHighAccuracy: true, timeout: 10000 }
+    )
+  }, [])
 
   const handleSearch = useCallback(async () => {
     if (!address.trim()) return
@@ -475,10 +573,12 @@ export function DiagnosticTool() {
   }, [address])
 
   const handleReset = () => {
-    setStep("address")
-    setAddress("")
-    setSatelliteImages([])
-    setActiveZoom(0)
+  setStep("address")
+  setAddress("")
+  setPredictions([])
+  setShowDropdown(false)
+  setSatelliteImages([])
+  setActiveZoom(0)
     setDiagnostic(null)
     setError(null)
     setLayerState({ vegetal: true, structure: true, etancheite: true })
@@ -595,20 +695,71 @@ export function DiagnosticTool() {
               </div>
 
               <div className="flex gap-3">
-                <div className="relative flex-1">
+                <div className="relative flex-1" ref={dropdownRef}>
                   <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
                   <input
                     type="text"
                     value={address}
-                    onChange={(e) => setAddress(e.target.value)}
-                    onKeyDown={(e) => e.key === "Enter" && step === "address" && handleSearch()}
+                    onChange={(e) => handleAddressChange(e.target.value)}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && step === "address") {
+                        setShowDropdown(false)
+                        handleSearch()
+                      }
+                    }}
+                    onFocus={() => predictions.length > 0 && setShowDropdown(true)}
                     placeholder="12 rue de la Paix, 75002 Paris"
                     disabled={step !== "address"}
-                    className="h-12 w-full rounded-xl border border-border bg-background pl-11 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
+                    className="h-12 w-full rounded-xl border border-border bg-background pl-11 pr-12 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
                   />
+                  {/* Geolocation button */}
+                  <button
+                    type="button"
+                    onClick={handleGeolocate}
+                    disabled={step !== "address" || geolocating}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground transition-all hover:bg-primary/10 hover:text-primary disabled:opacity-50"
+                    title="Me localiser automatiquement"
+                  >
+                    {geolocating ? (
+                      <Loader2 size={15} className="animate-spin text-primary" />
+                    ) : (
+                      <Navigation size={15} />
+                    )}
+                  </button>
+
+                  {/* Autocomplete dropdown */}
+                  {showDropdown && predictions.length > 0 && (
+                    <div className="absolute left-0 right-0 top-[calc(100%+4px)] z-50 overflow-hidden rounded-xl border border-border bg-card shadow-xl shadow-background/50">
+                      {predictions.map((p, i) => (
+                        <button
+                          key={p.placeId}
+                          type="button"
+                          onClick={() => handleSelectPrediction(p)}
+                          className={`flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-secondary/60 ${
+                            i !== 0 ? "border-t border-border/50" : ""
+                          }`}
+                        >
+                          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+                            <MapPin size={14} className="text-primary" />
+                          </div>
+                          <div className="min-w-0 flex-1">
+                            <p className="truncate text-sm font-medium text-foreground">
+                              {p.mainText}
+                            </p>
+                            <p className="truncate text-xs text-muted-foreground">
+                              {p.secondaryText}
+                            </p>
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
                 <button
-                  onClick={handleSearch}
+                  onClick={() => {
+                    setShowDropdown(false)
+                    handleSearch()
+                  }}
                   disabled={step !== "address" || !address.trim()}
                   className="flex h-12 items-center gap-2 rounded-xl bg-primary px-6 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90 disabled:opacity-50"
                 >
