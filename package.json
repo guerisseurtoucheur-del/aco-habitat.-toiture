@@ -1,0 +1,26 @@
+{
+  "name": "aco-habitat-toiture",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev --turbopack",
+    "build": "next build",
+    "start": "next start"
+  },
+  "dependencies": {
+    "next": "^16",
+    "react": "^19",
+    "react-dom": "^19",
+    "ai": "^6.0.0",
+    "@ai-sdk/react": "^3.0.0",
+    "lucide-react": "^0.469.0",
+    "tailwindcss": "^4",
+    "@tailwindcss/postcss": "^4"
+  },
+  "devDependencies": {
+    "typescript": "^5",
+    "@types/node": "^22",
+    "@types/react": "^19",
+    "@types/react-dom": "^19"
+  }
+}
