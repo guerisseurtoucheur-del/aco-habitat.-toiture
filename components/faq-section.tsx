@@ -22,7 +22,7 @@ const faqs = [
   {
     question: "Dans quelles zones intervenez-vous ?",
     answer:
-      "ACO-HABITAT intervient dans toute l'Ile-de-France : Paris et tous les departements de la petite et grande couronne (92, 93, 94, 77, 78, 91, 95).",
+      "ACO-HABITAT intervient sur toute la France. Que vous soyez en Ile-de-France, en Normandie, dans le Nord ou partout ailleurs, nous nous deplacons pour diagnostiquer et reparer votre toiture.",
   },
   {
     question: "Combien coute une intervention de reparation ?",

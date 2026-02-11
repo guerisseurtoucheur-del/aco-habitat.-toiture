@@ -24,12 +24,12 @@ const footerLinks = [
   {
     title: "Zones d'intervention",
     links: [
-      { label: "Paris (75)", href: "#contact" },
-      { label: "Hauts-de-Seine (92)", href: "#contact" },
-      { label: "Seine-Saint-Denis (93)", href: "#contact" },
-      { label: "Val-de-Marne (94)", href: "#contact" },
-      { label: "Yvelines (78)", href: "#contact" },
-      { label: "Toute Ile-de-France", href: "#contact" },
+      { label: "Ile-de-France", href: "#contact" },
+      { label: "Nord / Hauts-de-France", href: "#contact" },
+      { label: "Grand Est", href: "#contact" },
+      { label: "Normandie", href: "#contact" },
+      { label: "Bretagne / Pays de la Loire", href: "#contact" },
+      { label: "Toute la France", href: "#contact" },
     ],
   },
 ]
@@ -88,9 +88,17 @@ export function Footer() {
                 </div>
               </div>
               <p className="text-sm leading-relaxed text-muted-foreground">
-                Expert en diagnostic et travaux de toiture en Ile-de-France.
+                Expert en diagnostic et travaux de toiture sur toute la France.
                 Technologie IA pour un diagnostic precis et rapide.
               </p>
+              <div className="flex flex-col gap-2 text-sm text-muted-foreground">
+                <a href="tel:+33233311979" className="hover:text-foreground transition-colors">
+                  02 33 31 19 79
+                </a>
+                <a href="mailto:aco.habitat@orange.fr" className="hover:text-foreground transition-colors">
+                  aco.habitat@orange.fr
+                </a>
+              </div>
             </div>
 
             {/* Links */}

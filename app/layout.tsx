@@ -13,10 +13,10 @@ const _spaceGrotesk = Space_Grotesk({
 })
 
 export const metadata: Metadata = {
-  title: "ACO-HABITAT | Diagnostic Toiture par IA - Expert Couverture Ile-de-France",
+  title: "ACO-HABITAT | Diagnostic Toiture par IA - Expert Couverture France Entiere",
   description:
-    "Analysez l'etat de votre toiture en quelques secondes grace a l'intelligence artificielle. Diagnostic vegetal, structurel et etancheite. Devis gratuit. Expert toiture Ile-de-France.",
-  keywords: ["diagnostic toiture", "IA", "couverture", "renovation toiture", "Ile-de-France", "ACO-HABITAT"],
+    "Analysez l'etat de votre toiture en quelques secondes grace a l'intelligence artificielle. Diagnostic vegetal, structurel et etancheite. Devis gratuit. Expert toiture France entiere.",
+  keywords: ["diagnostic toiture", "IA", "couverture", "renovation toiture", "France entiere", "ACO-HABITAT"],
 }
 
 export const viewport: Viewport = {
