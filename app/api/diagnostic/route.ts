@@ -1,4 +1,3 @@
-import { GoogleGenerativeAI } from "@google/generative-ai";
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(request: NextRequest) {
@@ -21,7 +20,6 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate file type
     if (!file.type.startsWith("image/")) {
       return NextResponse.json(
         { error: "Le fichier doit etre une image." },
@@ -29,16 +27,12 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Validate file size (max 10MB)
     if (file.size > 10 * 1024 * 1024) {
       return NextResponse.json(
         { error: "L'image ne doit pas depasser 10 Mo." },
         { status: 400 }
       );
     }
-
-    const genAI = new GoogleGenerativeAI(apiKey);
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
     const bytes = await file.arrayBuffer();
     const base64Data = Buffer.from(bytes).toString("base64");
@@ -64,23 +58,51 @@ Donne 2-3 recommandations concretes pour l'entretien ou la renovation.
 
 Sois precis, professionnel et utile. Reponds en francais.`;
 
-    const result = await model.generateContent([
-      prompt,
+    const response = await fetch(
+      `https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,
       {
-        inlineData: {
-          data: base64Data,
-          mimeType: file.type,
-        },
-      },
-    ]);
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          contents: [
+            {
+              parts: [
+                { text: prompt },
+                {
+                  inline_data: {
+                    mime_type: file.type,
+                    data: base64Data,
+                  },
+                },
+              ],
+            },
+          ],
+        }),
+      }
+    );
 
-    const text = result.response.text();
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => null);
+      console.error("Gemini API error:", errorData);
+      return NextResponse.json(
+        { error: "Erreur lors de la communication avec l'IA." },
+        { status: 502 }
+      );
+    }
+
+    const data = await response.json();
+    const text =
+      data?.candidates?.[0]?.content?.parts?.[0]?.text ||
+      "Aucun resultat genere.";
 
     return NextResponse.json({ report: text });
   } catch (error) {
     console.error("Erreur diagnostic:", error);
     return NextResponse.json(
-      { error: "Une erreur est survenue lors de l'analyse. Veuillez reessayer." },
+      {
+        error:
+          "Une erreur est survenue lors de l'analyse. Veuillez reessayer.",
+      },
       { status: 500 }
     );
   }
