@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { Menu, X, Zap } from "lucide-react"
+import { Menu, X, Zap, Phone, Mail } from "lucide-react"
 
 const navLinks = [
   { href: "#services", label: "Services" },
@@ -31,6 +31,29 @@ export function Navbar() {
           : "bg-transparent"
       }`}
     >
+      <div className={`border-b border-border/40 transition-all duration-300 ${scrolled ? "hidden" : ""}`}>
+        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-2">
+          <div className="flex items-center gap-6">
+            <a
+              href="tel:+33233311979"
+              className="flex items-center gap-2 text-xs text-muted-foreground transition-colors hover:text-foreground"
+            >
+              <Phone size={12} className="text-primary" />
+              <span className="font-medium">02 33 31 19 79</span>
+            </a>
+            <a
+              href="mailto:aco.habitat@orange.fr"
+              className="flex items-center gap-2 text-xs text-muted-foreground transition-colors hover:text-foreground"
+            >
+              <Mail size={12} className="text-primary" />
+              <span className="font-medium">aco.habitat@orange.fr</span>
+            </a>
+          </div>
+          <span className="hidden text-xs text-muted-foreground sm:block">
+            Intervention sur toute la France
+          </span>
+        </div>
+      </div>
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
         <Link href="/" className="flex items-center gap-3 group">
           <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-primary transition-transform group-hover:scale-105">
