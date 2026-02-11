@@ -25,13 +25,15 @@ import {
   ZoomOut,
   Phone,
   Send,
+  Download,
+  ScanLine,
 } from "lucide-react"
 import type { DiagnosticResult, DiagnosticZone } from "@/lib/diagnostic-types"
 
 type Step = "address" | "satellite" | "scanning" | "analyzing" | "results"
 type SatelliteImage = { zoom: number; label: string; image: string }
 
-/* ── Scanning Overlay ── */
+/* ── Scanning Overlay with Radar ── */
 function ScannerOverlay({ phase }: { phase: "scanning" | "analyzing" }) {
   return (
     <div className="pointer-events-none absolute inset-0 z-10">
@@ -45,7 +47,7 @@ function ScannerOverlay({ phase }: { phase: "scanning" | "analyzing" }) {
         }}
       />
 
-      {/* Laser line */}
+      {/* Laser scan line */}
       {phase === "scanning" && (
         <>
           <div
@@ -64,6 +66,46 @@ function ScannerOverlay({ phase }: { phase: "scanning" | "analyzing" }) {
             }}
           />
         </>
+      )}
+
+      {/* Radar circle overlay */}
+      {phase === "analyzing" && (
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+          {/* Concentric circles */}
+          {[120, 80, 40].map((size) => (
+            <div
+              key={size}
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border"
+              style={{
+                width: size,
+                height: size,
+                borderColor: "rgba(59,130,246,0.2)",
+              }}
+            />
+          ))}
+          {/* Rotating sweep */}
+          <div
+            className="animate-radar-sweep absolute top-1/2 left-1/2"
+            style={{ width: 140, height: 140 }}
+          >
+            <div
+              style={{
+                position: "absolute",
+                top: 0,
+                left: "50%",
+                width: "50%",
+                height: "50%",
+                transformOrigin: "0% 100%",
+                background: "conic-gradient(from 0deg, transparent, rgba(59,130,246,0.3))",
+                borderRadius: "0 100% 0 0",
+              }}
+            />
+          </div>
+          {/* Center dot */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+            <div className="h-2 w-2 rounded-full bg-primary shadow-[0_0_10px_4px_rgba(59,130,246,0.4)]" />
+          </div>
+        </div>
       )}
 
       {/* Corner brackets */}
@@ -86,14 +128,58 @@ function ScannerOverlay({ phase }: { phase: "scanning" | "analyzing" }) {
       <div className="absolute bottom-3 left-3 flex items-center gap-2 rounded-md bg-background/80 px-3 py-1.5 backdrop-blur-sm">
         <div className="h-2 w-2 animate-pulse rounded-full bg-primary" />
         <span className="font-mono text-[10px] font-medium text-primary">
-          {phase === "scanning" ? "SCAN EN COURS..." : "ANALYSE IA..."}
+          {phase === "scanning" ? "SCAN LIDAR EN COURS..." : "ANALYSE MULTI-SPECTRALE..."}
         </span>
       </div>
 
-      {/* Coordinates HUD */}
-      <div className="absolute top-3 right-3 rounded-md bg-background/80 px-3 py-1.5 backdrop-blur-sm">
-        <span className="font-mono text-[10px] text-muted-foreground">
-          SAT-VIEW HD / {phase === "scanning" ? "LIDAR-SIM" : "AI-PROC"}
+      {/* Top-right HUD */}
+      <div className="absolute top-3 right-3 flex flex-col items-end gap-1">
+        <div className="rounded-md bg-background/80 px-3 py-1.5 backdrop-blur-sm">
+          <span className="font-mono text-[10px] text-muted-foreground">
+            SAT-VIEW HD / {phase === "scanning" ? "LIDAR-SIM" : "AI-NEURAL"}
+          </span>
+        </div>
+        <div className="rounded-md bg-background/80 px-3 py-1 backdrop-blur-sm">
+          <span className="font-mono text-[9px] text-cyan-400">
+            {phase === "scanning" ? "RES: 5cm/px" : "LAYERS: VEG / STR / ETA"}
+          </span>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+/* ── Hotspot Blinking Icon ── */
+function Hotspot({
+  x,
+  y,
+  color,
+  severity,
+  delay = 0,
+}: {
+  x: number
+  y: number
+  color: string
+  severity: string
+  delay?: number
+}) {
+  return (
+    <div
+      className="animate-zone-reveal absolute z-20 -translate-x-1/2 -translate-y-1/2"
+      style={{ left: `${x}%`, top: `${y}%`, animationDelay: `${delay}ms` }}
+    >
+      {/* Expanding ring */}
+      <div
+        className="animate-hotspot-ring absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full"
+        style={{ width: 20, height: 20, backgroundColor: `${color}30`, border: `1px solid ${color}40` }}
+      />
+      {/* Core blinking dot */}
+      <div
+        className="animate-hotspot-ping relative flex h-6 w-6 items-center justify-center rounded-full"
+        style={{ backgroundColor: `${color}20`, border: `2px solid ${color}`, boxShadow: `0 0 12px 3px ${color}50` }}
+      >
+        <span className="text-[8px] font-bold" style={{ color }}>
+          {severity === "severe" ? "!" : severity === "modere" ? "?" : "~"}
         </span>
       </div>
     </div>
@@ -123,6 +209,9 @@ function ZonePolygon({
         ? "#f59e0b"
         : color
 
+  // Healthy zone = score indicator, not a problem
+  const isHealthy = zone.severity === "faible" && color === "#22c55e"
+
   return (
     <div
       className="animate-zone-reveal absolute"
@@ -134,50 +223,75 @@ function ZonePolygon({
         animationDelay: `${delay}ms`,
       }}
     >
-      {/* Border with glow */}
+      {/* Border with glow - green translucent for healthy zones */}
       <div
         className="absolute inset-0 rounded-sm border-2"
         style={{
-          borderColor: severityColor,
-          boxShadow: `0 0 12px 2px ${severityColor}40, inset 0 0 12px 2px ${severityColor}15`,
-          backgroundColor: `${severityColor}10`,
+          borderColor: isHealthy ? "#22c55e60" : severityColor,
+          boxShadow: isHealthy
+            ? "inset 0 0 20px 4px rgba(34,197,94,0.08)"
+            : `0 0 12px 2px ${severityColor}40, inset 0 0 12px 2px ${severityColor}15`,
+          backgroundColor: isHealthy ? "rgba(34,197,94,0.06)" : `${severityColor}10`,
+          borderStyle: isHealthy ? "dashed" : "solid",
         }}
       />
 
-      {/* Pulsing corner dots */}
-      {["top-0 left-0", "top-0 right-0", "bottom-0 left-0", "bottom-0 right-0"].map((pos) => (
-        <div
-          key={pos}
-          className={`absolute ${pos} -translate-x-1/2 -translate-y-1/2`}
-          style={{
-            width: 6,
-            height: 6,
-            borderRadius: "50%",
-            backgroundColor: severityColor,
-            boxShadow: `0 0 6px 2px ${severityColor}60`,
-          }}
-        />
-      ))}
+      {/* Pulsing corner dots (not for healthy zones) */}
+      {!isHealthy &&
+        ["top-0 left-0", "top-0 right-0", "bottom-0 left-0", "bottom-0 right-0"].map((pos) => (
+          <div
+            key={pos}
+            className={`absolute ${pos} -translate-x-1/2 -translate-y-1/2`}
+            style={{
+              width: 6,
+              height: 6,
+              borderRadius: "50%",
+              backgroundColor: severityColor,
+              boxShadow: `0 0 6px 2px ${severityColor}60`,
+            }}
+          />
+        ))}
 
-      {/* Animated pulse ring */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-        <div
-          className="animate-pulse-ring h-3 w-3 rounded-full"
-          style={{ backgroundColor: `${severityColor}30`, border: `1px solid ${severityColor}50` }}
-        />
-      </div>
+      {/* Hotspot icon for problem zones */}
+      {!isHealthy && (
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+          <div
+            className="animate-hotspot-ring absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full"
+            style={{ width: 16, height: 16, backgroundColor: `${severityColor}25`, border: `1px solid ${severityColor}40` }}
+          />
+          <div
+            className="animate-hotspot-ping flex h-5 w-5 items-center justify-center rounded-full"
+            style={{ backgroundColor: severityColor, boxShadow: `0 0 10px 3px ${severityColor}50` }}
+          >
+            <span className="text-[8px] font-black text-white">
+              {zone.severity === "severe" ? "!!" : "!"}
+            </span>
+          </div>
+        </div>
+      )}
+
+      {/* Checkmark for healthy zones */}
+      {isHealthy && (
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+          <div className="flex h-5 w-5 items-center justify-center rounded-full bg-green-500/20 ring-1 ring-green-500/40">
+            <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
+              <path d="M2 5l2.5 2.5L8 3" stroke="#22c55e" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </div>
+        </div>
+      )}
 
       {/* Label tag */}
       <div
         className="absolute -top-7 left-0 flex items-center gap-1.5 whitespace-nowrap rounded px-2 py-1"
         style={{
-          backgroundColor: severityColor,
-          boxShadow: `0 2px 8px ${severityColor}50`,
+          backgroundColor: isHealthy ? "#22c55e" : severityColor,
+          boxShadow: `0 2px 8px ${isHealthy ? "#22c55e" : severityColor}50`,
         }}
       >
         <div className="h-1.5 w-1.5 rounded-full bg-white/80" />
         <span className="text-[9px] font-bold tracking-wide text-white uppercase">
-          {label}
+          {isHealthy ? "Zone saine" : label}
         </span>
       </div>
     </div>
@@ -776,6 +890,26 @@ export function DiagnosticTool() {
                         delay={(diagnostic.vegetal.zones.length + diagnostic.structure.zones.length + i) * 200}
                       />
                     ))}
+
+                    {/* Confidence Badge - bottom of image */}
+                    <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
+                      <div
+                        className="animate-badge-shine flex items-center gap-2 rounded-lg border border-cyan-500/30 bg-background/85 px-3 py-1.5 backdrop-blur-md"
+                        style={{
+                          backgroundImage: "linear-gradient(90deg, transparent 0%, rgba(6,182,212,0.08) 50%, transparent 100%)",
+                          backgroundSize: "200% 100%",
+                        }}
+                      >
+                        <ScanLine size={12} className="text-cyan-400" />
+                        <span className="font-mono text-[10px] font-semibold tracking-wide text-cyan-400">
+                          Resolution optimisee par IA - Precision 5cm/pixel
+                        </span>
+                      </div>
+                      <div className="flex items-center gap-1.5 rounded-lg bg-background/85 px-2.5 py-1.5 backdrop-blur-md">
+                        <div className="h-1.5 w-1.5 animate-pulse rounded-full bg-green-400" />
+                        <span className="font-mono text-[9px] text-green-400">LIVE ANALYSIS</span>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -824,6 +958,46 @@ export function DiagnosticTool() {
                     ))}
                   </div>
                 )}
+              </div>
+            </div>
+
+            {/* PDF Report Button */}
+            <div className="relative overflow-hidden rounded-2xl border border-cyan-500/30 bg-card p-8 text-center">
+              <div
+                className="absolute inset-0 opacity-30"
+                style={{
+                  backgroundImage:
+                    "linear-gradient(rgba(6,182,212,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(6,182,212,0.05) 1px, transparent 1px)",
+                  backgroundSize: "20px 20px",
+                }}
+              />
+              <div className="relative">
+                <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-cyan-500/30 bg-cyan-500/10 px-4 py-1.5 text-xs font-semibold text-cyan-400">
+                  <FileText size={12} />
+                  RAPPORT COMPLET
+                </div>
+                <h3 className="mb-2 text-2xl font-bold text-foreground" style={{ fontFamily: "var(--font-heading)" }}>
+                  {"Generer mon rapport d'entretien PDF complet"}
+                </h3>
+                <p className="mx-auto mb-6 max-w-lg text-sm text-muted-foreground">
+                  Recevez un document professionnel detaille avec photos satellite annotees,
+                  scores de diagnostic, zones detectees et recommandations d{"'"}intervention.
+                </p>
+                <button
+                  onClick={() => {
+                    const link = document.createElement("a")
+                    link.href = "#contact"
+                    link.click()
+                  }}
+                  className="group relative inline-flex items-center gap-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-8 py-4 text-base font-bold text-white shadow-lg shadow-cyan-500/25 transition-all hover:shadow-xl hover:shadow-cyan-500/30"
+                >
+                  <Download size={20} />
+                  Generer mon rapport PDF complet
+                  <span className="ml-1 rounded-md bg-white/20 px-2 py-0.5 text-[10px] font-semibold">GRATUIT</span>
+                </button>
+                <p className="mt-3 text-[10px] text-muted-foreground">
+                  Le rapport sera envoye par email apres verification par nos experts.
+                </p>
               </div>
             </div>
 
