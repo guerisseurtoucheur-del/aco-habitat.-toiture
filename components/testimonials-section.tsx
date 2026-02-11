@@ -48,7 +48,7 @@ export function TestimonialsSection() {
             Ils nous font confiance
           </h2>
           <p className="mt-4 text-pretty text-base leading-relaxed text-muted-foreground">
-            Decouvrez les retours de nos clients en Ile-de-France.
+            Decouvrez les retours de nos clients partout en France.
           </p>
         </div>
 

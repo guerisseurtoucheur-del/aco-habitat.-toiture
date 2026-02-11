@@ -19,7 +19,7 @@ const contactInfo = [
   {
     icon: MapPin,
     label: "Zone d'intervention",
-    value: "Ile-de-France",
+    value: "France entiere",
     href: null,
   },
   {
