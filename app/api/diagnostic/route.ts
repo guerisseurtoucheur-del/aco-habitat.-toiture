@@ -25,6 +25,7 @@ MATERIAU PROBABLE : [terrasse plate bitume-membrane / tuiles terre cuite / ardoi
 ELEMENTS VISIBLES : [liste de ce que tu vois reellement : antennes, cheminees, bouches d'aeration, panneaux solaires, etc.]
 ANOMALIES VISIBLES : [liste de ce que tu vois d'anormal, ou "aucune anomalie visible a cette resolution"]
 VEGETATION SUR LE TOIT : [oui avec description / non / impossible a determiner]
+TAILLE ESTIMEE DU BATIMENT : [estime la longueur x largeur approximative du batiment en metres, basee sur la proportion dans l'image satellite. Un pixel au zoom 20 fait environ 15cm. Donne ton estimation.]
 QUALITE IMAGE : [bonne / moyenne / faible - la resolution permet-elle de voir des details ?]`,
       },
       {
@@ -72,6 +73,13 @@ ADAPTATION PAR TYPE :
 - TUILES : problemes possibles = tuiles deplacees/cassees, mousse entre tuiles, faitage abime.
 - ARDOISES : problemes possibles = ardoises glissees, mousse, decoloration.
 - ZINC/METAL : problemes possibles = rouille, joints ouverts, bosses.
+
+SURFACE :
+- Estime la surface totale de la toiture en m2 a partir de la taille du batiment visible.
+- Pour un toit en pente, ajoute 15 a 30% a l'emprise au sol (selon l'inclinaison).
+- Pour une terrasse plate, la surface = emprise au sol.
+- Utilise l'observation "TAILLE ESTIMEE DU BATIMENT" comme base.
+- Indique la precision : "haute" si bien visible, "moyenne" si partiellement cache, "faible" si difficile.
 
 CALQUES :
 1. VEGETAL : mousse, lichen, vegetation parasite SUR le toit (pas les arbres a cote)

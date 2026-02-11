@@ -16,6 +16,12 @@ export const diagnosticSchema = z.object({
   toitureDescription: z
     .string()
     .describe("Description factuelle de ce que l'on voit sur l'image satellite : forme du toit, couleur, materiaux visibles, orientation. 1-2 phrases."),
+  surfaceEstimeeM2: z
+    .number()
+    .describe("Estimation de la surface de la toiture en metres carres. Estime en fonction de la taille visible du batiment sur l'image satellite. Pour un toit en pente, prendre en compte l'inclinaison (environ +15-30% par rapport a l'emprise au sol). Donne un chiffre entier realiste."),
+  surfacePrecision: z
+    .string()
+    .describe("Precision de l'estimation : 'haute' si batiment bien visible et isole, 'moyenne' si partiellement cache ou dense, 'faible' si difficile a delimiter. Un seul mot."),
   summary: z
     .string()
     .describe("Overall summary of the roof condition in French, 2-3 sentences. Must be coherent with the roof type identified."),

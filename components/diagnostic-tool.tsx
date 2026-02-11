@@ -785,7 +785,52 @@ export function DiagnosticTool() {
                   <ScoreGauge score={diagnostic.etancheite.score} label="Etancheite" icon={Droplets} color="#3b82f6" />
                 </div>
               </div>
-              <p className="mt-6 rounded-xl bg-secondary/50 p-4 text-sm leading-relaxed text-muted-foreground">
+              {/* Surface estimation */}
+              {diagnostic.surfaceEstimeeM2 && (
+                <div className="mt-6 flex flex-wrap items-center gap-4 rounded-xl border border-border bg-secondary/30 p-4">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
+                      <svg width="18" height="18" viewBox="0 0 18 18" fill="none" className="text-primary">
+                        <rect x="2" y="2" width="14" height="14" rx="1" stroke="currentColor" strokeWidth="1.5" strokeDasharray="3 2" />
+                        <path d="M5 9h8M9 5v8" stroke="currentColor" strokeWidth="1" strokeLinecap="round" opacity="0.4" />
+                      </svg>
+                    </div>
+                    <div>
+                      <p className="text-xs text-muted-foreground">Surface estimee</p>
+                      <p className="text-lg font-bold text-foreground">
+                        {diagnostic.surfaceEstimeeM2} m<sup>2</sup>
+                      </p>
+                    </div>
+                  </div>
+                  <div className="h-8 w-px bg-border" />
+                  <div>
+                    <p className="text-xs text-muted-foreground">Precision</p>
+                    <div className="flex items-center gap-1.5">
+                      <div
+                        className="h-2 w-2 rounded-full"
+                        style={{
+                          backgroundColor:
+                            diagnostic.surfacePrecision === "haute"
+                              ? "#22c55e"
+                              : diagnostic.surfacePrecision === "moyenne"
+                                ? "#f59e0b"
+                                : "#ef4444",
+                        }}
+                      />
+                      <span className="text-sm font-medium capitalize text-foreground">
+                        {diagnostic.surfacePrecision}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="h-8 w-px bg-border" />
+                  <div>
+                    <p className="text-xs text-muted-foreground">Type</p>
+                    <p className="text-sm font-medium text-foreground">{diagnostic.toitureType}</p>
+                  </div>
+                </div>
+              )}
+
+              <p className="mt-4 rounded-xl bg-secondary/50 p-4 text-sm leading-relaxed text-muted-foreground">
                 {diagnostic.summary}
               </p>
             </div>
