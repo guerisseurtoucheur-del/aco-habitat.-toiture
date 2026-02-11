@@ -450,8 +450,10 @@ export function DiagnosticTool() {
     }
     autocompleteTimer.current = setTimeout(async () => {
       try {
+        console.log("[v0] Fetching predictions for:", input)
         const res = await fetch(`/api/places?input=${encodeURIComponent(input)}`)
         const data = await res.json()
+        console.log("[v0] Predictions response:", JSON.stringify(data).slice(0, 200))
         if (data.predictions?.length > 0) {
           setPredictions(data.predictions)
           setShowDropdown(true)
@@ -459,7 +461,8 @@ export function DiagnosticTool() {
           setPredictions([])
           setShowDropdown(false)
         }
-      } catch {
+      } catch (err) {
+        console.log("[v0] Predictions error:", err)
         setPredictions([])
       }
     }, 300)
@@ -483,6 +486,7 @@ export function DiagnosticTool() {
 
   // Geolocation
   const handleGeolocate = useCallback(async () => {
+    console.log("[v0] Geolocation clicked, supported:", !!navigator.geolocation)
     if (!navigator.geolocation) {
       setError("La geolocalisation n'est pas supportee par votre navigateur.")
       return
@@ -493,20 +497,24 @@ export function DiagnosticTool() {
       async (position) => {
         try {
           const { latitude, longitude } = position.coords
+          console.log("[v0] GPS coords:", latitude, longitude)
           const res = await fetch(`/api/geocode?lat=${latitude}&lng=${longitude}`)
           const data = await res.json()
+          console.log("[v0] Reverse geocode:", data)
           if (data.address) {
             setAddress(data.address)
           } else {
             setError("Impossible de trouver votre adresse.")
           }
-        } catch {
+        } catch (err) {
+          console.log("[v0] Geocode error:", err)
           setError("Erreur lors de la geolocalisation.")
         } finally {
           setGeolocating(false)
         }
       },
-      () => {
+      (err) => {
+        console.log("[v0] Geolocation denied:", err.code, err.message)
         setError("Geolocalisation refusee. Autorisez l'acces a votre position.")
         setGeolocating(false)
       },
