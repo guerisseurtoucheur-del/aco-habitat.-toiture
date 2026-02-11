@@ -1,78 +1,119 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
-import { Menu, X } from "lucide-react"
+import { Menu, X, Zap } from "lucide-react"
 
 const navLinks = [
   { href: "#services", label: "Services" },
   { href: "#diagnostic", label: "Diagnostic IA" },
-  { href: "#methode", label: "Notre methode" },
+  { href: "#methode", label: "Methode" },
+  { href: "#temoignages", label: "Temoignages" },
+  { href: "#faq", label: "FAQ" },
   { href: "#contact", label: "Contact" },
 ]
 
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false)
+  const [scrolled, setScrolled] = useState(false)
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20)
+    window.addEventListener("scroll", handleScroll, { passive: true })
+    return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
 
   return (
-    <header className="fixed top-0 left-0 right-0 z-50 border-b border-border/40 bg-background/80 backdrop-blur-xl">
+    <header
+      className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
+        scrolled
+          ? "border-b border-border/60 bg-background/90 backdrop-blur-xl shadow-lg shadow-background/50"
+          : "bg-transparent"
+      }`}
+    >
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
-        <Link href="/" className="flex items-center gap-2">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-primary">
-            <span className="text-sm font-bold text-primary-foreground font-sans">A</span>
+        <Link href="/" className="flex items-center gap-3 group">
+          <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-primary transition-transform group-hover:scale-105">
+            <span className="text-sm font-bold text-primary-foreground font-sans tracking-wide">A</span>
+            <div className="absolute inset-0 rounded-xl bg-primary/50 blur-lg opacity-0 group-hover:opacity-100 transition-opacity" />
           </div>
-          <span className="text-lg font-bold tracking-tight text-foreground font-sans">
-            ACO-HABITAT
-          </span>
+          <div className="flex flex-col">
+            <span className="text-base font-bold tracking-tight text-foreground font-sans leading-tight">
+              ACO-HABITAT
+            </span>
+            <span className="text-[10px] font-medium text-muted-foreground tracking-widest uppercase">
+              Expert Toiture
+            </span>
+          </div>
         </Link>
 
-        <div className="hidden items-center gap-8 md:flex">
+        <div className="hidden items-center gap-1 lg:flex">
           {navLinks.map((link) => (
             <a
               key={link.href}
               href={link.href}
-              className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+              className="rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:text-foreground hover:bg-secondary"
             >
               {link.label}
             </a>
           ))}
+        </div>
+
+        <div className="hidden lg:flex items-center gap-3">
+          <a
+            href="tel:+33600000000"
+            className="rounded-lg border border-border px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-secondary"
+          >
+            06 XX XX XX XX
+          </a>
           <a
             href="#diagnostic"
-            className="rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition-opacity hover:opacity-90"
+            className="group relative flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition-all hover:shadow-lg hover:shadow-primary/25"
           >
-            Analyser ma toiture
+            <Zap size={14} className="transition-transform group-hover:scale-110" />
+            Diagnostic gratuit
           </a>
         </div>
 
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
-          className="text-foreground md:hidden"
+          className="text-foreground lg:hidden p-2 rounded-lg hover:bg-secondary transition-colors"
           aria-label={mobileOpen ? "Fermer le menu" : "Ouvrir le menu"}
         >
-          {mobileOpen ? <X size={24} /> : <Menu size={24} />}
+          {mobileOpen ? <X size={22} /> : <Menu size={22} />}
         </button>
       </nav>
 
       {mobileOpen && (
-        <div className="border-t border-border bg-background px-6 pb-6 md:hidden">
-          <div className="flex flex-col gap-4 pt-4">
+        <div className="border-t border-border bg-background/98 backdrop-blur-xl px-6 pb-6 lg:hidden">
+          <div className="flex flex-col gap-1 pt-4">
             {navLinks.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
                 onClick={() => setMobileOpen(false)}
-                className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                className="rounded-lg px-4 py-3 text-sm text-muted-foreground transition-colors hover:text-foreground hover:bg-secondary"
               >
                 {link.label}
               </a>
             ))}
-            <a
-              href="#diagnostic"
-              onClick={() => setMobileOpen(false)}
-              className="rounded-lg bg-primary px-5 py-2.5 text-center text-sm font-medium text-primary-foreground"
-            >
-              Analyser ma toiture
-            </a>
+            <div className="mt-4 flex flex-col gap-3">
+              <a
+                href="tel:+33600000000"
+                onClick={() => setMobileOpen(false)}
+                className="rounded-lg border border-border px-4 py-3 text-center text-sm font-medium text-foreground"
+              >
+                06 XX XX XX XX
+              </a>
+              <a
+                href="#diagnostic"
+                onClick={() => setMobileOpen(false)}
+                className="flex items-center justify-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-medium text-primary-foreground"
+              >
+                <Zap size={14} />
+                Diagnostic gratuit
+              </a>
+            </div>
           </div>
         </div>
       )}
