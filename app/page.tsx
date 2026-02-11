@@ -58,7 +58,6 @@ const testimonials = [
 ];
 
 export default function HomePage() {
-  console.log("[v0] HomePage rendering");
   return (
     <>
       {/* Hero Section */}
