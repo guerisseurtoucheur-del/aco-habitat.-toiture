@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server"
-import nodemailer from "nodemailer"
 
 export async function POST(request: Request) {
   try {
@@ -22,16 +21,6 @@ export async function POST(request: Request) {
       charpente: "Charpente",
       autre: "Autre",
     }
-
-    const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST || "smtp.orange.fr",
-      port: Number(process.env.SMTP_PORT) || 465,
-      secure: true,
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
-    })
 
     const htmlContent = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
@@ -69,6 +58,19 @@ export async function POST(request: Request) {
         </div>
       </div>
     `
+
+    // Use nodemailer dynamically to avoid build-time bundling issues
+    const nodemailer = await import("nodemailer")
+    
+    const transporter = nodemailer.default.createTransport({
+      host: process.env.SMTP_HOST || "smtp.orange.fr",
+      port: Number(process.env.SMTP_PORT) || 465,
+      secure: true,
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+    })
 
     await transporter.sendMail({
       from: `"ACO-HABITAT Site Web" <${process.env.SMTP_USER}>`,
