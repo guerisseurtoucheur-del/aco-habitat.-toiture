@@ -4,14 +4,12 @@ import "./globals.css";
 import { Header } from "@/components/header";
 import { Footer } from "@/components/footer";
 
-const inter = Inter({
+const _inter = Inter({
   subsets: ["latin"],
-  variable: "--font-inter",
 });
 
-const playfair = Playfair_Display({
+const _playfair = Playfair_Display({
   subsets: ["latin"],
-  variable: "--font-playfair",
 });
 
 export const metadata: Metadata = {
@@ -42,8 +40,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="fr" className={`${inter.variable} ${playfair.variable}`}>
-      <body className="font-sans">
+    <html lang="fr">
+      <body className="font-sans antialiased">
         <Header />
         <main>{children}</main>
         <Footer />
