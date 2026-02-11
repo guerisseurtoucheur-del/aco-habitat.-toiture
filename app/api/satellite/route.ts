@@ -29,31 +29,47 @@ export async function POST(req: Request) {
     const { lat, lng } = geocodeData.results[0].geometry.location
     const formattedAddress = geocodeData.results[0].formatted_address
 
-    // Step 2: Get satellite image from Google Maps Static API
-    // Zoom 20 = very close (individual building rooftops visible)
-    const zoom = 20
+    // Step 2: Get multiple satellite images at different zoom levels
+    // scale=2 doubles resolution (1280x1280 effective pixels)
+    // Zoom 20 = close view, Zoom 21 = max zoom (best detail on rooftop)
     const size = "640x640"
+    const scale = 2
     const mapType = "satellite"
-    const satelliteUrl = `https://maps.googleapis.com/maps/api/staticmap?center=${lat},${lng}&zoom=${zoom}&size=${size}&maptype=${mapType}&key=${apiKey}`
 
-    // Fetch the image and convert to base64
-    const imageRes = await fetch(satelliteUrl)
-    if (!imageRes.ok) {
+    const zoomLevels = [
+      { zoom: 21, label: "Max (tuiles visibles)" },
+      { zoom: 20, label: "Rapproche (toiture complete)" },
+      { zoom: 19, label: "Vue large (batiment + environs)" },
+    ]
+
+    const images = await Promise.all(
+      zoomLevels.map(async ({ zoom, label }) => {
+        const url = `https://maps.googleapis.com/maps/api/staticmap?center=${lat},${lng}&zoom=${zoom}&size=${size}&scale=${scale}&maptype=${mapType}&key=${apiKey}`
+        const res = await fetch(url)
+        if (!res.ok) return null
+        const buffer = await res.arrayBuffer()
+        return {
+          zoom,
+          label,
+          image: `data:image/png;base64,${Buffer.from(buffer).toString("base64")}`,
+        }
+      })
+    )
+
+    const validImages = images.filter(Boolean)
+    if (validImages.length === 0) {
       return Response.json(
-        { error: "Impossible de recuperer l'image satellite." },
+        { error: "Impossible de recuperer les images satellite." },
         { status: 500 }
       )
     }
 
-    const imageBuffer = await imageRes.arrayBuffer()
-    const base64Image = `data:image/png;base64,${Buffer.from(imageBuffer).toString("base64")}`
-
     return Response.json({
-      image: base64Image,
+      images: validImages,
+      primaryImage: validImages[0]?.image,
       lat,
       lng,
       formattedAddress,
-      satelliteUrl,
     })
   } catch (error) {
     console.error("Satellite API error:", error)

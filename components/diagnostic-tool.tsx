@@ -21,10 +21,13 @@ import {
   EyeOff,
   Shield,
   Zap,
+  ZoomIn,
+  ZoomOut,
 } from "lucide-react"
 import type { DiagnosticResult, DiagnosticZone } from "@/lib/diagnostic-types"
 
 type Step = "address" | "satellite" | "analyzing" | "results"
+type SatelliteImage = { zoom: number; label: string; image: string }
 
 function ScoreGauge({
   score,
@@ -118,7 +121,8 @@ function ZoneOverlay({
 export function DiagnosticTool() {
   const [step, setStep] = useState<Step>("address")
   const [address, setAddress] = useState("")
-  const [satelliteImage, setSatelliteImage] = useState<string | null>(null)
+  const [satelliteImages, setSatelliteImages] = useState<SatelliteImage[]>([])
+  const [activeZoom, setActiveZoom] = useState(0)
   const [formattedAddress, setFormattedAddress] = useState("")
   const [diagnostic, setDiagnostic] = useState<DiagnosticResult | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -154,15 +158,19 @@ export function DiagnosticTool() {
         return
       }
 
-      setSatelliteImage(satData.image)
+      setSatelliteImages(satData.images || [{ zoom: 20, label: "Standard", image: satData.primaryImage }])
+      setActiveZoom(0)
       setFormattedAddress(satData.formattedAddress)
       setStep("analyzing")
+
+      // Use the highest zoom image for analysis (best detail)
+      const analysisImage = satData.images?.[0]?.image || satData.primaryImage
 
       const diagRes = await fetch("/api/diagnostic", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          image: satData.image,
+          image: analysisImage,
           address: satData.formattedAddress,
         }),
       })
@@ -194,7 +202,8 @@ export function DiagnosticTool() {
   const handleReset = () => {
     setStep("address")
     setAddress("")
-    setSatelliteImage(null)
+    setSatelliteImages([])
+    setActiveZoom(0)
     setDiagnostic(null)
     setError(null)
     setActiveTab("overview")
@@ -366,11 +375,11 @@ export function DiagnosticTool() {
               )}
 
               {/* Loading: analyzing */}
-              {step === "analyzing" && satelliteImage && (
+              {step === "analyzing" && satelliteImages.length > 0 && (
                 <div className="mt-6 space-y-4">
                   <div className="overflow-hidden rounded-xl border border-border">
                     <img
-                      src={satelliteImage}
+                      src={satelliteImages[0]?.image}
                       alt="Vue satellite de la toiture"
                       className="h-64 w-full object-cover"
                     />
@@ -436,7 +445,7 @@ export function DiagnosticTool() {
         )}
 
         {/* Results */}
-        {step === "results" && diagnostic && satelliteImage && (
+        {step === "results" && diagnostic && satelliteImages.length > 0 && (
           <div ref={resultsRef} className="animate-fade-up space-y-8">
             {/* Address bar */}
             <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-border bg-card p-4">
@@ -559,11 +568,29 @@ export function DiagnosticTool() {
               <div className="lg:col-span-2">
                 <div className="rounded-2xl border border-border bg-card p-4">
                   <div className="mb-4 flex flex-wrap items-center justify-between gap-3">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-3">
                       <Layers size={16} className="text-primary" />
                       <span className="text-sm font-medium text-foreground">
                         Vue satellite avec calques
                       </span>
+                      {satelliteImages.length > 1 && (
+                        <div className="flex items-center gap-1 rounded-lg border border-border bg-secondary/50 p-0.5">
+                          {satelliteImages.map((img, i) => (
+                            <button
+                              key={img.zoom}
+                              onClick={() => setActiveZoom(i)}
+                              className={`flex items-center gap-1 rounded-md px-2 py-1 text-[10px] font-medium transition-all ${
+                                activeZoom === i
+                                  ? "bg-primary text-primary-foreground"
+                                  : "text-muted-foreground hover:text-foreground"
+                              }`}
+                            >
+                              {i === 0 ? <ZoomIn size={10} /> : i === satelliteImages.length - 1 ? <ZoomOut size={10} /> : null}
+                              {img.label}
+                            </button>
+                          ))}
+                        </div>
+                      )}
                     </div>
                     <div className="flex items-center gap-1">
                       {[
@@ -609,7 +636,7 @@ export function DiagnosticTool() {
                   </div>
                   <div className="relative overflow-hidden rounded-xl">
                     <img
-                      src={satelliteImage}
+                      src={satelliteImages[activeZoom]?.image || satelliteImages[0]?.image}
                       alt="Vue satellite de la toiture"
                       className="w-full"
                       crossOrigin="anonymous"
