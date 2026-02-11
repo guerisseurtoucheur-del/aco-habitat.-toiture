@@ -9,22 +9,21 @@ export async function GET(req: Request) {
     return NextResponse.json({ error: "lat and lng required" }, { status: 400 })
   }
 
-  const apiKey = process.env.GOOGLE_MAPS_API_KEY
-  if (!apiKey) {
-    return NextResponse.json({ error: "Google Maps API key not configured" }, { status: 500 })
-  }
-
   try {
-    const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&language=fr&key=${apiKey}`
+    // Use the free French government reverse geocoding API
+    const url = `https://api-adresse.data.gouv.fr/reverse/?lat=${lat}&lon=${lng}&limit=1`
     const res = await fetch(url)
     const data = await res.json()
 
-    if (data.status !== "OK" || !data.results?.[0]) {
+    if (!data.features || data.features.length === 0) {
       return NextResponse.json({ error: "Adresse introuvable" }, { status: 404 })
     }
 
+    const feature = data.features[0]
     return NextResponse.json({
-      address: data.results[0].formatted_address,
+      address: feature.properties.label,
+      lat: feature.geometry.coordinates[1],
+      lng: feature.geometry.coordinates[0],
     })
   } catch {
     return NextResponse.json({ error: "Erreur de connexion" }, { status: 500 })

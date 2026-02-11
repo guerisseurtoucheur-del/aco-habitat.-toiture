@@ -39,6 +39,8 @@ type PlacePrediction = {
   description: string
   mainText: string
   secondaryText: string
+  lat?: number
+  lng?: number
 }
 
 /* ── Scanning Overlay with Radar ── */
@@ -428,6 +430,7 @@ export function DiagnosticTool() {
     etancheite: true,
   })
   const resultsRef = useRef<HTMLDivElement>(null)
+  const handleSearchRef = useRef<() => void>(() => {})
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -440,7 +443,7 @@ export function DiagnosticTool() {
     return () => document.removeEventListener("mousedown", handleClickOutside)
   }, [])
 
-  // Fetch autocomplete predictions
+  // Fetch autocomplete predictions from adresse.data.gouv.fr
   const fetchPredictions = useCallback((input: string) => {
     if (autocompleteTimer.current) clearTimeout(autocompleteTimer.current)
     if (input.length < 3) {
@@ -450,10 +453,8 @@ export function DiagnosticTool() {
     }
     autocompleteTimer.current = setTimeout(async () => {
       try {
-        console.log("[v0] Fetching predictions for:", input)
         const res = await fetch(`/api/places?input=${encodeURIComponent(input)}`)
         const data = await res.json()
-        console.log("[v0] Predictions response:", JSON.stringify(data).slice(0, 200))
         if (data.predictions?.length > 0) {
           setPredictions(data.predictions)
           setShowDropdown(true)
@@ -461,11 +462,10 @@ export function DiagnosticTool() {
           setPredictions([])
           setShowDropdown(false)
         }
-      } catch (err) {
-        console.log("[v0] Predictions error:", err)
+      } catch {
         setPredictions([])
       }
-    }, 300)
+    }, 250)
   }, [])
 
   // Handle address input change
@@ -477,16 +477,19 @@ export function DiagnosticTool() {
     [fetchPredictions]
   )
 
-  // Select a prediction
+  // Select a prediction => set address and auto-launch scan
   const handleSelectPrediction = useCallback((prediction: PlacePrediction) => {
     setAddress(prediction.description)
     setShowDropdown(false)
     setPredictions([])
+    // Auto-launch analysis after a brief delay for UI feedback
+    setTimeout(() => {
+      handleSearchRef.current()
+    }, 100)
   }, [])
 
-  // Geolocation
+  // Geolocation via adresse.data.gouv.fr reverse geocoding
   const handleGeolocate = useCallback(async () => {
-    console.log("[v0] Geolocation clicked, supported:", !!navigator.geolocation)
     if (!navigator.geolocation) {
       setError("La geolocalisation n'est pas supportee par votre navigateur.")
       return
@@ -497,28 +500,31 @@ export function DiagnosticTool() {
       async (position) => {
         try {
           const { latitude, longitude } = position.coords
-          console.log("[v0] GPS coords:", latitude, longitude)
           const res = await fetch(`/api/geocode?lat=${latitude}&lng=${longitude}`)
           const data = await res.json()
-          console.log("[v0] Reverse geocode:", data)
           if (data.address) {
             setAddress(data.address)
+            // Auto-launch analysis
+            setTimeout(() => {
+              handleSearchRef.current()
+            }, 100)
           } else {
-            setError("Impossible de trouver votre adresse.")
+            setError("Impossible de trouver votre adresse. Verifiez que vous etes en France.")
           }
-        } catch (err) {
-          console.log("[v0] Geocode error:", err)
+        } catch {
           setError("Erreur lors de la geolocalisation.")
         } finally {
           setGeolocating(false)
         }
       },
-      (err) => {
-        console.log("[v0] Geolocation denied:", err.code, err.message)
-        setError("Geolocalisation refusee. Autorisez l'acces a votre position.")
+      (geoErr) => {
+        const msg = geoErr.code === 1
+          ? "Geolocalisation refusee. Autorisez l'acces dans les parametres de votre navigateur."
+          : "Impossible d'obtenir votre position. Reessayez."
+        setError(msg)
         setGeolocating(false)
       },
-      { enableHighAccuracy: true, timeout: 10000 }
+      { enableHighAccuracy: true, timeout: 15000 }
     )
   }, [])
 
@@ -579,6 +585,11 @@ export function DiagnosticTool() {
       setStep("address")
     }
   }, [address])
+
+  // Keep ref in sync so auto-launch works from selection/geolocation
+  useEffect(() => {
+    handleSearchRef.current = handleSearch
+  }, [handleSearch])
 
   const handleReset = () => {
   setStep("address")
@@ -702,86 +713,94 @@ export function DiagnosticTool() {
                 </div>
               </div>
 
-              <div className="flex gap-3">
-                <div className="relative flex-1" ref={dropdownRef}>
-                  <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
-                  <input
-                    type="text"
-                    value={address}
-                    onChange={(e) => handleAddressChange(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === "Enter" && step === "address") {
-                        setShowDropdown(false)
-                        handleSearch()
-                      }
-                    }}
-                    onFocus={() => predictions.length > 0 && setShowDropdown(true)}
-                    placeholder="12 rue de la Paix, 75002 Paris"
-                    disabled={step !== "address"}
-                    className="h-12 w-full rounded-xl border border-border bg-background pl-11 pr-12 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
-                  />
-                  {/* Geolocation button */}
+              <div className="flex flex-col gap-3">
+                <div className="flex gap-3">
+                  <div className="relative flex-1" ref={dropdownRef}>
+                    <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
+                    <input
+                      type="text"
+                      value={address}
+                      onChange={(e) => handleAddressChange(e.target.value)}
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter" && step === "address") {
+                          setShowDropdown(false)
+                          handleSearch()
+                        }
+                      }}
+                      onFocus={() => predictions.length > 0 && setShowDropdown(true)}
+                      placeholder="12 rue de la Paix, 75002 Paris"
+                      disabled={step !== "address"}
+                      className="h-12 w-full rounded-xl border border-border bg-background pl-11 pr-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20 disabled:opacity-50"
+                    />
+
+                    {/* Autocomplete dropdown */}
+                    {showDropdown && predictions.length > 0 && (
+                      <div className="absolute left-0 right-0 top-[calc(100%+4px)] z-50 overflow-hidden rounded-xl border border-border bg-card shadow-xl shadow-background/50">
+                        {predictions.map((p, i) => (
+                          <button
+                            key={p.placeId}
+                            type="button"
+                            onClick={() => handleSelectPrediction(p)}
+                            className={`flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-secondary/60 ${
+                              i !== 0 ? "border-t border-border/50" : ""
+                            }`}
+                          >
+                            <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
+                              <MapPin size={14} className="text-primary" />
+                            </div>
+                            <div className="min-w-0 flex-1">
+                              <p className="truncate text-sm font-medium text-foreground">
+                                {p.mainText}
+                              </p>
+                              <p className="truncate text-xs text-muted-foreground">
+                                {p.secondaryText}
+                              </p>
+                            </div>
+                          </button>
+                        ))}
+                        <div className="border-t border-border/50 px-4 py-2">
+                          <p className="text-[10px] text-muted-foreground/60">
+                            Donnees adresse.data.gouv.fr
+                          </p>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                   <button
-                    type="button"
-                    onClick={handleGeolocate}
-                    disabled={step !== "address" || geolocating}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 flex h-7 w-7 items-center justify-center rounded-lg text-muted-foreground transition-all hover:bg-primary/10 hover:text-primary disabled:opacity-50"
-                    title="Me localiser automatiquement"
+                    onClick={() => {
+                      setShowDropdown(false)
+                      handleSearch()
+                    }}
+                    disabled={step !== "address" || !address.trim()}
+                    className="flex h-12 items-center gap-2 rounded-xl bg-primary px-6 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90 disabled:opacity-50"
                   >
-                    {geolocating ? (
-                      <Loader2 size={15} className="animate-spin text-primary" />
+                    {step === "satellite" ? (
+                      <>
+                        <Loader2 size={16} className="animate-spin" />
+                        <span className="hidden sm:inline">Analyse...</span>
+                      </>
                     ) : (
-                      <Navigation size={15} />
+                      <>
+                        <Satellite size={16} />
+                        <span className="hidden sm:inline">Analyser ma toiture</span>
+                      </>
                     )}
                   </button>
-
-                  {/* Autocomplete dropdown */}
-                  {showDropdown && predictions.length > 0 && (
-                    <div className="absolute left-0 right-0 top-[calc(100%+4px)] z-50 overflow-hidden rounded-xl border border-border bg-card shadow-xl shadow-background/50">
-                      {predictions.map((p, i) => (
-                        <button
-                          key={p.placeId}
-                          type="button"
-                          onClick={() => handleSelectPrediction(p)}
-                          className={`flex w-full items-center gap-3 px-4 py-3 text-left transition-colors hover:bg-secondary/60 ${
-                            i !== 0 ? "border-t border-border/50" : ""
-                          }`}
-                        >
-                          <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-primary/10">
-                            <MapPin size={14} className="text-primary" />
-                          </div>
-                          <div className="min-w-0 flex-1">
-                            <p className="truncate text-sm font-medium text-foreground">
-                              {p.mainText}
-                            </p>
-                            <p className="truncate text-xs text-muted-foreground">
-                              {p.secondaryText}
-                            </p>
-                          </div>
-                        </button>
-                      ))}
-                    </div>
-                  )}
                 </div>
+
+                {/* Geolocation button */}
                 <button
-                  onClick={() => {
-                    setShowDropdown(false)
-                    handleSearch()
-                  }}
-                  disabled={step !== "address" || !address.trim()}
-                  className="flex h-12 items-center gap-2 rounded-xl bg-primary px-6 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90 disabled:opacity-50"
+                  type="button"
+                  onClick={handleGeolocate}
+                  disabled={step !== "address" || geolocating}
+                  className="flex items-center gap-2 self-start rounded-lg border border-border bg-secondary/40 px-3 py-2 text-xs font-medium text-muted-foreground transition-all hover:border-primary/30 hover:bg-primary/5 hover:text-primary disabled:opacity-50"
                 >
-                  {step === "satellite" ? (
-                    <>
-                      <Loader2 size={16} className="animate-spin" />
-                      <span className="hidden sm:inline">Satellite...</span>
-                    </>
+                  {geolocating ? (
+                    <Loader2 size={14} className="animate-spin text-primary" />
                   ) : (
-                    <>
-                      <Satellite size={16} />
-                      <span className="hidden sm:inline">Analyser</span>
-                    </>
+                    <Crosshair size={14} />
                   )}
+                  {geolocating ? "Localisation en cours..." : "Ma position actuelle"}
                 </button>
               </div>
 
