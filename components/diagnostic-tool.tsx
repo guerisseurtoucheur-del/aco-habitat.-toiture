@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useRef, useCallback, useEffect } from "react"
+import dynamic from "next/dynamic"
 import {
   MapPin,
   Search,
@@ -21,21 +22,32 @@ import {
   EyeOff,
   Shield,
   Zap,
-  ZoomIn,
-  ZoomOut,
   Phone,
   Send,
   Download,
   ScanLine,
   Crosshair,
-  Navigation,
   Thermometer,
   Flame,
+  MapPinned,
 } from "lucide-react"
 import type { DiagnosticResult, DiagnosticZone } from "@/lib/diagnostic-types"
+import type { MapCaptureData, MapMeasurement } from "./leaflet-map"
 
-type Step = "address" | "satellite" | "scanning" | "analyzing" | "results"
-type SatelliteImage = { zoom: number; label: string; image: string }
+/* Dynamic import of LeafletMap to avoid SSR issues with Leaflet */
+const LeafletMap = dynamic(() => import("./leaflet-map"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex h-[450px] w-full items-center justify-center rounded-xl border border-border bg-card md:h-[500px]">
+      <div className="flex flex-col items-center gap-3">
+        <Loader2 size={24} className="animate-spin text-primary" />
+        <span className="text-xs text-muted-foreground">Chargement de la carte...</span>
+      </div>
+    </div>
+  ),
+})
+
+type Step = "address" | "map" | "scanning" | "analyzing" | "results"
 type PlacePrediction = {
   placeId: string
   description: string
@@ -661,8 +673,9 @@ export function DiagnosticTool() {
   const [geolocating, setGeolocating] = useState(false)
   const autocompleteTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
-  const [satelliteImages, setSatelliteImages] = useState<SatelliteImage[]>([])
-  const [activeZoom, setActiveZoom] = useState(0)
+  const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number } | null>(null)
+  const [capturedImage, setCapturedImage] = useState<string | null>(null)
+  const [mapMeasurements, setMapMeasurements] = useState<MapMeasurement[]>([])
   const [thermalMode, setThermalMode] = useState(true)
   const [formattedAddress, setFormattedAddress] = useState("")
   const [diagnostic, setDiagnostic] = useState<DiagnosticResult | null>(null)
@@ -771,49 +784,68 @@ export function DiagnosticTool() {
     )
   }, [])
 
+  // Geocode the address and show the interactive map
   const handleSearch = useCallback(async () => {
     if (!address.trim()) return
     setError(null)
-    setStep("satellite")
+    setStep("map")
 
     try {
-      const satRes = await fetch("/api/satellite", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ address }),
-      })
-      const satData = await satRes.json()
+      // Geocode the address to get coordinates
+      const geoRes = await fetch(`/api/geocode?address=${encodeURIComponent(address)}`)
+      const geoData = await geoRes.json()
 
-      if (!satRes.ok) {
-        setError(satData.error || "Erreur lors de la recuperation de l'image satellite.")
-        setStep("address")
-        return
+      if (geoData.lat && geoData.lng) {
+        setMapCenter({ lat: geoData.lat, lng: geoData.lng })
+        setFormattedAddress(geoData.address || address)
+      } else {
+        // Fallback: try to get coords from the address via adresse.data.gouv.fr directly
+        const fallbackRes = await fetch(`https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(address)}&limit=1`)
+        const fallbackData = await fallbackRes.json()
+        if (fallbackData.features?.length > 0) {
+          const [lng, lat] = fallbackData.features[0].geometry.coordinates
+          setMapCenter({ lat, lng })
+          setFormattedAddress(fallbackData.features[0].properties.label || address)
+        } else {
+          setError("Impossible de localiser cette adresse. Verifiez et reessayez.")
+          setStep("address")
+          return
+        }
       }
+    } catch {
+      setError("Erreur lors de la localisation. Verifiez votre connexion.")
+      setStep("address")
+    }
+  }, [address])
 
-      setSatelliteImages(satData.images || [{ zoom: 20, label: "Standard", image: satData.primaryImage }])
-      setActiveZoom(0)
-      setFormattedAddress(satData.formattedAddress)
+  // Handle map capture -> run AI analysis
+  const handleMapCapture = useCallback(async (data: MapCaptureData) => {
+    setCapturedImage(data.imageBase64)
+    setMapMeasurements(data.measurements)
+    setStep("scanning")
 
+    try {
       // Show scanning animation for 3 seconds
-      setStep("scanning")
       await new Promise((r) => setTimeout(r, 3000))
-
       setStep("analyzing")
 
-      const analysisImage = satData.images?.[0]?.image || satData.primaryImage
+      // Send the captured image to the AI diagnostic
       const diagRes = await fetch("/api/diagnostic", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          image: analysisImage,
-          address: satData.formattedAddress,
+          image: data.imageBase64,
+          address: formattedAddress,
+          measurements: data.measurements,
+          bounds: data.bounds,
+          zoom: data.zoom,
         }),
       })
       const diagData = await diagRes.json()
 
       if (!diagRes.ok) {
         setError(diagData.error || "Erreur lors de l'analyse IA.")
-        setStep("address")
+        setStep("map")
         return
       }
 
@@ -825,9 +857,9 @@ export function DiagnosticTool() {
       }, 300)
     } catch {
       setError("Une erreur est survenue. Verifiez votre connexion et reessayez.")
-      setStep("address")
+      setStep("map")
     }
-  }, [address])
+  }, [formattedAddress])
 
   // Keep ref in sync so auto-launch works from selection/geolocation
   useEffect(() => {
@@ -835,14 +867,15 @@ export function DiagnosticTool() {
   }, [handleSearch])
 
   const handleReset = () => {
-  setStep("address")
-  setAddress("")
-  setPredictions([])
-  setShowDropdown(false)
-  setSatelliteImages([])
-  setActiveZoom(0)
-  setThermalMode(false)
-  setDiagnostic(null)
+    setStep("address")
+    setAddress("")
+    setPredictions([])
+    setShowDropdown(false)
+    setMapCenter(null)
+    setCapturedImage(null)
+    setMapMeasurements([])
+    setThermalMode(true)
+    setDiagnostic(null)
     setError(null)
     setLayerState({ vegetal: true, structure: true, etancheite: true })
   }
@@ -873,12 +906,12 @@ export function DiagnosticTool() {
 
   const progressSteps = [
     { key: "address", label: "Adresse", icon: MapPin },
-    { key: "satellite", label: "Satellite", icon: Satellite },
+    { key: "map", label: "Carte IGN", icon: MapPinned },
     { key: "scanning", label: "Scan", icon: Zap },
     { key: "analyzing", label: "Analyse IA", icon: Brain },
     { key: "results", label: "Resultats", icon: FileText },
   ]
-  const stepsOrder: Step[] = ["address", "satellite", "scanning", "analyzing", "results"]
+  const stepsOrder: Step[] = ["address", "map", "scanning", "analyzing", "results"]
   const currentIndex = stepsOrder.indexOf(step)
 
   return (
@@ -940,7 +973,7 @@ export function DiagnosticTool() {
         </div>
 
         {/* Address Input */}
-        {(step === "address" || step === "satellite") && (
+        {step === "address" && (
           <div className="mx-auto max-w-2xl">
             <div className="rounded-2xl border border-border bg-card p-8">
               <div className="mb-6 flex items-center gap-3">
@@ -1015,20 +1048,11 @@ export function DiagnosticTool() {
                       setShowDropdown(false)
                       handleSearch()
                     }}
-                    disabled={step !== "address" || !address.trim()}
+                    disabled={!address.trim()}
                     className="flex h-12 items-center gap-2 rounded-xl bg-primary px-6 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90 disabled:opacity-50"
                   >
-                    {step === "satellite" ? (
-                      <>
-                        <Loader2 size={16} className="animate-spin" />
-                        <span className="hidden sm:inline">Analyse...</span>
-                      </>
-                    ) : (
-                      <>
-                        <Satellite size={16} />
-                        <span className="hidden sm:inline">Analyser ma toiture</span>
-                      </>
-                    )}
+                    <MapPinned size={16} />
+                    <span className="hidden sm:inline">Localiser ma toiture</span>
                   </button>
                 </div>
 
