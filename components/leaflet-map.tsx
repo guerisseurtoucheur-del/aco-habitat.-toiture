@@ -17,22 +17,19 @@ import {
 } from "lucide-react"
 
 /* ── IGN WMTS tile URLs (free, no API key) ── */
-/* HR.ORTHOIMAGERY.ORTHOPHOTOS = Haute Resolution layer, native zoom up to 21 */
+/* ORTHOIMAGERY.ORTHOPHOTOS: reliable coverage, native zoom up to 19-20 */
+/* Leaflet upscales tiles beyond maxNativeZoom for closer views */
 const IGN_ORTHO =
-  "https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=HR.ORTHOIMAGERY.ORTHOPHOTOS&STYLE=normal&FORMAT=image/jpeg&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}"
+  "https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=ORTHOIMAGERY.ORTHOPHOTOS&STYLE=normal&FORMAT=image/jpeg&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}"
 const IGN_PLAN =
   "https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2&STYLE=normal&FORMAT=image/png&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}"
 const IGN_CADASTRE =
   "https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=CADASTRALPARCELS.PARCELLAIRE_EXPRESS&STYLE=normal&FORMAT=image/png&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}"
 
-const ATTRIBUTION = "&copy; <a href='https://www.ign.fr'>IGN</a> - Ortho HR"
+const ATTRIBUTION = "&copy; <a href='https://www.ign.fr'>IGN</a>"
 
-/* ── IGN WMS endpoint for server-side image capture (avoids CORS) ── */
-const IGN_WMS_CAPTURE =
-  "https://data.geopf.fr/wms-r/wms?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&LAYERS=HR.ORTHOIMAGERY.ORTHOPHOTOS&STYLES=&FORMAT=image/jpeg&CRS=EPSG:4326"
-
-/* Half-side of the auto selection box in degrees (~20m at mid-France latitudes) */
-const BOX_HALF_DEG = 0.0001
+/* Half-side of the auto selection box in degrees (~35m at mid-France latitudes) */
+const BOX_HALF_DEG = 0.00035
 
 /* ── Measurement helpers ── */
 function calcPolygonArea(latlngs: L.LatLng[]): number {
@@ -120,11 +117,11 @@ export default function LeafletMap({
 
     const map = L.map(mapContainerRef.current, {
       center: [center.lat, center.lng],
-      zoom: 21,
+      zoom: 19,
       zoomControl: false,
       attributionControl: true,
-      minZoom: 17,
-      maxZoom: 23,
+      minZoom: 15,
+      maxZoom: 21,
       /* Smooth scroll-wheel zoom */
       scrollWheelZoom: true,
       wheelPxPerZoomLevel: 120,
@@ -135,10 +132,11 @@ export default function LeafletMap({
     L.control.zoom({ position: "topright" }).addTo(map)
 
     // Base tile layer (satellite by default)
-    // maxNativeZoom 21 = highest native IGN tile, Leaflet upscales beyond
+    // maxNativeZoom 19 = highest native IGN ORTHO tile with guaranteed coverage
+    // Leaflet upscales to zoom 20-21 for closer views
     const tileLayer = L.tileLayer(IGN_ORTHO, {
-      maxZoom: 23,
-      maxNativeZoom: 21,
+      maxZoom: 21,
+      maxNativeZoom: 19,
       tileSize: 256,
       attribution: ATTRIBUTION,
     }).addTo(map)
@@ -250,16 +248,15 @@ export default function LeafletMap({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // Update center when props change: setView to zoom 21 for close roof view
+  // Update center when props change: setView to zoom 19 for clear roof view
   useEffect(() => {
     const map = mapRef.current
     if (!map) return
 
-    // Use setView first for instant positioning, then flyTo for smooth zoom
-    map.setView([center.lat, center.lng], 21, { animate: false })
-    // Then animate a smooth zoom
+    // Instant position then smooth animation to zoom 19
+    map.setView([center.lat, center.lng], 19, { animate: false })
     setTimeout(() => {
-      map.flyTo([center.lat, center.lng], 21, {
+      map.flyTo([center.lat, center.lng], 19, {
         animate: true,
         duration: 0.8,
       })
@@ -286,7 +283,7 @@ export default function LeafletMap({
     map.removeLayer(tileLayerRef.current)
 
     const url = activeLayer === "satellite" ? IGN_ORTHO : activeLayer === "plan" ? IGN_PLAN : IGN_ORTHO
-    const newLayer = L.tileLayer(url, { maxZoom: 23, maxNativeZoom: 21, tileSize: 256, attribution: ATTRIBUTION }).addTo(map)
+    const newLayer = L.tileLayer(url, { maxZoom: 21, maxNativeZoom: 19, tileSize: 256, attribution: ATTRIBUTION }).addTo(map)
     tileLayerRef.current = newLayer
   }, [activeLayer])
 
@@ -297,8 +294,8 @@ export default function LeafletMap({
 
     if (showCadastre && !cadastreLayerRef.current) {
       cadastreLayerRef.current = L.tileLayer(IGN_CADASTRE, {
-        maxZoom: 23,
-        maxNativeZoom: 21,
+        maxZoom: 21,
+        maxNativeZoom: 19,
         tileSize: 256,
         attribution: ATTRIBUTION,
         opacity: 0.7,
@@ -364,7 +361,9 @@ export default function LeafletMap({
     setIsCapturing(true)
 
     try {
-      // Use selection box bounds if available, else map viewport
+      // CRITICAL: Use the SELECTION BOX bounds, NOT the full viewport.
+      // The selection box covers ~35m, viewport covers ~300m at zoom 19.
+      // Smaller BBOX = much sharper image for the same pixel count.
       const captureBounds = selectionBoxRef.current
         ? selectionBoxRef.current.getBounds()
         : mapRef.current.getBounds()
@@ -375,26 +374,27 @@ export default function LeafletMap({
       const east = captureBounds.getEast()
       const captureCenter = captureBounds.getCenter()
 
-      // Request a high-res image from IGN WMS server directly
-      // BBOX format for CRS=EPSG:4326 is: minLat,minLon,maxLat,maxLon
-      const wmsUrl = `${IGN_WMS_CAPTURE}&WIDTH=1024&HEIGHT=1024&BBOX=${south},${west},${north},${east}`
-
-      // Fetch the image through our own API proxy to avoid CORS
+      // Request a square 1600x1600 image for the ~35m selection box
+      // This gives ~2cm/pixel resolution -- sharp enough to see individual tiles
       const response = await fetch("/api/map-capture", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: wmsUrl }),
+        body: JSON.stringify({
+          bounds: { south, west, north, east },
+          width: 1600,
+          height: 1600,
+        }),
       })
 
       if (!response.ok) {
-        throw new Error(`Capture failed: ${response.status}`)
+        const errData = await response.json().catch(() => ({}))
+        throw new Error(errData.error || `Capture failed: ${response.status}`)
       }
 
       const data = await response.json()
-      const imageBase64 = data.imageBase64
 
       onCapture?.({
-        imageBase64,
+        imageBase64: data.imageBase64,
         bounds: { north, south, east, west },
         center: { lat: captureCenter.lat, lng: captureCenter.lng },
         zoom: mapRef.current.getZoom(),

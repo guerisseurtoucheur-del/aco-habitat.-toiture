@@ -809,7 +809,7 @@ export function DiagnosticTool() {
               {/* Leaflet Map */}
               <LeafletMap
                 center={mapCenter}
-                zoom={20}
+                zoom={19}
                 onCapture={handleMapCapture}
                 onMeasurementsChange={(m) => setMapMeasurements(m)}
                 className="h-[450px] md:h-[550px]"
