@@ -120,11 +120,11 @@ export default function LeafletMap({
 
     const map = L.map(mapContainerRef.current, {
       center: [center.lat, center.lng],
-      zoom: 20,
+      zoom: 21,
       zoomControl: false,
       attributionControl: true,
       minZoom: 17,
-      maxZoom: 21,
+      maxZoom: 23,
       /* Smooth scroll-wheel zoom */
       scrollWheelZoom: true,
       wheelPxPerZoomLevel: 120,
@@ -135,9 +135,9 @@ export default function LeafletMap({
     L.control.zoom({ position: "topright" }).addTo(map)
 
     // Base tile layer (satellite by default)
-    // maxNativeZoom 21 = request tiles at zoom 20-21 from IGN directly
+    // maxNativeZoom 21 = highest native IGN tile, Leaflet upscales beyond
     const tileLayer = L.tileLayer(IGN_ORTHO, {
-      maxZoom: 21,
+      maxZoom: 23,
       maxNativeZoom: 21,
       tileSize: 256,
       attribution: ATTRIBUTION,
@@ -250,16 +250,16 @@ export default function LeafletMap({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // Update center when props change: setView to zoom 20 then flyTo for smooth animation
+  // Update center when props change: setView to zoom 21 for close roof view
   useEffect(() => {
     const map = mapRef.current
     if (!map) return
 
     // Use setView first for instant positioning, then flyTo for smooth zoom
-    map.setView([center.lat, center.lng], 20, { animate: false })
+    map.setView([center.lat, center.lng], 21, { animate: false })
     // Then animate a smooth zoom
     setTimeout(() => {
-      map.flyTo([center.lat, center.lng], 20, {
+      map.flyTo([center.lat, center.lng], 21, {
         animate: true,
         duration: 0.8,
       })
@@ -286,7 +286,7 @@ export default function LeafletMap({
     map.removeLayer(tileLayerRef.current)
 
     const url = activeLayer === "satellite" ? IGN_ORTHO : activeLayer === "plan" ? IGN_PLAN : IGN_ORTHO
-    const newLayer = L.tileLayer(url, { maxZoom: 21, maxNativeZoom: 21, tileSize: 256, attribution: ATTRIBUTION }).addTo(map)
+    const newLayer = L.tileLayer(url, { maxZoom: 23, maxNativeZoom: 21, tileSize: 256, attribution: ATTRIBUTION }).addTo(map)
     tileLayerRef.current = newLayer
   }, [activeLayer])
 
@@ -297,7 +297,7 @@ export default function LeafletMap({
 
     if (showCadastre && !cadastreLayerRef.current) {
       cadastreLayerRef.current = L.tileLayer(IGN_CADASTRE, {
-        maxZoom: 21,
+        maxZoom: 23,
         maxNativeZoom: 21,
         tileSize: 256,
         attribution: ATTRIBUTION,
