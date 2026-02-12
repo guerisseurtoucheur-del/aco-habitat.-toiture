@@ -16,15 +16,26 @@ import {
   Landmark,
 } from "lucide-react"
 
-/* ── IGN tile URLs (free, no API key) ── */
+/* ── IGN WMTS tile URLs (free, no API key) ── */
+/* PM tilematrixset: native tiles available up to zoom 19 for ortho, upscale to 21 */
 const IGN_ORTHO =
-  "https://data.geopf.fr/wmts?service=WMTS&request=GetTile&version=1.0.0&tilematrixset=PM&tilematrix={z}&tilecol={x}&tilerow={y}&layer=ORTHOIMAGERY.ORTHOPHOTOS&format=image/jpeg&style=normal"
+  "https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&TILEMATRIXSET=PM&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}&LAYER=ORTHOIMAGERY.ORTHOPHOTOS&FORMAT=image/jpeg&STYLE=normal"
 const IGN_PLAN =
-  "https://data.geopf.fr/wmts?service=WMTS&request=GetTile&version=1.0.0&tilematrixset=PM&tilematrix={z}&tilecol={x}&tilerow={y}&layer=GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2&format=image/png&style=normal"
+  "https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&TILEMATRIXSET=PM&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}&LAYER=GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2&FORMAT=image/png&STYLE=normal"
 const IGN_CADASTRE =
-  "https://data.geopf.fr/wmts?service=WMTS&request=GetTile&version=1.0.0&tilematrixset=PM&tilematrix={z}&tilecol={x}&tilerow={y}&layer=CADASTRALPARCELS.PARCELLAIRE_EXPRESS&format=image/png&style=normal"
+  "https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&TILEMATRIXSET=PM&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}&LAYER=CADASTRALPARCELS.PARCELLAIRE_EXPRESS&FORMAT=image/png&STYLE=normal"
 
-const ATTRIBUTION = "&copy; <a href='https://www.ign.fr'>IGN</a>"
+const ATTRIBUTION = "&copy; <a href='https://www.ign.fr'>IGN</a> - Ortho-photo"
+
+/* Number of meters for the auto selection box (half-side) */
+const SELECTION_BOX_HALF_M = 10 // 20m x 20m box
+
+/* Convert meters offset to lat/lng delta */
+function metersToLatLng(lat: number, meters: number) {
+  const dLat = meters / 110540
+  const dLng = meters / (111320 * Math.cos((lat * Math.PI) / 180))
+  return { dLat, dLng }
+}
 
 /* ── Measurement helpers ── */
 function calcPolygonArea(latlngs: L.LatLng[]): number {
@@ -86,6 +97,8 @@ export default function LeafletMap({
   const cadastreLayerRef = useRef<L.TileLayer | null>(null)
   const drawnItemsRef = useRef<L.FeatureGroup | null>(null)
   const drawControlRef = useRef<L.Control.Draw | null>(null)
+  const markerRef = useRef<L.Marker | null>(null)
+  const selectionBoxRef = useRef<L.Rectangle | null>(null)
 
   const [activeLayer, setActiveLayer] = useState<LayerMode>("satellite")
   const [showCadastre, setShowCadastre] = useState(false)
@@ -110,20 +123,60 @@ export default function LeafletMap({
 
     const map = L.map(mapContainerRef.current, {
       center: [center.lat, center.lng],
-      zoom,
+      zoom: Math.max(zoom, 20),
       zoomControl: false,
       attributionControl: true,
+      minZoom: 17,
+      maxZoom: 21,
     })
 
     // Add zoom control top-right
     L.control.zoom({ position: "topright" }).addTo(map)
 
     // Base tile layer (satellite by default)
+    // IGN PM tilematrixset has native tiles up to zoom 19, upscale beyond
     const tileLayer = L.tileLayer(IGN_ORTHO, {
       maxZoom: 21,
-      maxNativeZoom: 20,
+      maxNativeZoom: 19,
+      tileSize: 256,
       attribution: ATTRIBUTION,
     }).addTo(map)
+
+    // Place marker on the exact address coordinates
+    const addressMarker = L.marker([center.lat, center.lng], {
+      title: "Adresse",
+    }).addTo(map)
+    markerRef.current = addressMarker
+
+    // Auto-draw a 20x20m selection rectangle centered on the address
+    const { dLat, dLng } = metersToLatLng(center.lat, SELECTION_BOX_HALF_M)
+    const selectionBounds: L.LatLngBoundsExpression = [
+      [center.lat - dLat, center.lng - dLng],
+      [center.lat + dLat, center.lng + dLng],
+    ]
+    const selectionBox = L.rectangle(selectionBounds, {
+      color: "#3b82f6",
+      weight: 2,
+      fillColor: "#3b82f6",
+      fillOpacity: 0.12,
+      dashArray: "6, 4",
+      interactive: true,
+    }).addTo(map)
+
+    // Make the selection box editable (draggable + resizable)
+    // @ts-expect-error - editing is available via leaflet-draw plugin
+    if (selectionBox.editing) {
+      // @ts-expect-error - editing.enable() from leaflet-draw
+      selectionBox.editing.enable()
+    }
+    selectionBoxRef.current = selectionBox
+
+    // Bind tooltip to show the user they can resize
+    selectionBox.bindTooltip("Zone d'analyse (20x20m) - redimensionnable", {
+      permanent: false,
+      direction: "top",
+      className: "leaflet-measurement-label",
+    })
 
     tileLayerRef.current = tileLayer
 
@@ -191,14 +244,35 @@ export default function LeafletMap({
     return () => {
       map.remove()
       mapRef.current = null
+      markerRef.current = null
+      selectionBoxRef.current = null
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  // Update center when props change
+  // Update center when props change: flyTo zoom 20 with smooth animation
   useEffect(() => {
-    if (mapRef.current) {
-      mapRef.current.setView([center.lat, center.lng], zoom, { animate: true })
+    const map = mapRef.current
+    if (!map) return
+
+    const targetZoom = Math.max(zoom, 20)
+    map.flyTo([center.lat, center.lng], targetZoom, {
+      animate: true,
+      duration: 1.5,
+    })
+
+    // Update marker position
+    if (markerRef.current) {
+      markerRef.current.setLatLng([center.lat, center.lng])
+    }
+
+    // Update selection box position (20x20m centered)
+    if (selectionBoxRef.current) {
+      const { dLat, dLng } = metersToLatLng(center.lat, SELECTION_BOX_HALF_M)
+      selectionBoxRef.current.setBounds([
+        [center.lat - dLat, center.lng - dLng],
+        [center.lat + dLat, center.lng + dLng],
+      ])
     }
   }, [center.lat, center.lng, zoom])
 
@@ -209,7 +283,7 @@ export default function LeafletMap({
     map.removeLayer(tileLayerRef.current)
 
     const url = activeLayer === "satellite" ? IGN_ORTHO : activeLayer === "plan" ? IGN_PLAN : IGN_ORTHO
-    const newLayer = L.tileLayer(url, { maxZoom: 21, maxNativeZoom: 20, attribution: ATTRIBUTION }).addTo(map)
+    const newLayer = L.tileLayer(url, { maxZoom: 21, maxNativeZoom: 19, tileSize: 256, attribution: ATTRIBUTION }).addTo(map)
     tileLayerRef.current = newLayer
   }, [activeLayer])
 
@@ -221,7 +295,8 @@ export default function LeafletMap({
     if (showCadastre && !cadastreLayerRef.current) {
       cadastreLayerRef.current = L.tileLayer(IGN_CADASTRE, {
         maxZoom: 21,
-        maxNativeZoom: 20,
+        maxNativeZoom: 19,
+        tileSize: 256,
         attribution: ATTRIBUTION,
         opacity: 0.7,
       }).addTo(map)
@@ -284,6 +359,13 @@ export default function LeafletMap({
     setIsCapturing(true)
 
     try {
+      // If there is a selection box, zoom/fit to it first for a tight capture
+      if (selectionBoxRef.current) {
+        mapRef.current.fitBounds(selectionBoxRef.current.getBounds(), { padding: [20, 20], animate: false })
+        // Wait for tiles to load after fitBounds
+        await new Promise((r) => setTimeout(r, 800))
+      }
+
       // Use html2canvas to capture the map container
       const html2canvas = (await import("html2canvas")).default
       const canvas = await html2canvas(mapContainerRef.current, {
@@ -294,19 +376,23 @@ export default function LeafletMap({
         backgroundColor: null,
       })
 
-      const imageBase64 = canvas.toDataURL("image/jpeg", 0.9)
-      const bounds = mapRef.current.getBounds()
-      const mapCenter = mapRef.current.getCenter()
+      const imageBase64 = canvas.toDataURL("image/jpeg", 0.92)
+
+      // Use selection box bounds if available, else map viewport
+      const captureBounds = selectionBoxRef.current
+        ? selectionBoxRef.current.getBounds()
+        : mapRef.current.getBounds()
+      const captureCenter = captureBounds.getCenter()
 
       onCapture?.({
         imageBase64,
         bounds: {
-          north: bounds.getNorth(),
-          south: bounds.getSouth(),
-          east: bounds.getEast(),
-          west: bounds.getWest(),
+          north: captureBounds.getNorth(),
+          south: captureBounds.getSouth(),
+          east: captureBounds.getEast(),
+          west: captureBounds.getWest(),
         },
-        center: { lat: mapCenter.lat, lng: mapCenter.lng },
+        center: { lat: captureCenter.lat, lng: captureCenter.lng },
         zoom: mapRef.current.getZoom(),
         measurements,
       })

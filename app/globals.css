@@ -318,3 +318,21 @@
 .leaflet-draw-actions-bottom {
   display: none !important;
 }
+
+/* Selection box editing handles */
+.leaflet-editing-icon {
+  background: #3b82f6 !important;
+  border: 2px solid #fff !important;
+  border-radius: 50% !important;
+  width: 10px !important;
+  height: 10px !important;
+  margin-left: -5px !important;
+  margin-top: -5px !important;
+  cursor: pointer !important;
+  box-shadow: 0 0 6px rgba(59, 130, 246, 0.5) !important;
+}
+
+/* Address marker pulse */
+.leaflet-marker-icon {
+  filter: hue-rotate(210deg) saturate(1.3);
+}

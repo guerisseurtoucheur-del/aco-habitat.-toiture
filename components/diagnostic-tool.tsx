@@ -800,9 +800,9 @@ export function DiagnosticTool() {
               <div className="flex items-center gap-3 border-b border-border bg-primary/5 px-5 py-2.5">
                 <div className="h-2 w-2 animate-pulse rounded-full bg-primary" />
                 <p className="text-xs text-foreground/70">
-                  Naviguez sur la carte pour centrer votre toiture, puis cliquez sur{" "}
+                  Un rectangle de selection de 20x20m est place sur votre adresse. Ajustez-le si besoin pour couvrir exactement votre toiture, puis cliquez sur{" "}
                   <span className="font-semibold text-primary">Capturer et analyser</span>.
-                  Utilisez les outils de mesure pour calculer la surface ou les longueurs.
+                  Vous pouvez aussi utiliser les outils de mesure.
                 </p>
               </div>
 
