@@ -313,7 +313,7 @@ export default function LeafletMap({
     if (drawHandlerRef.current) {
       (drawHandlerRef.current as L.Draw.Polygon).disable()
     }
-    const handler = new L.Draw.Polygon(mapRef.current, {
+    const handler = new L.Draw.Polygon(mapRef.current as unknown as L.Draw.DrawMap, {
       shapeOptions: {
         color: "#3b82f6",
         weight: 2,
@@ -332,7 +332,7 @@ export default function LeafletMap({
     if (drawHandlerRef.current) {
       (drawHandlerRef.current as L.Draw.Polyline).disable()
     }
-    const handler = new L.Draw.Polyline(mapRef.current, {
+    const handler = new L.Draw.Polyline(mapRef.current as unknown as L.Draw.DrawMap, {
       shapeOptions: {
         color: "#f59e0b",
         weight: 2,
