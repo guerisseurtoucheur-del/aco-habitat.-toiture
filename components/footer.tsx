@@ -127,7 +127,8 @@ export function Footer() {
       <div className="border-t border-border">
         <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-6 py-6 sm:flex-row">
           <p className="text-xs text-muted-foreground">
-            {"2026 ACO-HABITAT. Tous droits reserves."}
+            {"2026 ACO-HABITAT. Tous droits reserves. — "}
+            <a href="https://diag.aco-habitat.fr" className="hover:text-foreground transition-colors">diag.aco-habitat.fr</a>
           </p>
           <div className="flex gap-6 text-xs text-muted-foreground">
             <a href="#" className="hover:text-foreground transition-colors">Mentions legales</a>
