@@ -198,7 +198,7 @@ function Hotspot({
   )
 }
 
-/* ── Zone Polygon Overlay ── */
+/* ── Zone Polygon Overlay (clickable bounding box) ── */
 function ZonePolygon({
   zone,
   color,
@@ -207,6 +207,8 @@ function ZonePolygon({
   delay = 0,
   icon: Icon,
   categoryLabel,
+  onClick,
+  isSelected,
 }: {
   zone: DiagnosticZone
   color: string
@@ -215,12 +217,17 @@ function ZonePolygon({
   delay?: number
   icon?: React.ElementType
   categoryLabel?: string
+  onClick?: () => void
+  isSelected?: boolean
 }) {
   if (!visible) return null
 
+  const severityLabel =
+    zone.severity === "severe" ? "Critique" : zone.severity === "modere" ? "Modere" : "Faible"
+
   return (
     <div
-      className="animate-zone-reveal absolute"
+      className="animate-zone-reveal absolute z-20 cursor-pointer"
       style={{
         left: `${zone.x}%`,
         top: `${zone.y}%`,
@@ -228,55 +235,27 @@ function ZonePolygon({
         height: `${zone.height}%`,
         animationDelay: `${delay}ms`,
       }}
+      onClick={(e) => {
+        e.stopPropagation()
+        onClick?.()
+      }}
     >
       {/* Transparent fill */}
       <div
-        className="absolute inset-0 rounded-lg"
+        className="absolute inset-0 rounded-md transition-colors duration-200"
         style={{
-          backgroundColor: `${color}15`,
+          backgroundColor: isSelected ? `${color}30` : `${color}12`,
         }}
       />
 
-      {/* Thin border with rounded corners */}
+      {/* Border with rounded corners (2px) */}
       <div
-        className="absolute inset-0 rounded-lg border-[1.5px]"
+        className="absolute inset-0 rounded-md border-2 transition-all duration-200"
         style={{
           borderColor: color,
+          boxShadow: isSelected ? `0 0 12px 2px ${color}50` : "none",
         }}
       />
-
-      {/* Corner dots */}
-      {["top-0 left-0", "top-0 right-0", "bottom-0 left-0", "bottom-0 right-0"].map((pos) => (
-        <div
-          key={pos}
-          className={`absolute ${pos} -translate-x-1/2 -translate-y-1/2`}
-          style={{
-            width: 5,
-            height: 5,
-            borderRadius: "50%",
-            backgroundColor: color,
-            boxShadow: `0 0 4px 1px ${color}60`,
-          }}
-        />
-      ))}
-
-      {/* Center indicator */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-        <div
-          className="animate-hotspot-ping flex h-5 w-5 items-center justify-center rounded-full"
-          style={{
-            backgroundColor: `${color}25`,
-            border: `1.5px solid ${color}90`,
-            boxShadow: `0 0 8px 2px ${color}40`,
-          }}
-        >
-          {Icon ? (
-            <Icon size={9} style={{ color }} />
-          ) : (
-            <div className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: color }} />
-          )}
-        </div>
-      </div>
 
       {/* Label tag above the rectangle */}
       <div
@@ -291,6 +270,46 @@ function ZonePolygon({
           {categoryLabel || label}
         </span>
       </div>
+
+      {/* Info popup on click */}
+      {isSelected && (
+        <div
+          className="absolute left-1/2 z-30 w-52 -translate-x-1/2 rounded-xl border border-border bg-card p-3 shadow-xl"
+          style={{
+            top: "calc(100% + 8px)",
+            borderColor: `${color}40`,
+          }}
+        >
+          <div className="mb-2 flex items-center gap-2">
+            {Icon && (
+              <div className="flex h-5 w-5 items-center justify-center rounded" style={{ backgroundColor: `${color}20` }}>
+                <Icon size={10} style={{ color }} />
+              </div>
+            )}
+            <span className="text-[10px] font-bold uppercase tracking-wider" style={{ color }}>
+              {categoryLabel}
+            </span>
+            <span
+              className="ml-auto rounded px-1.5 py-0.5 text-[8px] font-bold text-white"
+              style={{
+                backgroundColor:
+                  zone.severity === "severe" ? "#ef4444" : zone.severity === "modere" ? "#f59e0b" : "#22c55e",
+              }}
+            >
+              {severityLabel}
+            </span>
+          </div>
+          <p className="mb-2 text-[11px] leading-relaxed text-foreground/90">{zone.label}</p>
+          <a
+            href="#contact"
+            className="flex w-full items-center justify-center gap-1.5 rounded-lg py-1.5 text-[10px] font-semibold text-white transition-colors"
+            style={{ backgroundColor: color }}
+          >
+            <Send size={8} />
+            Demander un devis
+          </a>
+        </div>
+      )}
     </div>
   )
 }
@@ -401,9 +420,13 @@ function MaterialBadge({ type }: { type: string }) {
 function ThermalOverlay({
   zones,
   visible,
+  selectedZoneId,
+  onSelectZone,
 }: {
   zones: { x: number; y: number; width: number; height: number; intensite: number; label: string }[]
   visible: boolean
+  selectedZoneId: string | null
+  onSelectZone: (id: string | null) => void
 }) {
   if (!visible) return null
   return (
@@ -423,63 +446,83 @@ function ThermalOverlay({
         }}
       />
 
-      {/* Hot zones with labels */}
-      {zones.map((zone, i) => (
-        <div
-          key={i}
-          className="animate-zone-reveal absolute"
-          style={{
-            left: `${zone.x}%`,
-            top: `${zone.y}%`,
-            width: `${zone.width}%`,
-            height: `${zone.height}%`,
-            animationDelay: `${i * 300}ms`,
-          }}
-        >
-          {/* Transparent orange fill */}
+      {/* Hot zones with labels -- clickable */}
+      {zones.map((zone, i) => {
+        const zoneId = `t-${i}`
+        const isSelected = selectedZoneId === zoneId
+        return (
           <div
-            className="absolute inset-0 rounded-lg"
+            key={i}
+            className="animate-zone-reveal pointer-events-auto absolute z-20 cursor-pointer"
             style={{
-              backgroundColor: `rgba(249,115,22,${0.1 + zone.intensite / 200})`,
+              left: `${zone.x}%`,
+              top: `${zone.y}%`,
+              width: `${zone.width}%`,
+              height: `${zone.height}%`,
+              animationDelay: `${i * 300}ms`,
             }}
-          />
-          {/* Thin orange border */}
-          <div
-            className="absolute inset-0 rounded-lg border-[1.5px]"
-            style={{ borderColor: "#f97316" }}
-          />
-
-          {/* Label */}
-          <div className="absolute -top-7 left-0 flex items-center gap-1.5 whitespace-nowrap rounded-md px-2.5 py-1 shadow-md" style={{ backgroundColor: "#f97316", boxShadow: "0 2px 8px rgba(249,115,22,0.4)" }}>
-            <Flame size={9} className="text-white" />
-            <span className="text-[9px] font-bold tracking-wide text-white uppercase">
-              Thermique : +{zone.intensite}%
-            </span>
-          </div>
-
-          {/* Corner dots */}
-          {["top-0 left-0", "top-0 right-0", "bottom-0 left-0", "bottom-0 right-0"].map((pos) => (
+            onClick={(e) => {
+              e.stopPropagation()
+              onSelectZone(isSelected ? null : zoneId)
+            }}
+          >
+            {/* Transparent orange fill */}
             <div
-              key={pos}
-              className={`absolute ${pos} -translate-x-1/2 -translate-y-1/2`}
+              className="absolute inset-0 rounded-md transition-colors duration-200"
               style={{
-                width: 5,
-                height: 5,
-                borderRadius: "50%",
-                backgroundColor: "#f97316",
-                boxShadow: "0 0 4px 1px rgba(249,115,22,0.6)",
+                backgroundColor: isSelected ? "rgba(249,115,22,0.3)" : `rgba(249,115,22,${0.1 + zone.intensite / 200})`,
               }}
             />
-          ))}
+            {/* Border (2px) */}
+            <div
+              className="absolute inset-0 rounded-md border-2 transition-all duration-200"
+              style={{
+                borderColor: "#f97316",
+                boxShadow: isSelected ? "0 0 12px 2px rgba(249,115,22,0.5)" : "none",
+              }}
+            />
 
-          {/* Center heat indicator */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-            <div className="animate-hotspot-ping flex h-5 w-5 items-center justify-center rounded-full" style={{ backgroundColor: "rgba(249,115,22,0.25)", border: "1.5px solid rgba(249,115,22,0.9)", boxShadow: "0 0 8px 2px rgba(249,115,22,0.4)" }}>
-              <Thermometer size={9} className="text-orange-400" />
+            {/* Label */}
+            <div className="absolute -top-7 left-0 flex items-center gap-1.5 whitespace-nowrap rounded-md px-2.5 py-1 shadow-md" style={{ backgroundColor: "#f97316", boxShadow: "0 2px 8px rgba(249,115,22,0.4)" }}>
+              <Flame size={9} className="text-white" />
+              <span className="text-[9px] font-bold tracking-wide text-white uppercase">
+                Thermique : +{zone.intensite}%
+              </span>
             </div>
+
+            {/* Info popup on click */}
+            {isSelected && (
+              <div
+                className="absolute left-1/2 z-30 w-52 -translate-x-1/2 rounded-xl border bg-card p-3 shadow-xl"
+                style={{
+                  top: "calc(100% + 8px)",
+                  borderColor: "rgba(249,115,22,0.4)",
+                }}
+              >
+                <div className="mb-2 flex items-center gap-2">
+                  <div className="flex h-5 w-5 items-center justify-center rounded" style={{ backgroundColor: "rgba(249,115,22,0.2)" }}>
+                    <Thermometer size={10} className="text-orange-400" />
+                  </div>
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-orange-400">
+                    Thermique
+                  </span>
+                  <span className="ml-auto rounded bg-orange-500 px-1.5 py-0.5 text-[8px] font-bold text-white">
+                    +{zone.intensite}%
+                  </span>
+                </div>
+                <p className="mb-2 text-[11px] leading-relaxed text-foreground/90">{zone.label}</p>
+                <a
+                  href="#contact"
+                  className="flex w-full items-center justify-center gap-1.5 rounded-lg bg-orange-500 py-1.5 text-[10px] font-semibold text-white transition-colors"
+                >
+                  <Send size={8} />
+                  Bilan energetique
+                </a>
+              </div>
+            )}
           </div>
-        </div>
-      ))}
+        )
+      })}
 
       {/* Thermal scale legend */}
       <div className="absolute bottom-3 right-3 flex items-center gap-2 rounded-lg bg-background/90 px-3 py-2 backdrop-blur-md">
@@ -590,6 +633,7 @@ export function DiagnosticTool() {
     structure: true,
     etancheite: true,
   })
+  const [selectedZoneId, setSelectedZoneId] = useState<string | null>(null)
   const resultsRef = useRef<HTMLDivElement>(null)
   const handleSearchRef = useRef<() => void>(() => {})
 
@@ -763,6 +807,7 @@ export function DiagnosticTool() {
   setDiagnostic(null)
     setError(null)
     setLayerState({ vegetal: true, structure: true, etancheite: true })
+    setSelectedZoneId(null)
   }
 
   const toggleLayer = (layer: keyof typeof layerState) => {
@@ -779,6 +824,16 @@ export function DiagnosticTool() {
     if (score >= 75) return "Bon etat"
     if (score >= 50) return "A surveiller"
     return "Intervention requise"
+  }
+
+  if (diagnostic) {
+    console.log("[v0] Diagnostic zones:", {
+      vegetal: diagnostic.vegetal.zones.length,
+      structure: diagnostic.structure.zones.length,
+      etancheite: diagnostic.etancheite.zones.length,
+      thermique: diagnostic.thermique?.pertesChaleur?.length ?? 0,
+      layerState,
+    })
   }
 
   const allZones = diagnostic
@@ -1179,7 +1234,7 @@ export function DiagnosticTool() {
             <div className="grid gap-6 lg:grid-cols-3">
               {/* Satellite image with overlay zones */}
               <div className="lg:col-span-2">
-                <div className="overflow-hidden rounded-2xl border border-border bg-card">
+                <div className="rounded-2xl border border-border bg-card">
                   {/* Toolbar */}
                   <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-4 py-3">
                     <div className="flex items-center gap-3">
@@ -1238,7 +1293,8 @@ export function DiagnosticTool() {
                   </div>
 
                   {/* Image with polygon overlays */}
-                  <div className="relative">
+                  <div className="pb-0 pt-8" onClick={() => setSelectedZoneId(null)}>
+                    <div className="relative overflow-visible">
                     <img
                     src={satelliteImages[activeZoom]?.image || satelliteImages[0]?.image}
                     alt="Vue satellite de la toiture"
@@ -1256,7 +1312,7 @@ export function DiagnosticTool() {
                       }}
                     />
 
-                    {/* Zone overlays with colored borders (thermal style) */}
+                    {/* Zone overlays - clickable bounding boxes */}
                     {diagnostic.vegetal.zones.map((z, i) => (
                       <ZonePolygon
                         key={`v-${i}`}
@@ -1267,6 +1323,8 @@ export function DiagnosticTool() {
                         delay={i * 200}
                         icon={Leaf}
                         categoryLabel="Vegetal"
+                        onClick={() => setSelectedZoneId(selectedZoneId === `v-${i}` ? null : `v-${i}`)}
+                        isSelected={selectedZoneId === `v-${i}`}
                       />
                     ))}
                     {diagnostic.structure.zones.map((z, i) => (
@@ -1279,6 +1337,8 @@ export function DiagnosticTool() {
                         delay={(diagnostic.vegetal.zones.length + i) * 200}
                         icon={Wrench}
                         categoryLabel="Structure"
+                        onClick={() => setSelectedZoneId(selectedZoneId === `s-${i}` ? null : `s-${i}`)}
+                        isSelected={selectedZoneId === `s-${i}`}
                       />
                     ))}
                     {diagnostic.etancheite.zones.map((z, i) => (
@@ -1291,6 +1351,8 @@ export function DiagnosticTool() {
                         delay={(diagnostic.vegetal.zones.length + diagnostic.structure.zones.length + i) * 200}
                         icon={Droplets}
                         categoryLabel="Etancheite"
+                        onClick={() => setSelectedZoneId(selectedZoneId === `e-${i}` ? null : `e-${i}`)}
+                        isSelected={selectedZoneId === `e-${i}`}
                       />
                     ))}
 
@@ -1299,6 +1361,8 @@ export function DiagnosticTool() {
                       <ThermalOverlay
                         zones={diagnostic.thermique.pertesChaleur}
                         visible={thermalMode}
+                        selectedZoneId={selectedZoneId}
+                        onSelectZone={setSelectedZoneId}
                       />
                     )}
 
@@ -1321,6 +1385,7 @@ export function DiagnosticTool() {
                         <span className="font-mono text-[9px] text-green-400">LIVE ANALYSIS</span>
                       </div>
                     </div>
+                  </div>
                   </div>
                 </div>
               </div>
