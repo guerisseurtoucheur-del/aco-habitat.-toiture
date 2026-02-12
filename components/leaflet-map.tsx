@@ -28,8 +28,8 @@ const IGN_CADASTRE =
 
 const ATTRIBUTION = "&copy; <a href='https://www.ign.fr'>IGN</a>"
 
-/* Half-side of the auto selection box in degrees (~35m at mid-France latitudes) */
-const BOX_HALF_DEG = 0.00035
+/* Half-side of the auto selection box in degrees (~25m at mid-France latitudes) */
+const BOX_HALF_DEG = 0.00025
 
 /* ── Measurement helpers ── */
 function calcPolygonArea(latlngs: L.LatLng[]): number {
@@ -374,15 +374,15 @@ export default function LeafletMap({
       const east = captureBounds.getEast()
       const captureCenter = captureBounds.getCenter()
 
-      // Request a square 1600x1600 image for the ~35m selection box
-      // This gives ~2cm/pixel resolution -- sharp enough to see individual tiles
+      // Request max resolution 4096x4096 for the ~25m selection box
+      // 25m at 4096px = ~0.6cm/pixel -- the sharpest the IGN data can provide
       const response = await fetch("/api/map-capture", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           bounds: { south, west, north, east },
-          width: 1600,
-          height: 1600,
+          width: 4096,
+          height: 4096,
         }),
       })
 

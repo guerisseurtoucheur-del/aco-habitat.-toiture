@@ -1,8 +1,9 @@
 import { NextResponse } from "next/server"
+import sharp from "sharp"
 
 export async function POST(req: Request) {
   try {
-    const { bounds, width = 1200, height = 1200 } = await req.json()
+    const { bounds, width = 4096, height = 4096 } = await req.json()
 
     if (!bounds || !bounds.south || !bounds.north || !bounds.west || !bounds.east) {
       return NextResponse.json({ error: "Bounds requises (south, north, west, east)" }, { status: 400 })
@@ -10,9 +11,7 @@ export async function POST(req: Request) {
 
     const { south, north, west, east } = bounds
 
-    // Build IGN WMS GetMap URL for high-res capture
-    // WMS 1.3.0 + CRS=EPSG:4326: BBOX = minLat,minLon,maxLat,maxLon
-    // For a ~35m selection box at 1600px = ~2cm/pixel = very sharp
+    // Request max resolution from IGN WMS (cap at 4096 which is their limit)
     const reqWidth = Math.min(Math.max(width, 800), 4096)
     const reqHeight = Math.min(Math.max(height, 800), 4096)
 
@@ -28,7 +27,7 @@ export async function POST(req: Request) {
     wmsUrl.searchParams.set("HEIGHT", String(reqHeight))
     wmsUrl.searchParams.set("BBOX", `${south},${west},${north},${east}`)
 
-    // Try fetching with HR layer first, fallback to standard layer
+    // Try HR layer first, fallback to standard ORTHOIMAGERY
     let response = await fetch(wmsUrl.toString(), {
       headers: {
         "Accept": "image/jpeg, image/png, image/*",
@@ -36,8 +35,8 @@ export async function POST(req: Request) {
       },
     })
 
-    // If HR layer fails, retry with standard ORTHOIMAGERY layer
-    if (!response.ok || (response.headers.get("content-type") || "").includes("xml")) {
+    const ct = response.headers.get("content-type") || ""
+    if (!response.ok || ct.includes("xml") || ct.includes("text")) {
       wmsUrl.searchParams.set("LAYERS", "ORTHOIMAGERY.ORTHOPHOTOS")
       response = await fetch(wmsUrl.toString(), {
         headers: {
@@ -56,8 +55,6 @@ export async function POST(req: Request) {
     }
 
     const contentType = response.headers.get("content-type") || "image/jpeg"
-
-    // Check if response is actually an image (IGN sometimes returns XML errors)
     if (contentType.includes("xml") || contentType.includes("text")) {
       const text = await response.text()
       return NextResponse.json(
@@ -66,14 +63,25 @@ export async function POST(req: Request) {
       )
     }
 
-    // Convert to base64
-    const arrayBuffer = await response.arrayBuffer()
-    const sizeKb = Math.round(arrayBuffer.byteLength / 1024)
-    console.log("[map-capture] Image received:", sizeKb, "KB, type:", contentType)
+    // --- Image enhancement with sharp ---
+    const rawBuffer = Buffer.from(await response.arrayBuffer())
 
-    const base64 = Buffer.from(arrayBuffer).toString("base64")
-    const mimeType = contentType.startsWith("image/") ? contentType : "image/jpeg"
-    const imageBase64 = `data:${mimeType};base64,${base64}`
+    const enhanced = await sharp(rawBuffer)
+      // Boost brightness (+15%) and saturation (+20%) for richer colors
+      .modulate({
+        brightness: 1.15,
+        saturation: 1.2,
+      })
+      // Increase contrast with a subtle sigmoid curve
+      .linear(1.2, -(128 * 0.2))
+      // Sharpen: sigma=1 for clear detail, flat=1 for gentle sharpening
+      .sharpen({ sigma: 1, m1: 1, m2: 2 })
+      // Output as high-quality JPEG (quality 92 = good balance size/quality)
+      .jpeg({ quality: 92, chromaSubsampling: "4:4:4" })
+      .toBuffer()
+
+    const base64 = enhanced.toString("base64")
+    const imageBase64 = `data:image/jpeg;base64,${base64}`
 
     return NextResponse.json({ imageBase64 })
   } catch (err) {
