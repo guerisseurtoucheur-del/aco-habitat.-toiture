@@ -89,7 +89,7 @@ export default function LeafletMap({
   const tileLayerRef = useRef<L.TileLayer | null>(null)
   const cadastreLayerRef = useRef<L.TileLayer | null>(null)
   const drawnItemsRef = useRef<L.FeatureGroup | null>(null)
-  const drawControlRef = useRef<L.Control.Draw | null>(null)
+  const drawControlRef = useRef<any>(null)
   const markerRef = useRef<L.Marker | null>(null)
   const selectionBoxRef = useRef<L.Rectangle | null>(null)
 
@@ -100,7 +100,7 @@ export default function LeafletMap({
   const [drawMode, setDrawMode] = useState<"none" | "polygon" | "polyline">("none")
   const [showLayerMenu, setShowLayerMenu] = useState(false)
 
-  const drawHandlerRef = useRef<L.Draw.Polygon | L.Draw.Polyline | null>(null)
+  const drawHandlerRef = useRef<any>(null)
 
   // Initialize map
   useEffect(() => {
@@ -161,10 +161,9 @@ export default function LeafletMap({
     }).addTo(map)
 
     // Make the selection box editable (draggable + resizable handles)
-    // @ts-expect-error - editing is available via leaflet-draw plugin
-    if (selectionBox.editing) {
-      // @ts-expect-error - editing.enable() from leaflet-draw
-      selectionBox.editing.enable()
+    const editableBox: any = selectionBox
+    if (editableBox.editing) {
+      editableBox.editing.enable()
     }
     selectionBoxRef.current = selectionBox
 
@@ -184,9 +183,8 @@ export default function LeafletMap({
     drawnItemsRef.current = drawnItems
 
     // Listen for draw events
-    map.on(L.Draw.Event.CREATED, (e: L.LeafletEvent) => {
-      const event = e as L.DrawEvents.Created
-      const layer = event.layer
+    map.on("draw:created" as any, (e: any) => {
+      const layer = e.layer
       drawnItems.addLayer(layer)
 
       let measurement: MapMeasurement | null = null
@@ -233,7 +231,7 @@ export default function LeafletMap({
       setDrawMode("none")
     })
 
-    map.on(L.Draw.Event.DRAWSTOP, () => {
+    map.on("draw:drawstop" as any, () => {
       setDrawMode("none")
     })
 
@@ -311,10 +309,10 @@ export default function LeafletMap({
   const startDrawPolygon = useCallback(() => {
     if (!mapRef.current) return
     if (drawHandlerRef.current) {
-      (drawHandlerRef.current as L.Draw.Polygon).disable()
+      (drawHandlerRef.current as any).disable()
     }
-    // @ts-expect-error - L.Map vs L.Draw.DrawMap type mismatch between @types/leaflet and @types/leaflet-draw
-    const handler = new L.Draw.Polygon(mapRef.current, {
+    const drawMap: any = mapRef.current
+    const handler = new (L.Draw as any).Polygon(drawMap, {
       shapeOptions: {
         color: "#3b82f6",
         weight: 2,
@@ -331,10 +329,10 @@ export default function LeafletMap({
   const startDrawPolyline = useCallback(() => {
     if (!mapRef.current) return
     if (drawHandlerRef.current) {
-      (drawHandlerRef.current as L.Draw.Polyline).disable()
+      (drawHandlerRef.current as any).disable()
     }
-    // @ts-expect-error - L.Map vs L.Draw.DrawMap type mismatch between @types/leaflet and @types/leaflet-draw
-    const handler = new L.Draw.Polyline(mapRef.current, {
+    const drawMap2: any = mapRef.current
+    const handler = new (L.Draw as any).Polyline(drawMap2, {
       shapeOptions: {
         color: "#f59e0b",
         weight: 2,
