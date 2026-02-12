@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server"
-import sharp from "sharp"
+
+// Force Node.js runtime (sharp requires native binaries, not compatible with Edge)
+export const runtime = "nodejs"
 
 export async function POST(req: Request) {
   try {
@@ -66,21 +68,28 @@ export async function POST(req: Request) {
     // --- Image enhancement with sharp ---
     const rawBuffer = Buffer.from(await response.arrayBuffer())
 
-    const enhanced = await sharp(rawBuffer)
-      // Boost brightness (+15%) and saturation (+20%) for richer colors
-      .modulate({
-        brightness: 1.15,
-        saturation: 1.2,
-      })
-      // Increase contrast with a subtle sigmoid curve
-      .linear(1.2, -(128 * 0.2))
-      // Sharpen: sigma=1 for clear detail, flat=1 for gentle sharpening
-      .sharpen({ sigma: 1, m1: 1, m2: 2 })
-      // Output as high-quality JPEG (quality 92 = good balance size/quality)
-      .jpeg({ quality: 92, chromaSubsampling: "4:4:4" })
-      .toBuffer()
+    let finalBuffer: Buffer = rawBuffer
+    try {
+      const sharp = (await import("sharp")).default
+      finalBuffer = await sharp(rawBuffer)
+        // Boost brightness (+15%) and saturation (+20%) for richer colors
+        .modulate({
+          brightness: 1.15,
+          saturation: 1.2,
+        })
+        // Increase contrast
+        .linear(1.2, -(128 * 0.2))
+        // Sharpen for clear detail
+        .sharpen({ sigma: 1, m1: 1, m2: 2 })
+        // Output as high-quality JPEG
+        .jpeg({ quality: 92, chromaSubsampling: "4:4:4" })
+        .toBuffer()
+    } catch (sharpErr) {
+      // If sharp fails (e.g. in preview), return the raw image
+      console.warn("[map-capture] sharp unavailable, returning raw image:", sharpErr)
+    }
 
-    const base64 = enhanced.toString("base64")
+    const base64 = finalBuffer.toString("base64")
     const imageBase64 = `data:image/jpeg;base64,${base64}`
 
     return NextResponse.json({ imageBase64 })
