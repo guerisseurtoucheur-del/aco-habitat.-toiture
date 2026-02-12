@@ -1,6 +1,12 @@
-import { Zap } from "lucide-react"
+import { Zap, Star, ExternalLink } from "lucide-react"
 
-const footerLinks = [
+interface FooterLink {
+  label: string
+  href: string
+  external?: boolean
+}
+
+const footerLinks: { title: string; links: FooterLink[] }[] = [
   {
     title: "Services",
     links: [
@@ -19,6 +25,7 @@ const footerLinks = [
       { label: "Temoignages", href: "#temoignages" },
       { label: "FAQ", href: "#faq" },
       { label: "Contact", href: "#contact" },
+      { label: "Avis Google", href: "https://g.page/r/YOUR_GOOGLE_BUSINESS_ID/review", external: true },
     ],
   },
   {
@@ -83,13 +90,13 @@ export function Footer() {
                 <div className="flex flex-col">
                   <span className="text-base font-bold text-foreground leading-tight">ACO-HABITAT</span>
                   <span className="text-[10px] font-medium text-muted-foreground tracking-widest uppercase">
-                    Expert Toiture
+                    Expert Couverture & Charpente
                   </span>
                 </div>
               </div>
               <p className="text-sm leading-relaxed text-muted-foreground">
-                Expert en diagnostic et travaux de toiture sur toute la France.
-                Technologie IA pour un diagnostic precis et rapide.
+                Expert en couverture et charpente sur toute la France.
+                Diagnostic toiture par IA, reparation, renovation et travaux de charpente.
               </p>
               <div className="flex flex-col gap-2 text-sm text-muted-foreground">
                 <a href="tel:+33233311979" className="hover:text-foreground transition-colors">
@@ -99,6 +106,24 @@ export function Footer() {
                   aco.habitat@orange.fr
                 </a>
               </div>
+
+              {/* Google Business rating badge */}
+              <a
+                href="https://g.page/r/YOUR_GOOGLE_BUSINESS_ID/review"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-3 rounded-xl border border-accent/20 bg-accent/5 px-4 py-3 transition-all hover:border-accent/40 hover:bg-accent/10"
+              >
+                <div className="flex items-center gap-0.5">
+                  {[...Array(5)].map((_, i) => (
+                    <Star key={i} size={12} className="fill-accent text-accent" />
+                  ))}
+                </div>
+                <div className="flex flex-col">
+                  <span className="text-xs font-semibold text-foreground">4.9/5 sur Google</span>
+                  <span className="text-[10px] text-muted-foreground">Plus de 500 avis</span>
+                </div>
+              </a>
             </div>
 
             {/* Links */}
@@ -110,9 +135,11 @@ export function Footer() {
                     <li key={link.label}>
                       <a
                         href={link.href}
-                        className="text-sm text-muted-foreground transition-colors hover:text-foreground"
+                        {...(link.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
+                        className="flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
                       >
                         {link.label}
+                        {link.external && <ExternalLink size={11} />}
                       </a>
                     </li>
                   ))}
