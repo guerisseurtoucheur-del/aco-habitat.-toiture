@@ -361,60 +361,47 @@ export default function LeafletMap({
     setIsCapturing(true)
 
     try {
-      // Use the current map viewport bounds -- captures exactly what the user sees
-      const mapBounds = mapRef.current.getBounds()
-      const south = mapBounds.getSouth()
-      const west = mapBounds.getWest()
-      const north = mapBounds.getNorth()
-      const east = mapBounds.getEast()
+      // CRITICAL: Use the SELECTION BOX bounds, NOT the full viewport.
+      // The selection box covers ~35m, viewport covers ~300m at zoom 19.
+      // Smaller BBOX = much sharper image for the same pixel count.
+      const captureBounds = selectionBoxRef.current
+        ? selectionBoxRef.current.getBounds()
+        : mapRef.current.getBounds()
 
-      // Calculate pixel dimensions matching the map container aspect ratio
-      const container = mapContainerRef.current
-      const pxWidth = container ? Math.round(container.clientWidth * 2) : 1200
-      const pxHeight = container ? Math.round(container.clientHeight * 2) : 1200
+      const south = captureBounds.getSouth()
+      const west = captureBounds.getWest()
+      const north = captureBounds.getNorth()
+      const east = captureBounds.getEast()
+      const captureCenter = captureBounds.getCenter()
 
-      console.log("[v0] Capture bounds:", { south, west, north, east }, "px:", pxWidth, "x", pxHeight)
-
-      // Send bounds to our server-side API proxy which builds the WMS URL
+      // Request a square 1600x1600 image for the ~35m selection box
+      // This gives ~2cm/pixel resolution -- sharp enough to see individual tiles
       const response = await fetch("/api/map-capture", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           bounds: { south, west, north, east },
-          width: pxWidth,
-          height: pxHeight,
+          width: 1600,
+          height: 1600,
         }),
       })
 
       if (!response.ok) {
         const errData = await response.json().catch(() => ({}))
-        console.error("[v0] Capture API error:", errData)
         throw new Error(errData.error || `Capture failed: ${response.status}`)
       }
 
       const data = await response.json()
-      const imageBase64 = data.imageBase64
-
-      // Use selection box bounds for the diagnostic metadata if available
-      const selBounds = selectionBoxRef.current
-        ? selectionBoxRef.current.getBounds()
-        : mapBounds
-      const captureCenter = selBounds.getCenter()
 
       onCapture?.({
-        imageBase64,
-        bounds: {
-          north: selBounds.getNorth(),
-          south: selBounds.getSouth(),
-          east: selBounds.getEast(),
-          west: selBounds.getWest(),
-        },
+        imageBase64: data.imageBase64,
+        bounds: { north, south, east, west },
         center: { lat: captureCenter.lat, lng: captureCenter.lng },
         zoom: mapRef.current.getZoom(),
         measurements,
       })
     } catch (err) {
-      console.error("[v0] Capture failed:", err)
+      console.error("Capture failed:", err)
     } finally {
       setIsCapturing(false)
     }
