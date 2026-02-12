@@ -17,15 +17,19 @@ import {
 } from "lucide-react"
 
 /* ── IGN WMTS tile URLs (free, no API key) ── */
-/* HR.ORTHOIMAGERY.ORTHOPHOTOS = Haute Resolution layer, supports zoom up to 21 natively */
+/* HR.ORTHOIMAGERY.ORTHOPHOTOS = Haute Resolution layer, native zoom up to 21 */
 const IGN_ORTHO =
-  "https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&TILEMATRIXSET=PM&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}&LAYER=HR.ORTHOIMAGERY.ORTHOPHOTOS&STYLE=normal&FORMAT=image/jpeg"
+  "https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=HR.ORTHOIMAGERY.ORTHOPHOTOS&STYLE=normal&FORMAT=image/jpeg&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}"
 const IGN_PLAN =
-  "https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&TILEMATRIXSET=PM&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}&LAYER=GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2&FORMAT=image/png&STYLE=normal"
+  "https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2&STYLE=normal&FORMAT=image/png&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}"
 const IGN_CADASTRE =
-  "https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&TILEMATRIXSET=PM&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}&LAYER=CADASTRALPARCELS.PARCELLAIRE_EXPRESS&FORMAT=image/png&STYLE=normal"
+  "https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=CADASTRALPARCELS.PARCELLAIRE_EXPRESS&STYLE=normal&FORMAT=image/png&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}"
 
 const ATTRIBUTION = "&copy; <a href='https://www.ign.fr'>IGN</a> - Ortho HR"
+
+/* ── IGN WMS endpoint for server-side image capture (avoids CORS) ── */
+const IGN_WMS_CAPTURE =
+  "https://data.geopf.fr/wms-r/wms?SERVICE=WMS&VERSION=1.3.0&REQUEST=GetMap&LAYERS=HR.ORTHOIMAGERY.ORTHOPHOTOS&STYLES=&FORMAT=image/jpeg&CRS=EPSG:4326"
 
 /* Half-side of the auto selection box in degrees (~20m at mid-France latitudes) */
 const BOX_HALF_DEG = 0.0001
@@ -354,45 +358,44 @@ export default function LeafletMap({
     setDrawMode("none")
   }, [onMeasurementsChange])
 
-  // Capture map as image
+  // Capture map as image via IGN WMS GetMap (avoids CORS blue-canvas issue)
   const captureMap = useCallback(async () => {
-    if (!mapRef.current || !mapContainerRef.current) return
+    if (!mapRef.current) return
     setIsCapturing(true)
 
     try {
-      // If there is a selection box, zoom/fit to it first for a tight capture
-      if (selectionBoxRef.current) {
-        mapRef.current.fitBounds(selectionBoxRef.current.getBounds(), { padding: [20, 20], animate: false })
-        // Wait for tiles to load after fitBounds
-        await new Promise((r) => setTimeout(r, 800))
-      }
-
-      // Use html2canvas to capture the map container
-      const html2canvas = (await import("html2canvas")).default
-      const canvas = await html2canvas(mapContainerRef.current, {
-        useCORS: true,
-        allowTaint: true,
-        scale: 2,
-        logging: false,
-        backgroundColor: null,
-      })
-
-      const imageBase64 = canvas.toDataURL("image/jpeg", 0.92)
-
       // Use selection box bounds if available, else map viewport
       const captureBounds = selectionBoxRef.current
         ? selectionBoxRef.current.getBounds()
         : mapRef.current.getBounds()
+
+      const south = captureBounds.getSouth()
+      const west = captureBounds.getWest()
+      const north = captureBounds.getNorth()
+      const east = captureBounds.getEast()
       const captureCenter = captureBounds.getCenter()
+
+      // Request a high-res image from IGN WMS server directly
+      // BBOX format for CRS=EPSG:4326 is: minLat,minLon,maxLat,maxLon
+      const wmsUrl = `${IGN_WMS_CAPTURE}&WIDTH=1024&HEIGHT=1024&BBOX=${south},${west},${north},${east}`
+
+      // Fetch the image through our own API proxy to avoid CORS
+      const response = await fetch("/api/map-capture", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: wmsUrl }),
+      })
+
+      if (!response.ok) {
+        throw new Error(`Capture failed: ${response.status}`)
+      }
+
+      const data = await response.json()
+      const imageBase64 = data.imageBase64
 
       onCapture?.({
         imageBase64,
-        bounds: {
-          north: captureBounds.getNorth(),
-          south: captureBounds.getSouth(),
-          east: captureBounds.getEast(),
-          west: captureBounds.getWest(),
-        },
+        bounds: { north, south, east, west },
         center: { lat: captureCenter.lat, lng: captureCenter.lng },
         zoom: mapRef.current.getZoom(),
         measurements,
