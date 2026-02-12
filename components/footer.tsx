@@ -10,12 +10,13 @@ const footerLinks: { title: string; links: FooterLink[] }[] = [
   {
     title: "Services",
     links: [
-      { label: "Diagnostic IA", href: "#diagnostic" },
-      { label: "Reparation", href: "#services" },
-      { label: "Renovation", href: "#services" },
-      { label: "Isolation", href: "#services" },
-      { label: "Demoussage", href: "#services" },
-      { label: "Charpente", href: "#services" },
+      { label: "Diagnostic IA", href: "/services/diagnostic-ia" },
+      { label: "Couverture", href: "/services/couverture" },
+      { label: "Charpente", href: "/services/charpente" },
+      { label: "Reparation", href: "/services/reparation-toiture" },
+      { label: "Renovation", href: "/services/renovation-toiture" },
+      { label: "Isolation", href: "/services/isolation-thermique" },
+      { label: "Demoussage", href: "/services/demoussage" },
     ],
   },
   {

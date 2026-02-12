@@ -65,7 +65,7 @@ export function Navbar() {
               ACO-HABITAT
             </span>
             <span className="text-[10px] font-medium text-muted-foreground tracking-widest uppercase">
-              Expert Toiture
+              Expert Couverture & Charpente
             </span>
           </div>
         </Link>
