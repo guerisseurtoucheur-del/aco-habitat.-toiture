@@ -206,3 +206,133 @@
 .animate-badge-shine {
   animation: badgeShine 3s linear infinite;
 }
+
+/* ── Leaflet overrides for dark theme ── */
+.leaflet-container {
+  background: #0c1221;
+  font-family: var(--font-sans);
+}
+
+.leaflet-control-zoom a {
+  background: #141c2e !important;
+  color: #f1f5f9 !important;
+  border-color: #1e293b !important;
+}
+
+.leaflet-control-zoom a:hover {
+  background: #1e293b !important;
+}
+
+.leaflet-control-attribution {
+  background: rgba(12, 18, 33, 0.85) !important;
+  color: #64748b !important;
+  font-size: 9px !important;
+}
+
+.leaflet-control-attribution a {
+  color: #3b82f6 !important;
+}
+
+/* Leaflet Draw overrides */
+.leaflet-draw-toolbar a {
+  background-color: #141c2e !important;
+  border-color: #1e293b !important;
+  color: #f1f5f9 !important;
+}
+
+.leaflet-draw-toolbar a:hover {
+  background-color: #1e293b !important;
+}
+
+.leaflet-draw-actions {
+  background: #141c2e !important;
+  border-color: #1e293b !important;
+}
+
+.leaflet-draw-actions a {
+  background: #141c2e !important;
+  color: #f1f5f9 !important;
+  border-color: #1e293b !important;
+}
+
+.leaflet-draw-actions a:hover {
+  background: #1e293b !important;
+}
+
+.leaflet-draw-tooltip {
+  background: rgba(12, 18, 33, 0.9) !important;
+  border-color: #3b82f6 !important;
+  color: #f1f5f9 !important;
+}
+
+.leaflet-draw-tooltip-subtext {
+  color: #64748b !important;
+}
+
+.leaflet-popup-content-wrapper {
+  background: #0c1221 !important;
+  color: #f1f5f9 !important;
+  border: 1px solid #1e293b !important;
+  border-radius: 0.75rem !important;
+}
+
+.leaflet-popup-tip {
+  background: #0c1221 !important;
+  border: 1px solid #1e293b !important;
+}
+
+.leaflet-popup-close-button {
+  color: #64748b !important;
+}
+
+.leaflet-popup-close-button:hover {
+  color: #f1f5f9 !important;
+}
+
+/* Measurement labels on map */
+.leaflet-measurement-label {
+  background: none !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+
+.leaflet-measurement-label span {
+  display: inline-block;
+  background: rgba(12, 18, 33, 0.9);
+  border: 1px solid #3b82f6;
+  border-radius: 6px;
+  padding: 2px 8px;
+  font-size: 11px;
+  font-weight: 700;
+  color: #3b82f6;
+  white-space: nowrap;
+  backdrop-filter: blur(4px);
+}
+
+/* Hide default leaflet-draw toolbar since we use custom buttons */
+.leaflet-draw-toolbar {
+  display: none !important;
+}
+
+.leaflet-draw-actions-top,
+.leaflet-draw-actions-bottom {
+  display: none !important;
+}
+
+/* Selection box editing handles */
+.leaflet-editing-icon {
+  background: #3b82f6 !important;
+  border: 2px solid #fff !important;
+  border-radius: 50% !important;
+  width: 10px !important;
+  height: 10px !important;
+  margin-left: -5px !important;
+  margin-top: -5px !important;
+  cursor: pointer !important;
+  box-shadow: 0 0 6px rgba(59, 130, 246, 0.5) !important;
+}
+
+/* Address marker pulse */
+.leaflet-marker-icon {
+  filter: hue-rotate(210deg) saturate(1.3);
+}

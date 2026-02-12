@@ -1,41 +1,50 @@
 "use client"
 
 import { useState, useRef, useCallback, useEffect } from "react"
+import dynamic from "next/dynamic"
 import {
   MapPin,
   Search,
   Loader2,
-  Satellite,
   Brain,
   CheckCircle2,
   AlertTriangle,
   XCircle,
   ChevronRight,
   FileText,
-  Layers,
   Leaf,
   Wrench,
   Droplets,
   RotateCcw,
-  Eye,
-  EyeOff,
   Shield,
   Zap,
-  ZoomIn,
-  ZoomOut,
   Phone,
   Send,
   Download,
   ScanLine,
   Crosshair,
-  Navigation,
   Thermometer,
   Flame,
+  MapPinned,
+  Ruler,
 } from "lucide-react"
 import type { DiagnosticResult, DiagnosticZone } from "@/lib/diagnostic-types"
+import type { MapCaptureData, MapMeasurement } from "./leaflet-map"
 
-type Step = "address" | "satellite" | "scanning" | "analyzing" | "results"
-type SatelliteImage = { zoom: number; label: string; image: string }
+/* Dynamic import of LeafletMap to avoid SSR issues with Leaflet */
+const LeafletMap = dynamic(() => import("./leaflet-map"), {
+  ssr: false,
+  loading: () => (
+    <div className="flex h-[450px] w-full items-center justify-center rounded-xl border border-border bg-card md:h-[500px]">
+      <div className="flex flex-col items-center gap-3">
+        <Loader2 size={24} className="animate-spin text-primary" />
+        <span className="text-xs text-muted-foreground">Chargement de la carte...</span>
+      </div>
+    </div>
+  ),
+})
+
+type Step = "address" | "map" | "scanning" | "analyzing" | "results"
 type PlacePrediction = {
   placeId: string
   description: string
@@ -161,155 +170,6 @@ function ScannerOverlay({ phase }: { phase: "scanning" | "analyzing" }) {
   )
 }
 
-/* ── Hotspot Blinking Icon ── */
-function Hotspot({
-  x,
-  y,
-  color,
-  severity,
-  delay = 0,
-}: {
-  x: number
-  y: number
-  color: string
-  severity: string
-  delay?: number
-}) {
-  return (
-    <div
-      className="animate-zone-reveal absolute z-20 -translate-x-1/2 -translate-y-1/2"
-      style={{ left: `${x}%`, top: `${y}%`, animationDelay: `${delay}ms` }}
-    >
-      {/* Expanding ring */}
-      <div
-        className="animate-hotspot-ring absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full"
-        style={{ width: 20, height: 20, backgroundColor: `${color}30`, border: `1px solid ${color}40` }}
-      />
-      {/* Core blinking dot */}
-      <div
-        className="animate-hotspot-ping relative flex h-6 w-6 items-center justify-center rounded-full"
-        style={{ backgroundColor: `${color}20`, border: `2px solid ${color}`, boxShadow: `0 0 12px 3px ${color}50` }}
-      >
-        <span className="text-[8px] font-bold" style={{ color }}>
-          {severity === "severe" ? "!" : severity === "modere" ? "?" : "~"}
-        </span>
-      </div>
-    </div>
-  )
-}
-
-/* ── Zone Polygon Overlay ── */
-function ZonePolygon({
-  zone,
-  color,
-  visible,
-  label,
-  delay = 0,
-}: {
-  zone: DiagnosticZone
-  color: string
-  visible: boolean
-  label: string
-  delay?: number
-}) {
-  if (!visible) return null
-
-  const severityColor =
-    zone.severity === "severe"
-      ? "#ef4444"
-      : zone.severity === "modere"
-        ? "#f59e0b"
-        : color
-
-  // Healthy zone = score indicator, not a problem
-  const isHealthy = zone.severity === "faible" && color === "#22c55e"
-
-  return (
-    <div
-      className="animate-zone-reveal absolute"
-      style={{
-        left: `${zone.x}%`,
-        top: `${zone.y}%`,
-        width: `${zone.width}%`,
-        height: `${zone.height}%`,
-        animationDelay: `${delay}ms`,
-      }}
-    >
-      {/* Border with glow - green translucent for healthy zones */}
-      <div
-        className="absolute inset-0 rounded-sm border-2"
-        style={{
-          borderColor: isHealthy ? "#22c55e60" : severityColor,
-          boxShadow: isHealthy
-            ? "inset 0 0 20px 4px rgba(34,197,94,0.08)"
-            : `0 0 12px 2px ${severityColor}40, inset 0 0 12px 2px ${severityColor}15`,
-          backgroundColor: isHealthy ? "rgba(34,197,94,0.06)" : `${severityColor}10`,
-          borderStyle: isHealthy ? "dashed" : "solid",
-        }}
-      />
-
-      {/* Pulsing corner dots (not for healthy zones) */}
-      {!isHealthy &&
-        ["top-0 left-0", "top-0 right-0", "bottom-0 left-0", "bottom-0 right-0"].map((pos) => (
-          <div
-            key={pos}
-            className={`absolute ${pos} -translate-x-1/2 -translate-y-1/2`}
-            style={{
-              width: 6,
-              height: 6,
-              borderRadius: "50%",
-              backgroundColor: severityColor,
-              boxShadow: `0 0 6px 2px ${severityColor}60`,
-            }}
-          />
-        ))}
-
-      {/* Hotspot icon for problem zones */}
-      {!isHealthy && (
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-          <div
-            className="animate-hotspot-ring absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full"
-            style={{ width: 16, height: 16, backgroundColor: `${severityColor}25`, border: `1px solid ${severityColor}40` }}
-          />
-          <div
-            className="animate-hotspot-ping flex h-5 w-5 items-center justify-center rounded-full"
-            style={{ backgroundColor: severityColor, boxShadow: `0 0 10px 3px ${severityColor}50` }}
-          >
-            <span className="text-[8px] font-black text-white">
-              {zone.severity === "severe" ? "!!" : "!"}
-            </span>
-          </div>
-        </div>
-      )}
-
-      {/* Checkmark for healthy zones */}
-      {isHealthy && (
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-          <div className="flex h-5 w-5 items-center justify-center rounded-full bg-green-500/20 ring-1 ring-green-500/40">
-            <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-              <path d="M2 5l2.5 2.5L8 3" stroke="#22c55e" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </div>
-        </div>
-      )}
-
-      {/* Label tag */}
-      <div
-        className="absolute -top-7 left-0 flex items-center gap-1.5 whitespace-nowrap rounded px-2 py-1"
-        style={{
-          backgroundColor: isHealthy ? "#22c55e" : severityColor,
-          boxShadow: `0 2px 8px ${isHealthy ? "#22c55e" : severityColor}50`,
-        }}
-      >
-        <div className="h-1.5 w-1.5 rounded-full bg-white/80" />
-        <span className="text-[9px] font-bold tracking-wide text-white uppercase">
-          {isHealthy ? "Zone saine" : label}
-        </span>
-      </div>
-    </div>
-  )
-}
-
 /* ── Score Gauge ── */
 function ScoreGauge({
   score,
@@ -412,89 +272,6 @@ function MaterialBadge({ type }: { type: string }) {
   )
 }
 
-/* ── Thermal Overlay ── */
-function ThermalOverlay({
-  zones,
-  visible,
-}: {
-  zones: { x: number; y: number; width: number; height: number; intensite: number; label: string }[]
-  visible: boolean
-}) {
-  if (!visible) return null
-  return (
-    <div className="pointer-events-none absolute inset-0 z-10">
-      {/* Full image thermal tint: blue-to-red gradient */}
-      <div
-        className="absolute inset-0 mix-blend-multiply"
-        style={{
-          background: "linear-gradient(135deg, rgba(59,130,246,0.35) 0%, rgba(139,92,246,0.2) 30%, rgba(249,115,22,0.25) 60%, rgba(239,68,68,0.35) 100%)",
-        }}
-      />
-      {/* Cool zones = blue tinted areas */}
-      <div
-        className="absolute inset-0 mix-blend-screen"
-        style={{
-          background: "radial-gradient(ellipse at 30% 30%, rgba(59,130,246,0.15), transparent 50%), radial-gradient(ellipse at 70% 70%, rgba(59,130,246,0.1), transparent 50%)",
-        }}
-      />
-
-      {/* Hot zones with labels */}
-      {zones.map((zone, i) => (
-        <div
-          key={i}
-          className="animate-zone-reveal absolute"
-          style={{
-            left: `${zone.x}%`,
-            top: `${zone.y}%`,
-            width: `${zone.width}%`,
-            height: `${zone.height}%`,
-            animationDelay: `${i * 300}ms`,
-          }}
-        >
-          {/* Hot zone radial glow */}
-          <div
-            className="absolute inset-0 rounded-md"
-            style={{
-              background: `radial-gradient(ellipse at center, rgba(239,68,68,${0.2 + zone.intensite / 100}), rgba(249,115,22,${0.1 + zone.intensite / 200}), transparent 70%)`,
-              boxShadow: `inset 0 0 20px rgba(239,68,68,${0.15 + zone.intensite / 150})`,
-            }}
-          />
-          {/* Pulsing border */}
-          <div
-            className="absolute inset-0 animate-pulse rounded-md border-2"
-            style={{ borderColor: `rgba(239,68,68,${0.4 + zone.intensite / 100})` }}
-          />
-
-          {/* Label */}
-          <div className="absolute -top-8 left-0 flex items-center gap-1.5 whitespace-nowrap rounded bg-red-600 px-2 py-1 shadow-lg shadow-red-900/40">
-            <Flame size={9} className="text-white" />
-            <span className="text-[9px] font-bold tracking-wide text-white">
-              Perte de chaleur : +{zone.intensite}%
-            </span>
-          </div>
-
-          {/* Center heat indicator */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-            <div className="animate-hotspot-ping flex h-6 w-6 items-center justify-center rounded-full bg-red-500/30 ring-2 ring-red-500/50">
-              <Thermometer size={10} className="text-red-400" />
-            </div>
-          </div>
-        </div>
-      ))}
-
-      {/* Thermal scale legend */}
-      <div className="absolute bottom-3 right-3 flex items-center gap-2 rounded-lg bg-background/90 px-3 py-2 backdrop-blur-md">
-        <span className="text-[9px] font-semibold text-blue-400">Froid</span>
-        <div
-          className="h-2 w-20 rounded-full"
-          style={{ background: "linear-gradient(to right, #3b82f6, #8b5cf6, #f97316, #ef4444)" }}
-        />
-        <span className="text-[9px] font-semibold text-red-400">Chaud</span>
-      </div>
-    </div>
-  )
-}
-
 /* ── Thermal Score Card ── */
 function ThermalScoreCard({
   scoreIsolation,
@@ -571,6 +348,18 @@ function ThermalScoreCard({
   )
 }
 
+/* ── Post-process diagnostic: ensure thermal data exists ── */
+function ensureRealisticZones(diag: DiagnosticResult): DiagnosticResult {
+  const r = structuredClone(diag)
+
+  // Ensure thermique pertesChaleur array exists (IA sometimes omits it)
+  if (!r.thermique.pertesChaleur) {
+    r.thermique.pertesChaleur = []
+  }
+
+  return r
+}
+
 /* ── Main Component ── */
 export function DiagnosticTool() {
   const [step, setStep] = useState<Step>("address")
@@ -580,17 +369,12 @@ export function DiagnosticTool() {
   const [geolocating, setGeolocating] = useState(false)
   const autocompleteTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const dropdownRef = useRef<HTMLDivElement>(null)
-  const [satelliteImages, setSatelliteImages] = useState<SatelliteImage[]>([])
-  const [activeZoom, setActiveZoom] = useState(0)
-  const [thermalMode, setThermalMode] = useState(false)
+  const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number } | null>(null)
+  const [capturedImage, setCapturedImage] = useState<string | null>(null)
+  const [mapMeasurements, setMapMeasurements] = useState<MapMeasurement[]>([])
   const [formattedAddress, setFormattedAddress] = useState("")
   const [diagnostic, setDiagnostic] = useState<DiagnosticResult | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [layerState, setLayerState] = useState({
-    vegetal: true,
-    structure: true,
-    etancheite: true,
-  })
   const resultsRef = useRef<HTMLDivElement>(null)
   const handleSearchRef = useRef<() => void>(() => {})
 
@@ -639,15 +423,22 @@ export function DiagnosticTool() {
     [fetchPredictions]
   )
 
-  // Select a prediction => set address and auto-launch scan
+  // Select a prediction => set address and auto-launch map
   const handleSelectPrediction = useCallback((prediction: PlacePrediction) => {
     setAddress(prediction.description)
     setShowDropdown(false)
     setPredictions([])
-    // Auto-launch analysis after a brief delay for UI feedback
-    setTimeout(() => {
-      handleSearchRef.current()
-    }, 100)
+    // If prediction has coords, go straight to map
+    if (prediction.lat && prediction.lng) {
+      setFormattedAddress(prediction.description)
+      setMapCenter({ lat: prediction.lat, lng: prediction.lng })
+      setStep("map")
+    } else {
+      // Fallback: geocode
+      setTimeout(() => {
+        handleSearchRef.current()
+      }, 100)
+    }
   }, [])
 
   // Geolocation via adresse.data.gouv.fr reverse geocoding
@@ -664,12 +455,11 @@ export function DiagnosticTool() {
           const { latitude, longitude } = position.coords
           const res = await fetch(`/api/geocode?lat=${latitude}&lng=${longitude}`)
           const data = await res.json()
-          if (data.address) {
+          if (data.address && data.lat && data.lng) {
             setAddress(data.address)
-            // Auto-launch analysis
-            setTimeout(() => {
-              handleSearchRef.current()
-            }, 100)
+            setFormattedAddress(data.address)
+            setMapCenter({ lat: data.lat, lng: data.lng })
+            setStep("map")
           } else {
             setError("Impossible de trouver votre adresse. Verifiez que vous etes en France.")
           }
@@ -690,53 +480,72 @@ export function DiagnosticTool() {
     )
   }, [])
 
+  // Geocode the address and show the interactive map
   const handleSearch = useCallback(async () => {
     if (!address.trim()) return
     setError(null)
-    setStep("satellite")
+    setStep("map")
 
     try {
-      const satRes = await fetch("/api/satellite", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ address }),
-      })
-      const satData = await satRes.json()
+      // Geocode the address to get coordinates
+      const geoRes = await fetch(`/api/geocode?address=${encodeURIComponent(address)}`)
+      const geoData = await geoRes.json()
 
-      if (!satRes.ok) {
-        setError(satData.error || "Erreur lors de la recuperation de l'image satellite.")
-        setStep("address")
-        return
+      if (geoData.lat && geoData.lng) {
+        setMapCenter({ lat: geoData.lat, lng: geoData.lng })
+        setFormattedAddress(geoData.address || address)
+      } else {
+        // Fallback: try to get coords from the address via adresse.data.gouv.fr directly
+        const fallbackRes = await fetch(`https://api-adresse.data.gouv.fr/search/?q=${encodeURIComponent(address)}&limit=1`)
+        const fallbackData = await fallbackRes.json()
+        if (fallbackData.features?.length > 0) {
+          const [lng, lat] = fallbackData.features[0].geometry.coordinates
+          setMapCenter({ lat, lng })
+          setFormattedAddress(fallbackData.features[0].properties.label || address)
+        } else {
+          setError("Impossible de localiser cette adresse. Verifiez et reessayez.")
+          setStep("address")
+          return
+        }
       }
+    } catch {
+      setError("Erreur lors de la localisation. Verifiez votre connexion.")
+      setStep("address")
+    }
+  }, [address])
 
-      setSatelliteImages(satData.images || [{ zoom: 20, label: "Standard", image: satData.primaryImage }])
-      setActiveZoom(0)
-      setFormattedAddress(satData.formattedAddress)
+  // Handle map capture -> run AI analysis
+  const handleMapCapture = useCallback(async (data: MapCaptureData) => {
+    setCapturedImage(data.imageBase64)
+    setMapMeasurements(data.measurements)
+    setStep("scanning")
 
+    try {
       // Show scanning animation for 3 seconds
-      setStep("scanning")
       await new Promise((r) => setTimeout(r, 3000))
-
       setStep("analyzing")
 
-      const analysisImage = satData.images?.[0]?.image || satData.primaryImage
+      // Send the captured image to the AI diagnostic
       const diagRes = await fetch("/api/diagnostic", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          image: analysisImage,
-          address: satData.formattedAddress,
+          image: data.imageBase64,
+          address: formattedAddress,
+          measurements: data.measurements,
+          bounds: data.bounds,
+          zoom: data.zoom,
         }),
       })
       const diagData = await diagRes.json()
 
       if (!diagRes.ok) {
         setError(diagData.error || "Erreur lors de l'analyse IA.")
-        setStep("address")
+        setStep("map")
         return
       }
 
-      setDiagnostic(diagData.diagnostic)
+      setDiagnostic(ensureRealisticZones(diagData.diagnostic))
       setStep("results")
 
       setTimeout(() => {
@@ -744,9 +553,9 @@ export function DiagnosticTool() {
       }, 300)
     } catch {
       setError("Une erreur est survenue. Verifiez votre connexion et reessayez.")
-      setStep("address")
+      setStep("map")
     }
-  }, [address])
+  }, [formattedAddress])
 
   // Keep ref in sync so auto-launch works from selection/geolocation
   useEffect(() => {
@@ -754,20 +563,15 @@ export function DiagnosticTool() {
   }, [handleSearch])
 
   const handleReset = () => {
-  setStep("address")
-  setAddress("")
-  setPredictions([])
-  setShowDropdown(false)
-  setSatelliteImages([])
-  setActiveZoom(0)
-  setThermalMode(false)
-  setDiagnostic(null)
+    setStep("address")
+    setAddress("")
+    setPredictions([])
+    setShowDropdown(false)
+    setMapCenter(null)
+    setCapturedImage(null)
+    setMapMeasurements([])
+    setDiagnostic(null)
     setError(null)
-    setLayerState({ vegetal: true, structure: true, etancheite: true })
-  }
-
-  const toggleLayer = (layer: keyof typeof layerState) => {
-    setLayerState((prev) => ({ ...prev, [layer]: !prev[layer] }))
   }
 
   const getSeverityIcon = (score: number) => {
@@ -784,43 +588,31 @@ export function DiagnosticTool() {
 
   const allZones = diagnostic
     ? [
-        ...diagnostic.vegetal.zones.map((z) => ({ ...z, category: "Vegetal" as const, color: "#22c55e", icon: Leaf })),
+        ...diagnostic.vegetal.zones.map((z) => ({ ...z, category: "Vegetal" as const, color: "#84cc16", icon: Leaf })),
         ...diagnostic.structure.zones.map((z) => ({ ...z, category: "Structure" as const, color: "#ef4444", icon: Wrench })),
-        ...diagnostic.etancheite.zones.map((z) => ({ ...z, category: "Etancheite" as const, color: "#3b82f6", icon: Droplets })),
+        ...diagnostic.etancheite.zones.map((z) => ({ ...z, category: "Etancheite" as const, color: "#22c55e", icon: Droplets })),
       ]
     : []
 
   const progressSteps = [
     { key: "address", label: "Adresse", icon: MapPin },
-    { key: "satellite", label: "Satellite", icon: Satellite },
+    { key: "map", label: "Carte IGN", icon: MapPinned },
     { key: "scanning", label: "Scan", icon: Zap },
     { key: "analyzing", label: "Analyse IA", icon: Brain },
     { key: "results", label: "Resultats", icon: FileText },
   ]
-  const stepsOrder: Step[] = ["address", "satellite", "scanning", "analyzing", "results"]
+  const stepsOrder: Step[] = ["address", "map", "scanning", "analyzing", "results"]
   const currentIndex = stepsOrder.indexOf(step)
 
   return (
     <section id="diagnostic" className="relative py-24">
-      {/* SVG sharpening filter for satellite images */}
-      <svg className="absolute h-0 w-0" aria-hidden="true">
-        <defs>
-          <filter id="sharpen">
-            <feConvolveMatrix
-              order="3"
-              kernelMatrix="0 -0.5 0  -0.5 3 -0.5  0 -0.5 0"
-              preserveAlpha="true"
-            />
-          </filter>
-        </defs>
-      </svg>
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,_var(--color-glow-blue),_transparent_50%)]" />
       <div className="relative mx-auto max-w-7xl px-6">
         {/* Header */}
         <div className="mx-auto mb-16 max-w-3xl text-center">
           <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary">
-            <Satellite size={14} />
-            Diagnostic par Satellite
+              <MapPinned size={14} />
+              Diagnostic par carte IGN
           </div>
           <h2
             className="mb-4 text-balance text-4xl font-bold tracking-tight text-foreground md:text-5xl"
@@ -859,7 +651,7 @@ export function DiagnosticTool() {
         </div>
 
         {/* Address Input */}
-        {(step === "address" || step === "satellite") && (
+        {step === "address" && (
           <div className="mx-auto max-w-2xl">
             <div className="rounded-2xl border border-border bg-card p-8">
               <div className="mb-6 flex items-center gap-3">
@@ -934,20 +726,11 @@ export function DiagnosticTool() {
                       setShowDropdown(false)
                       handleSearch()
                     }}
-                    disabled={step !== "address" || !address.trim()}
+                    disabled={!address.trim()}
                     className="flex h-12 items-center gap-2 rounded-xl bg-primary px-6 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90 disabled:opacity-50"
                   >
-                    {step === "satellite" ? (
-                      <>
-                        <Loader2 size={16} className="animate-spin" />
-                        <span className="hidden sm:inline">Analyse...</span>
-                      </>
-                    ) : (
-                      <>
-                        <Satellite size={16} />
-                        <span className="hidden sm:inline">Analyser ma toiture</span>
-                      </>
-                    )}
+                    <MapPinned size={16} />
+                    <span className="hidden sm:inline">Localiser ma toiture</span>
                   </button>
                 </div>
 
@@ -967,20 +750,6 @@ export function DiagnosticTool() {
                 </button>
               </div>
 
-              {step === "satellite" && (
-                <div className="mt-6 flex items-center gap-3 rounded-xl border border-primary/20 bg-primary/5 p-4">
-                  <Loader2 size={20} className="animate-spin text-primary" />
-                  <div>
-                    <p className="text-sm font-medium text-foreground">
-                      Recuperation de l{"'"}image satellite...
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      Connexion aux serveurs satellite en cours
-                    </p>
-                  </div>
-                </div>
-              )}
-
               {error && (
                 <div className="mt-4 flex items-center gap-3 rounded-xl border border-destructive/30 bg-destructive/10 p-4">
                   <XCircle size={20} className="shrink-0 text-destructive" />
@@ -990,9 +759,9 @@ export function DiagnosticTool() {
 
               <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
                 {[
-                  { icon: Satellite, label: "Vue satellite HD", desc: "Resolution x2 doublee" },
+                  { icon: MapPinned, label: "Carte IGN HD", desc: "Ortho-photo IGN officielle" },
                   { icon: Shield, label: "Sans deplacement", desc: "100% a distance" },
-                  { icon: Zap, label: "Resultat en 30s", desc: "Analyse instantanee" },
+                  { icon: Zap, label: "Resultat en 30s", desc: "Analyse IA instantanee" },
                 ].map((f) => (
                   <div key={f.label} className="flex flex-col items-center gap-2 rounded-xl border border-border/50 bg-secondary/30 p-4 text-center">
                     <f.icon size={20} className="text-primary" />
@@ -1005,8 +774,67 @@ export function DiagnosticTool() {
           </div>
         )}
 
+        {/* Interactive Map Step */}
+        {step === "map" && mapCenter && (
+          <div className="mx-auto max-w-5xl">
+            <div className="rounded-2xl border border-border bg-card">
+              {/* Map header */}
+              <div className="flex items-center justify-between border-b border-border px-5 py-3">
+                <div className="flex items-center gap-3">
+                  <MapPinned size={16} className="text-primary" />
+                  <div>
+                    <p className="text-sm font-semibold text-foreground">Carte interactive IGN</p>
+                    <p className="text-[10px] text-muted-foreground">{formattedAddress}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setStep("address")}
+                  className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  <RotateCcw size={10} />
+                  Changer adresse
+                </button>
+              </div>
+
+              {/* Instructions */}
+              <div className="flex items-center gap-3 border-b border-border bg-primary/5 px-5 py-2.5">
+                <div className="h-2 w-2 animate-pulse rounded-full bg-primary" />
+                <p className="text-xs text-foreground/70">
+                  Un rectangle de selection de 20x20m est place sur votre adresse. Ajustez-le si besoin pour couvrir exactement votre toiture, puis cliquez sur{" "}
+                  <span className="font-semibold text-primary">Capturer et analyser</span>.
+                  Vous pouvez aussi utiliser les outils de mesure.
+                </p>
+              </div>
+
+              {/* Leaflet Map */}
+              <LeafletMap
+                center={mapCenter}
+                zoom={20}
+                onCapture={handleMapCapture}
+                onMeasurementsChange={(m) => setMapMeasurements(m)}
+                className="h-[450px] md:h-[550px]"
+              />
+
+              {/* Measurements display */}
+              {mapMeasurements.length > 0 && (
+                <div className="flex flex-wrap items-center gap-3 border-t border-border px-5 py-3">
+                  <Ruler size={12} className="text-primary" />
+                  <span className="text-xs font-medium text-foreground">Mesures :</span>
+                  {mapMeasurements.map((m, i) => (
+                    <span key={i} className="rounded-md bg-primary/10 px-2 py-1 text-xs font-semibold text-primary">
+                      {m.type === "area"
+                        ? `${m.value.toFixed(1)} m\u00B2`
+                        : `${m.value.toFixed(1)} m`}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Scanning / Analyzing View */}
-        {(step === "scanning" || step === "analyzing") && satelliteImages.length > 0 && (
+        {(step === "scanning" || step === "analyzing") && capturedImage && (
           <div className="mx-auto max-w-4xl">
             <div className="overflow-hidden rounded-2xl border border-primary/30 bg-card">
               {/* Top HUD bar */}
@@ -1025,10 +853,10 @@ export function DiagnosticTool() {
               {/* Image with scanner */}
               <div className="relative">
                 <img
-                    src={satelliteImages[0]?.image}
-                    alt="Vue satellite"
+                    src={capturedImage || ""}
+                    alt="Capture IGN de la toiture"
                     className="w-full"
-                    style={{ filter: "url(#sharpen) contrast(1.15) saturate(1.1) brightness(1.05)" }}
+                    style={{ filter: "contrast(1.1) saturate(1.05) brightness(1.02)" }}
                 />
                 <ScannerOverlay phase={step} />
               </div>
@@ -1039,8 +867,8 @@ export function DiagnosticTool() {
                   <Brain size={14} className="animate-pulse text-primary" />
                   <span className="text-xs text-muted-foreground">
                     {step === "scanning"
-                      ? "Scan lidar simule... Detection des contours de la toiture"
-                      : "Analyse IA multi-calques : vegetation, structure, etancheite"}
+                      ? "Scan de la capture IGN... Detection des contours de la toiture"
+                      : "Analyse IA multi-calques : vegetation, structure, etancheite, thermique"}
                   </span>
                 </div>
                 <div className="ml-auto">
@@ -1052,7 +880,7 @@ export function DiagnosticTool() {
         )}
 
         {/* Results */}
-        {step === "results" && diagnostic && satelliteImages.length > 0 && (
+        {step === "results" && diagnostic && capturedImage && (
           <div ref={resultsRef} className="animate-fade-up space-y-8">
             {/* Address bar + Material detection */}
             <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-border bg-card p-4">
@@ -1061,7 +889,7 @@ export function DiagnosticTool() {
                 <div>
                   <p className="text-sm font-medium text-foreground">{formattedAddress}</p>
                   <p className="mt-1 text-xs text-muted-foreground">
-                    Diagnostic satellite - {new Date().toLocaleDateString("fr-FR")}
+                    Diagnostic IGN - {new Date().toLocaleDateString("fr-FR")}
                   </p>
                 </div>
               </div>
@@ -1121,9 +949,9 @@ export function DiagnosticTool() {
                   </div>
                 </div>
                 <div className="flex items-center justify-center gap-8 md:col-span-3">
-                  <ScoreGauge score={diagnostic.vegetal.score} label="Vegetal" icon={Leaf} color="#22c55e" />
+                  <ScoreGauge score={diagnostic.vegetal.score} label="Vegetal" icon={Leaf} color="#84cc16" />
                   <ScoreGauge score={diagnostic.structure.score} label="Structure" icon={Wrench} color="#ef4444" />
-                  <ScoreGauge score={diagnostic.etancheite.score} label="Etancheite" icon={Droplets} color="#3b82f6" />
+                  <ScoreGauge score={diagnostic.etancheite.score} label="Etancheite" icon={Droplets} color="#22c55e" />
                 </div>
               </div>
               {/* Surface estimation */}
@@ -1171,6 +999,21 @@ export function DiagnosticTool() {
                 </div>
               )}
 
+              {/* User-drawn measurements from map */}
+              {mapMeasurements.length > 0 && (
+                <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-primary/20 bg-primary/5 p-4">
+                  <Ruler size={16} className="text-primary" />
+                  <span className="text-xs font-semibold text-foreground">Mesures manuelles :</span>
+                  {mapMeasurements.map((m, i) => (
+                    <span key={i} className="rounded-md bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary">
+                      {m.type === "area"
+                        ? `Surface : ${m.value.toFixed(1)} m\u00B2`
+                        : `Longueur : ${m.value.toFixed(1)} m`}
+                    </span>
+                  ))}
+                </div>
+              )}
+
               <p className="mt-4 rounded-xl bg-secondary/50 p-4 text-sm leading-relaxed text-muted-foreground">
                 {diagnostic.summary}
               </p>
@@ -1178,124 +1021,38 @@ export function DiagnosticTool() {
 
             {/* Image + Zones + Sidebar */}
             <div className="grid gap-6 lg:grid-cols-3">
-              {/* Satellite image with overlay zones */}
+              {/* IGN aerial image with overlay zones */}
               <div className="lg:col-span-2">
-                <div className="overflow-hidden rounded-2xl border border-border bg-card">
-                  {/* Toolbar */}
-                  <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-4 py-3">
+                <div className="rounded-2xl border border-border bg-card">
+                  {/* Toolbar - single roof view */}
+                  <div className="flex items-center justify-between border-b border-border px-4 py-3">
                     <div className="flex items-center gap-3">
-                      <Layers size={14} className="text-primary" />
-                      <span className="text-xs font-medium text-foreground">Vue satellite avec calques</span>
-                      {satelliteImages.length > 1 && (
-                        <div className="flex items-center gap-0.5 rounded-lg border border-border bg-secondary/50 p-0.5">
-                          {satelliteImages.map((img, i) => (
-                            <button
-                              key={img.zoom}
-                              onClick={() => setActiveZoom(i)}
-                              className={`flex items-center gap-1 rounded-md px-2 py-1 text-[9px] font-medium transition-all ${
-                                activeZoom === i ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
-                              }`}
-                            >
-                              {i === 0 ? <ZoomIn size={8} /> : i === satelliteImages.length - 1 ? <ZoomOut size={8} /> : null}
-                              {img.label}
-                            </button>
-                          ))}
-                        </div>
-                      )}
+                      <Crosshair size={14} className="text-primary" />
+                      <span className="text-xs font-medium text-foreground">Vue aerienne IGN - Toiture analysee</span>
                     </div>
-                    <div className="flex items-center gap-1">
-                      {[
-                        { key: "vegetal" as const, label: "Vegetal", color: "#22c55e" },
-                        { key: "structure" as const, label: "Structure", color: "#ef4444" },
-                        { key: "etancheite" as const, label: "Etancheite", color: "#3b82f6" },
-                      ].map((l) => (
-                        <button
-                          key={l.key}
-                          onClick={() => toggleLayer(l.key)}
-                          className="flex items-center gap-1 rounded-lg px-2 py-1.5 text-[10px] font-medium transition-all"
-                          style={{
-                            backgroundColor: layerState[l.key] ? `${l.color}20` : "transparent",
-                            color: layerState[l.key] ? l.color : "var(--color-muted-foreground)",
-                            border: `1px solid ${layerState[l.key] ? l.color : "var(--color-border)"}`,
-                          }}
-                        >
-                          {layerState[l.key] ? <Eye size={10} /> : <EyeOff size={10} />}
-                          {l.label}
-                        </button>
-                      ))}
-                      <div className="mx-1 h-4 w-px bg-border" />
-                      <button
-                        onClick={() => setThermalMode(!thermalMode)}
-                        className={`flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-[10px] font-semibold transition-all ${
-                          thermalMode
-                            ? "border border-orange-500 bg-gradient-to-r from-orange-500/20 to-red-500/20 text-orange-400"
-                            : "border border-border text-muted-foreground hover:border-orange-500/30 hover:text-orange-400"
-                        }`}
-                      >
-                        <Thermometer size={10} />
-                        Thermique
-                      </button>
+                    <div className="flex items-center gap-1.5 rounded-lg bg-green-500/10 px-2.5 py-1 border border-green-500/30">
+                      <div className="h-1.5 w-1.5 animate-pulse rounded-full bg-green-400" />
+                      <span className="text-[10px] font-semibold text-green-400">Analyse terminee</span>
                     </div>
                   </div>
 
-                  {/* Image with polygon overlays */}
+                  {/* Clean image of the single roof */}
                   <div className="relative">
                     <img
-                    src={satelliteImages[activeZoom]?.image || satelliteImages[0]?.image}
-                    alt="Vue satellite de la toiture"
-                    className="w-full"
-                    crossOrigin="anonymous"
-                    style={{ filter: "url(#sharpen) contrast(1.15) saturate(1.1) brightness(1.05)" }}
+                      src={capturedImage || ""}
+                      alt="Vue aerienne IGN de la toiture analysee"
+                      className="w-full"
+                      style={{ filter: "contrast(1.1) saturate(1.05) brightness(1.02)" }}
                     />
-                    {/* Tech grid overlay */}
+                    {/* Subtle tech grid overlay */}
                     <div
                       className="pointer-events-none absolute inset-0"
                       style={{
                         backgroundImage:
-                          "linear-gradient(rgba(59,130,246,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(59,130,246,0.04) 1px, transparent 1px)",
+                          "linear-gradient(rgba(59,130,246,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(59,130,246,0.03) 1px, transparent 1px)",
                         backgroundSize: "30px 30px",
                       }}
                     />
-
-                    {/* Zone overlays with colored borders */}
-                    {diagnostic.vegetal.zones.map((z, i) => (
-                      <ZonePolygon
-                        key={`v-${i}`}
-                        zone={z}
-                        color="#22c55e"
-                        visible={layerState.vegetal}
-                        label={z.label}
-                        delay={i * 200}
-                      />
-                    ))}
-                    {diagnostic.structure.zones.map((z, i) => (
-                      <ZonePolygon
-                        key={`s-${i}`}
-                        zone={z}
-                        color="#ef4444"
-                        visible={layerState.structure}
-                        label={z.label}
-                        delay={(diagnostic.vegetal.zones.length + i) * 200}
-                      />
-                    ))}
-                    {diagnostic.etancheite.zones.map((z, i) => (
-                      <ZonePolygon
-                        key={`e-${i}`}
-                        zone={z}
-                        color="#3b82f6"
-                        visible={layerState.etancheite}
-                        label={z.label}
-                        delay={(diagnostic.vegetal.zones.length + diagnostic.structure.zones.length + i) * 200}
-                      />
-                    ))}
-
-                    {/* Thermal overlay */}
-                    {diagnostic.thermique && (
-                      <ThermalOverlay
-                        zones={diagnostic.thermique.pertesChaleur}
-                        visible={thermalMode}
-                      />
-                    )}
 
                     {/* Confidence Badge - bottom of image */}
                     <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
@@ -1308,12 +1065,8 @@ export function DiagnosticTool() {
                       >
                         <ScanLine size={12} className="text-cyan-400" />
                         <span className="font-mono text-[10px] font-semibold tracking-wide text-cyan-400">
-                          Resolution optimisee par IA - Precision 5cm/pixel
+                          Ortho-photo IGN - Analyse IA haute resolution
                         </span>
-                      </div>
-                      <div className="flex items-center gap-1.5 rounded-lg bg-background/85 px-2.5 py-1.5 backdrop-blur-md">
-                        <div className="h-1.5 w-1.5 animate-pulse rounded-full bg-green-400" />
-                        <span className="font-mono text-[9px] text-green-400">LIVE ANALYSIS</span>
                       </div>
                     </div>
                   </div>
@@ -1376,6 +1129,177 @@ export function DiagnosticTool() {
                 )}
               </div>
             </div>
+
+            {/* Resume du diagnostic */}
+            {(() => {
+              const hasStructure = diagnostic.structure.zones.some(z => z.severity === "severe" || z.severity === "modere")
+              const hasThermique = diagnostic.thermique?.pertesChaleur?.some(z => z.intensite > 10)
+              const hasEtancheite = diagnostic.etancheite.zones.some(z => z.severity === "severe" || z.severity === "modere")
+              const hasVegetal = diagnostic.vegetal.zones.some(z => z.severity === "severe" || z.severity === "modere")
+              const totalIssues = [hasStructure, hasThermique, hasEtancheite, hasVegetal].filter(Boolean).length
+
+              return (
+                <div className="rounded-2xl border border-border bg-card p-6">
+                  <div className="mb-5 flex items-center gap-3">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-amber-500/10">
+                      <AlertTriangle size={20} className="text-amber-500" />
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold text-foreground" style={{ fontFamily: "var(--font-heading)" }}>
+                        Resume du diagnostic
+                      </h3>
+                      <p className="text-xs text-muted-foreground">
+                        {totalIssues} point{totalIssues > 1 ? "s" : ""} de vigilance detecte{totalIssues > 1 ? "s" : ""}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="grid gap-3 sm:grid-cols-2">
+                    {/* Structure */}
+                    <div
+                      className="flex items-start gap-3 rounded-xl border-2 p-4"
+                      style={{
+                        borderColor: hasStructure ? "#ef4444" : "var(--color-border)",
+                        backgroundColor: hasStructure ? "rgba(239,68,68,0.05)" : "transparent",
+                      }}
+                    >
+                      <div
+                        className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
+                        style={{ backgroundColor: hasStructure ? "rgba(239,68,68,0.15)" : "var(--color-secondary)" }}
+                      >
+                        <Wrench size={14} style={{ color: hasStructure ? "#ef4444" : "var(--color-muted-foreground)" }} />
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold" style={{ color: hasStructure ? "#ef4444" : "var(--color-foreground)" }}>
+                          {hasStructure ? "Attention, probleme structurel critique !" : "Structure conforme"}
+                        </p>
+                        <p className="mt-0.5 text-xs text-muted-foreground">
+                          {hasStructure ? diagnostic.structure.description : "Aucun defaut structurel majeur detecte."}
+                        </p>
+                        {hasStructure && (
+                          <a href="#contact" className="mt-2 inline-flex items-center gap-1 text-[10px] font-semibold text-red-500 hover:underline">
+                            <Send size={8} />
+                            Demander une intervention
+                          </a>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Thermique */}
+                    <div
+                      className="flex items-start gap-3 rounded-xl border-2 p-4"
+                      style={{
+                        borderColor: hasThermique ? "#f97316" : "var(--color-border)",
+                        backgroundColor: hasThermique ? "rgba(249,115,22,0.05)" : "transparent",
+                      }}
+                    >
+                      <div
+                        className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
+                        style={{ backgroundColor: hasThermique ? "rgba(249,115,22,0.15)" : "var(--color-secondary)" }}
+                      >
+                        <Flame size={14} style={{ color: hasThermique ? "#f97316" : "var(--color-muted-foreground)" }} />
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold" style={{ color: hasThermique ? "#f97316" : "var(--color-foreground)" }}>
+                          {hasThermique ? "Alerte thermique : isolation a verifier" : "Isolation correcte"}
+                        </p>
+                        <p className="mt-0.5 text-xs text-muted-foreground">
+                          {hasThermique ? diagnostic.thermique.commentaire : "Pas de deperdition thermique significative."}
+                        </p>
+                        {hasThermique && (
+                          <a href="#contact" className="mt-2 inline-flex items-center gap-1 text-[10px] font-semibold text-orange-500 hover:underline">
+                            <Send size={8} />
+                            Bilan energetique gratuit
+                          </a>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Etancheite */}
+                    <div
+                      className="flex items-start gap-3 rounded-xl border-2 p-4"
+                      style={{
+                        borderColor: hasEtancheite ? "#f59e0b" : "#22c55e",
+                        backgroundColor: hasEtancheite ? "rgba(245,158,11,0.05)" : "rgba(34,197,94,0.05)",
+                      }}
+                    >
+                      <div
+                        className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
+                        style={{ backgroundColor: hasEtancheite ? "rgba(245,158,11,0.15)" : "rgba(34,197,94,0.15)" }}
+                      >
+                        <Droplets size={14} style={{ color: hasEtancheite ? "#f59e0b" : "#22c55e" }} />
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold" style={{ color: hasEtancheite ? "#f59e0b" : "#22c55e" }}>
+                          {hasEtancheite ? "Etancheite a surveiller" : "Etancheite conforme"}
+                        </p>
+                        <p className="mt-0.5 text-xs text-muted-foreground">
+                          {hasEtancheite ? diagnostic.etancheite.description : "L'etancheite de votre toiture est en bon etat."}
+                        </p>
+                        {hasEtancheite && (
+                          <a href="#contact" className="mt-2 inline-flex items-center gap-1 text-[10px] font-semibold text-amber-500 hover:underline">
+                            <Send size={8} />
+                            Demander un devis etancheite
+                          </a>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Vegetal */}
+                    <div
+                      className="flex items-start gap-3 rounded-xl border-2 p-4"
+                      style={{
+                        borderColor: hasVegetal ? "#84cc16" : "var(--color-border)",
+                        backgroundColor: hasVegetal ? "rgba(132,204,22,0.05)" : "transparent",
+                      }}
+                    >
+                      <div
+                        className="mt-0.5 flex h-8 w-8 shrink-0 items-center justify-center rounded-lg"
+                        style={{ backgroundColor: hasVegetal ? "rgba(132,204,22,0.15)" : "var(--color-secondary)" }}
+                      >
+                        <Leaf size={14} style={{ color: hasVegetal ? "#84cc16" : "var(--color-muted-foreground)" }} />
+                      </div>
+                      <div>
+                        <p className="text-sm font-bold" style={{ color: hasVegetal ? "#84cc16" : "var(--color-foreground)" }}>
+                          {hasVegetal ? "Vegetation parasite detectee" : "Pas de vegetation parasite"}
+                        </p>
+                        <p className="mt-0.5 text-xs text-muted-foreground">
+                          {hasVegetal ? diagnostic.vegetal.description : "Aucune mousse ou lichen problematique detecte."}
+                        </p>
+                        {hasVegetal && (
+                          <a href="#contact" className="mt-2 inline-flex items-center gap-1 text-[10px] font-semibold hover:underline" style={{ color: "#84cc16" }}>
+                            <Send size={8} />
+                            Demander un nettoyage
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Global alert banner if critical issues */}
+                  {(hasStructure || hasThermique) && (
+                    <div className="mt-5 flex items-center gap-3 rounded-xl border border-red-500/30 bg-red-500/10 p-4">
+                      <XCircle size={18} className="shrink-0 text-red-500" />
+                      <div className="flex-1">
+                        <p className="text-sm font-bold text-red-500">
+                          Intervention recommandee
+                        </p>
+                        <p className="text-xs text-red-400/80">
+                          Des points critiques ont ete detectes sur votre toiture. Nous vous recommandons de faire intervenir un professionnel.
+                        </p>
+                      </div>
+                      <a
+                        href="tel:+33233311979"
+                        className="flex shrink-0 items-center gap-2 rounded-lg bg-red-500 px-4 py-2 text-xs font-bold text-white transition-colors hover:bg-red-600"
+                      >
+                        <Phone size={12} />
+                        Appeler
+                      </a>
+                    </div>
+                  )}
+                </div>
+              )
+            })()}
 
             {/* PDF Report Button */}
             <div className="relative overflow-hidden rounded-2xl border border-cyan-500/30 bg-card p-8 text-center">

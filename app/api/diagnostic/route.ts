@@ -2,21 +2,39 @@ import { generateText, Output } from "ai"
 import { diagnosticSchema } from "@/lib/diagnostic-types"
 
 export async function POST(req: Request) {
-  const { image, address } = await req.json()
+  const { image, address, measurements, bounds, zoom } = await req.json()
 
   if (!image) {
     return Response.json({ error: "Aucune image fournie" }, { status: 400 })
   }
 
+  // Build measurement context string for the AI
+  let measurementContext = ""
+  if (measurements && measurements.length > 0) {
+    const parts = measurements.map((m: { type: string; value: number; unit: string }) =>
+      m.type === "area"
+        ? `Surface mesuree par l'utilisateur : ${m.value.toFixed(1)} m2`
+        : `Longueur mesuree par l'utilisateur : ${m.value.toFixed(1)} m`
+    )
+    measurementContext = `\nMESURES MANUELLES DE L'UTILISATEUR :\n${parts.join("\n")}\n`
+  }
+
+  // Build bounds context
+  let boundsContext = ""
+  if (bounds) {
+    boundsContext = `\nCOORDONNEES DE LA ZONE : Nord ${bounds.north?.toFixed(6)}, Sud ${bounds.south?.toFixed(6)}, Est ${bounds.east?.toFixed(6)}, Ouest ${bounds.west?.toFixed(6)}`
+    if (zoom) boundsContext += ` | Zoom : ${zoom}`
+    boundsContext += "\n"
+  }
+
   // Step 1: First pass - ask the AI to describe what it ACTUALLY sees (no structured output)
-  // This forces honest observation before diagnosis
   const { text: observation } = await generateText({
     model: "openai/gpt-4o",
     messages: [
       {
         role: "system",
-        content: `Tu es un observateur expert en batiment. Ton UNIQUE travail est de DECRIRE factuellement ce que tu vois sur cette image satellite vue du dessus. Tu ne fais AUCUN diagnostic, AUCUNE supposition.
-
+        content: `Tu es un observateur expert en batiment. Ton UNIQUE travail est de DECRIRE factuellement ce que tu vois sur cette image aerienne (ortho-photo IGN) vue du dessus. Tu ne fais AUCUN diagnostic, AUCUNE supposition.
+${measurementContext}${boundsContext}
 Reponds EXACTEMENT dans ce format :
 FORME DU TOIT : [plat / en pente / multi-pans / arrondi / autre]
 SURFACE : [ce que tu vois : lisse et uniforme / avec des rangees regulieres / ondulee / etc.]
@@ -25,7 +43,7 @@ MATERIAU PROBABLE : [terrasse plate bitume-membrane / tuiles terre cuite / ardoi
 ELEMENTS VISIBLES : [liste de ce que tu vois reellement : antennes, cheminees, bouches d'aeration, panneaux solaires, etc.]
 ANOMALIES VISIBLES : [liste de ce que tu vois d'anormal, ou "aucune anomalie visible a cette resolution"]
 VEGETATION SUR LE TOIT : [oui avec description / non / impossible a determiner]
-TAILLE ESTIMEE DU BATIMENT : [estime la longueur x largeur approximative du batiment en metres, basee sur la proportion dans l'image satellite. Un pixel au zoom 20 fait environ 15cm. Donne ton estimation.]
+TAILLE ESTIMEE DU BATIMENT : [estime la longueur x largeur approximative du batiment en metres. ${measurements?.length > 0 ? "L'utilisateur a fourni des mesures manuelles, utilise-les comme reference." : "Estime a partir de l'echelle de l'image."}]
 QUALITE IMAGE : [bonne / moyenne / faible - la resolution permet-elle de voir des details ?]`,
       },
       {
@@ -33,7 +51,7 @@ QUALITE IMAGE : [bonne / moyenne / faible - la resolution permet-elle de voir de
         content: [
           {
             type: "text",
-            text: "Decris FACTUELLEMENT ce que tu vois sur cette image satellite. Ne suppose rien, ne diagnostique rien. Decris seulement.",
+            text: "Decris FACTUELLEMENT ce que tu vois sur cette image aerienne IGN. Ne suppose rien, ne diagnostique rien. Decris seulement.",
           },
           {
             type: "image",
@@ -75,11 +93,12 @@ ADAPTATION PAR TYPE :
 - ZINC/METAL : problemes possibles = rouille, joints ouverts, bosses.
 
 SURFACE :
-- Estime la surface totale de la toiture en m2 a partir de la taille du batiment visible.
+- ${measurements?.length > 0 ? "L'utilisateur a dessine des mesures sur la carte IGN. Utilise ces mesures comme reference principale pour la surface." : "Estime la surface totale de la toiture en m2 a partir de la taille du batiment visible."}
 - Pour un toit en pente, ajoute 15 a 30% a l'emprise au sol (selon l'inclinaison).
 - Pour une terrasse plate, la surface = emprise au sol.
 - Utilise l'observation "TAILLE ESTIMEE DU BATIMENT" comme base.
-- Indique la precision : "haute" si bien visible, "moyenne" si partiellement cache, "faible" si difficile.
+- Indique la precision : "haute" si mesures manuelles disponibles, "moyenne" si bien visible, "faible" si difficile.
+${measurementContext}
 
 CALQUES :
 1. VEGETAL : mousse, lichen, vegetation parasite SUR le toit (pas les arbres a cote)
