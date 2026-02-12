@@ -12,13 +12,10 @@ import {
   XCircle,
   ChevronRight,
   FileText,
-  Layers,
   Leaf,
   Wrench,
   Droplets,
   RotateCcw,
-  Eye,
-  EyeOff,
   Shield,
   Zap,
   Phone,
@@ -173,141 +170,6 @@ function ScannerOverlay({ phase }: { phase: "scanning" | "analyzing" }) {
   )
 }
 
-/* ── Hotspot Blinking Icon ── */
-function Hotspot({
-  x,
-  y,
-  color,
-  severity,
-  delay = 0,
-}: {
-  x: number
-  y: number
-  color: string
-  severity: string
-  delay?: number
-}) {
-  return (
-    <div
-      className="animate-zone-reveal absolute z-20 -translate-x-1/2 -translate-y-1/2"
-      style={{ left: `${x}%`, top: `${y}%`, animationDelay: `${delay}ms` }}
-    >
-      {/* Expanding ring */}
-      <div
-        className="animate-hotspot-ring absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full"
-        style={{ width: 20, height: 20, backgroundColor: `${color}30`, border: `1px solid ${color}40` }}
-      />
-      {/* Core blinking dot */}
-      <div
-        className="animate-hotspot-ping relative flex h-6 w-6 items-center justify-center rounded-full"
-        style={{ backgroundColor: `${color}20`, border: `2px solid ${color}`, boxShadow: `0 0 12px 3px ${color}50` }}
-      >
-        <span className="text-[8px] font-bold" style={{ color }}>
-          {severity === "severe" ? "!" : severity === "modere" ? "?" : "~"}
-        </span>
-      </div>
-    </div>
-  )
-}
-
-/* ── Zone Polygon Overlay (always-visible info card) ── */
-function ZonePolygon({
-  zone,
-  color,
-  visible,
-  label,
-  delay = 0,
-  icon: Icon,
-  categoryLabel,
-}: {
-  zone: DiagnosticZone
-  color: string
-  visible: boolean
-  label: string
-  delay?: number
-  icon?: React.ElementType
-  categoryLabel?: string
-}) {
-  if (!visible) return null
-
-  const severityLabel =
-    zone.severity === "severe" ? "Critique" : zone.severity === "modere" ? "Modere" : "Faible"
-  const severityColor =
-    zone.severity === "severe" ? "#ef4444" : zone.severity === "modere" ? "#f59e0b" : "#22c55e"
-  const hasProblem = zone.severity === "severe" || zone.severity === "modere"
-
-  return (
-    <div
-      className="animate-zone-reveal absolute z-20"
-      style={{
-        left: `${zone.x}%`,
-        top: `${zone.y}%`,
-        width: `${zone.width}%`,
-        height: `${zone.height}%`,
-        animationDelay: `${delay}ms`,
-      }}
-    >
-      {/* Transparent fill */}
-      <div
-        className="absolute inset-0 rounded-md"
-        style={{ backgroundColor: `${color}15` }}
-      />
-
-      {/* Border (2px, rounded) */}
-      <div
-        className="absolute inset-0 rounded-md border-2"
-        style={{
-          borderColor: color,
-          boxShadow: hasProblem ? `0 0 10px 1px ${color}35` : "none",
-        }}
-      />
-
-      {/* Label tag above */}
-      <div
-        className="absolute -top-7 left-0 flex items-center gap-1.5 whitespace-nowrap rounded-md px-2.5 py-1 shadow-md"
-        style={{
-          backgroundColor: color,
-          boxShadow: `0 2px 8px ${color}40`,
-        }}
-      >
-        {Icon && <Icon size={9} className="text-white" />}
-        <span className="text-[9px] font-bold tracking-wide text-white uppercase">
-          {categoryLabel || label}
-        </span>
-      </div>
-
-      {/* Always-visible info card below the box */}
-      {hasProblem && (
-        <div
-          className="absolute left-1/2 z-30 w-48 -translate-x-1/2 rounded-lg border bg-card/95 p-2.5 shadow-lg backdrop-blur-sm"
-          style={{
-            top: "calc(100% + 6px)",
-            borderColor: `${color}50`,
-          }}
-        >
-          <div className="mb-1.5 flex items-center gap-1.5">
-            {Icon && (
-              <div className="flex h-4 w-4 items-center justify-center rounded" style={{ backgroundColor: `${color}20` }}>
-                <Icon size={8} style={{ color }} />
-              </div>
-            )}
-            <span className="text-[9px] font-bold uppercase tracking-wider" style={{ color }}>
-              {categoryLabel}
-            </span>
-            <span
-              className="ml-auto rounded px-1.5 py-0.5 text-[7px] font-bold text-white"
-              style={{ backgroundColor: severityColor }}
-            >
-              {severityLabel}
-            </span>
-          </div>
-          <p className="text-[10px] leading-snug text-foreground/80">{zone.label}</p>
-        </div>
-      )}
-    </div>
-  )
-}
-
 /* ── Score Gauge ── */
 function ScoreGauge({
   score,
@@ -410,106 +272,6 @@ function MaterialBadge({ type }: { type: string }) {
   )
 }
 
-/* ── Thermal Overlay ── */
-function ThermalOverlay({
-  zones,
-  visible,
-}: {
-  zones: { x: number; y: number; width: number; height: number; intensite: number; label: string }[]
-  visible: boolean
-}) {
-  if (!visible) return null
-  return (
-    <div className="pointer-events-none absolute inset-0 z-10">
-      {/* Full image thermal tint */}
-      <div
-        className="absolute inset-0 mix-blend-multiply"
-        style={{
-          background: "linear-gradient(135deg, rgba(59,130,246,0.35) 0%, rgba(139,92,246,0.2) 30%, rgba(249,115,22,0.25) 60%, rgba(239,68,68,0.35) 100%)",
-        }}
-      />
-      <div
-        className="absolute inset-0 mix-blend-screen"
-        style={{
-          background: "radial-gradient(ellipse at 30% 30%, rgba(59,130,246,0.15), transparent 50%), radial-gradient(ellipse at 70% 70%, rgba(59,130,246,0.1), transparent 50%)",
-        }}
-      />
-
-      {/* Hot zones with always-visible info */}
-      {zones.map((zone, i) => {
-        const isHigh = zone.intensite > 15
-        return (
-          <div
-            key={i}
-            className="animate-zone-reveal absolute z-20"
-            style={{
-              left: `${zone.x}%`,
-              top: `${zone.y}%`,
-              width: `${zone.width}%`,
-              height: `${zone.height}%`,
-              animationDelay: `${i * 300}ms`,
-            }}
-          >
-            {/* Orange fill */}
-            <div
-              className="absolute inset-0 rounded-md"
-              style={{ backgroundColor: `rgba(249,115,22,${0.1 + zone.intensite / 200})` }}
-            />
-            {/* Orange border (2px) */}
-            <div
-              className="absolute inset-0 rounded-md border-2"
-              style={{
-                borderColor: "#f97316",
-                boxShadow: isHigh ? "0 0 10px 1px rgba(249,115,22,0.35)" : "none",
-              }}
-            />
-
-            {/* Label */}
-            <div className="absolute -top-7 left-0 flex items-center gap-1.5 whitespace-nowrap rounded-md px-2.5 py-1 shadow-md" style={{ backgroundColor: "#f97316", boxShadow: "0 2px 8px rgba(249,115,22,0.4)" }}>
-              <Flame size={9} className="text-white" />
-              <span className="text-[9px] font-bold tracking-wide text-white uppercase">
-                Thermique : +{zone.intensite}%
-              </span>
-            </div>
-
-            {/* Always-visible info card */}
-            <div
-              className="absolute left-1/2 z-30 w-48 -translate-x-1/2 rounded-lg border bg-card/95 p-2.5 shadow-lg backdrop-blur-sm"
-              style={{
-                top: "calc(100% + 6px)",
-                borderColor: "rgba(249,115,22,0.5)",
-              }}
-            >
-              <div className="mb-1.5 flex items-center gap-1.5">
-                <div className="flex h-4 w-4 items-center justify-center rounded" style={{ backgroundColor: "rgba(249,115,22,0.2)" }}>
-                  <Thermometer size={8} className="text-orange-400" />
-                </div>
-                <span className="text-[9px] font-bold uppercase tracking-wider text-orange-400">
-                  Thermique
-                </span>
-                <span className="ml-auto rounded bg-orange-500 px-1.5 py-0.5 text-[7px] font-bold text-white">
-                  +{zone.intensite}%
-                </span>
-              </div>
-              <p className="text-[10px] leading-snug text-foreground/80">{zone.label}</p>
-            </div>
-          </div>
-        )
-      })}
-
-      {/* Thermal scale legend */}
-      <div className="absolute bottom-3 right-3 flex items-center gap-2 rounded-lg bg-background/90 px-3 py-2 backdrop-blur-md">
-        <span className="text-[9px] font-semibold text-blue-400">Froid</span>
-        <div
-          className="h-2 w-20 rounded-full"
-          style={{ background: "linear-gradient(to right, #3b82f6, #8b5cf6, #f97316, #ef4444)" }}
-        />
-        <span className="text-[9px] font-semibold text-red-400">Chaud</span>
-      </div>
-    </div>
-  )
-}
-
 /* ── Thermal Score Card ── */
 function ThermalScoreCard({
   scoreIsolation,
@@ -586,80 +348,14 @@ function ThermalScoreCard({
   )
 }
 
-/* ── Ensure diagnostic always has visible anomaly zones for all 4 categories ── */
+/* ── Post-process diagnostic: ensure thermal data exists ── */
 function ensureRealisticZones(diag: DiagnosticResult): DiagnosticResult {
   const r = structuredClone(diag)
 
-  // Cap all scores to 85 max so there is always something to show
-  r.scoreGlobal = Math.min(r.scoreGlobal, 82)
-  r.structure.score = Math.min(r.structure.score, 78)
-  r.etancheite.score = Math.min(r.etancheite.score, 80)
-  r.vegetal.score = Math.min(r.vegetal.score, 75)
-  r.thermique.scoreIsolation = Math.min(r.thermique.scoreIsolation, 70)
-
-  // --- Structure (rouge) : always at least 1 zone ---
-  const hasStructureZones = r.structure.zones.some(z => z.severity === "severe" || z.severity === "modere")
-  if (!hasStructureZones) {
-    const sev = r.structure.score < 50 ? "severe" as const : "modere" as const
-    r.structure.zones = [
-      {
-        x: 52, y: 8, width: 20, height: 16,
-        severity: sev,
-        label: sev === "severe"
-          ? "Degradation structurelle : tuiles deplacees, fissure de faitage ou aretes endommagees"
-          : "Usure structurelle moderee : surveillance et entretien recommandes",
-      },
-      ...(r.structure.score < 60 ? [{
-        x: 10, y: 40, width: 14, height: 11,
-        severity: "modere" as const,
-        label: "Zone de fragilite secondaire : rive ou gouttiere a verifier",
-      }] : []),
-    ]
+  // Ensure thermique pertesChaleur array exists (IA sometimes omits it)
+  if (!r.thermique.pertesChaleur) {
+    r.thermique.pertesChaleur = []
   }
-
-  // --- Etancheite (vert) : always at least 1 zone ---
-  const hasEtanchZones = r.etancheite.zones.some(z => z.severity === "severe" || z.severity === "modere")
-  if (!hasEtanchZones) {
-    const sev = r.etancheite.score < 50 ? "severe" as const : "modere" as const
-    r.etancheite.zones = [{
-      x: 5, y: 10, width: 18, height: 14,
-      severity: sev,
-      label: sev === "severe"
-        ? "Risque d'infiltration eleve : joints ou solins deteriores"
-        : "Etancheite a surveiller : traces d'humidite possibles",
-    }]
-  }
-
-  // --- Vegetal (lime) : always at least 1 zone ---
-  const hasVegetZones = r.vegetal.zones.some(z => z.severity === "severe" || z.severity === "modere")
-  if (!hasVegetZones) {
-    const sev = r.vegetal.score < 50 ? "severe" as const : "modere" as const
-    r.vegetal.zones = [{
-      x: 60, y: 55, width: 18, height: 14,
-      severity: sev,
-      label: sev === "severe"
-        ? "Mousse et lichen abondants : nettoyage et traitement hydrofuge necessaires"
-        : "Traces de mousse legere : traitement preventif conseille",
-    }]
-  }
-
-  // --- Thermique (orange) : always at least 1 zone ---
-  if (!r.thermique.pertesChaleur || r.thermique.pertesChaleur.length === 0) {
-    const intensity = r.thermique.scoreIsolation < 50 ? 22 : 14
-    r.thermique.pertesChaleur = [{
-      x: 30, y: 25, width: 22, height: 16,
-      intensite: intensity,
-      label: intensity > 15
-        ? "Deperdition thermique importante : isolation defaillante ou absente"
-        : "Zone de deperdition moderee : pont thermique probable",
-    }]
-  }
-
-  // Also ensure thermal intensity reflects the score
-  r.thermique.pertesChaleur = r.thermique.pertesChaleur.map(z => ({
-    ...z,
-    intensite: Math.max(z.intensite, r.thermique.scoreIsolation < 50 ? 18 : 10),
-  }))
 
   return r
 }
@@ -676,15 +372,9 @@ export function DiagnosticTool() {
   const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number } | null>(null)
   const [capturedImage, setCapturedImage] = useState<string | null>(null)
   const [mapMeasurements, setMapMeasurements] = useState<MapMeasurement[]>([])
-  const [thermalMode, setThermalMode] = useState(true)
   const [formattedAddress, setFormattedAddress] = useState("")
   const [diagnostic, setDiagnostic] = useState<DiagnosticResult | null>(null)
   const [error, setError] = useState<string | null>(null)
-  const [layerState, setLayerState] = useState({
-    vegetal: true,
-    structure: true,
-    etancheite: true,
-  })
   const resultsRef = useRef<HTMLDivElement>(null)
   const handleSearchRef = useRef<() => void>(() => {})
 
@@ -880,14 +570,8 @@ export function DiagnosticTool() {
     setMapCenter(null)
     setCapturedImage(null)
     setMapMeasurements([])
-    setThermalMode(true)
     setDiagnostic(null)
     setError(null)
-    setLayerState({ vegetal: true, structure: true, etancheite: true })
-  }
-
-  const toggleLayer = (layer: keyof typeof layerState) => {
-    setLayerState((prev) => ({ ...prev, [layer]: !prev[layer] }))
   }
 
   const getSeverityIcon = (score: number) => {
@@ -922,18 +606,6 @@ export function DiagnosticTool() {
 
   return (
     <section id="diagnostic" className="relative py-24">
-      {/* SVG sharpening filter for satellite images */}
-      <svg className="absolute h-0 w-0" aria-hidden="true">
-        <defs>
-          <filter id="sharpen">
-            <feConvolveMatrix
-              order="3"
-              kernelMatrix="0 -0.5 0  -0.5 3 -0.5  0 -0.5 0"
-              preserveAlpha="true"
-            />
-          </filter>
-        </defs>
-      </svg>
       <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,_var(--color-glow-blue),_transparent_50%)]" />
       <div className="relative mx-auto max-w-7xl px-6">
         {/* Header */}
@@ -1137,7 +809,7 @@ export function DiagnosticTool() {
               {/* Leaflet Map */}
               <LeafletMap
                 center={mapCenter}
-                zoom={19}
+                zoom={20}
                 onCapture={handleMapCapture}
                 onMeasurementsChange={(m) => setMapMeasurements(m)}
                 className="h-[450px] md:h-[550px]"
@@ -1352,111 +1024,35 @@ export function DiagnosticTool() {
               {/* IGN aerial image with overlay zones */}
               <div className="lg:col-span-2">
                 <div className="rounded-2xl border border-border bg-card">
-                  {/* Toolbar */}
-                  <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-4 py-3">
+                  {/* Toolbar - single roof view */}
+                  <div className="flex items-center justify-between border-b border-border px-4 py-3">
                     <div className="flex items-center gap-3">
-                      <Layers size={14} className="text-primary" />
-                      <span className="text-xs font-medium text-foreground">Vue aerienne IGN avec calques</span>
+                      <Crosshair size={14} className="text-primary" />
+                      <span className="text-xs font-medium text-foreground">Vue aerienne IGN - Toiture analysee</span>
                     </div>
-                    <div className="flex items-center gap-1">
-                      {[
-                        { key: "vegetal" as const, label: "Vegetal", color: "#84cc16" },
-                        { key: "structure" as const, label: "Structure", color: "#ef4444" },
-                        { key: "etancheite" as const, label: "Etancheite", color: "#22c55e" },
-                      ].map((l) => (
-                        <button
-                          key={l.key}
-                          onClick={() => toggleLayer(l.key)}
-                          className="flex items-center gap-1 rounded-lg px-2 py-1.5 text-[10px] font-medium transition-all"
-                          style={{
-                            backgroundColor: layerState[l.key] ? `${l.color}20` : "transparent",
-                            color: layerState[l.key] ? l.color : "var(--color-muted-foreground)",
-                            border: `1px solid ${layerState[l.key] ? l.color : "var(--color-border)"}`,
-                          }}
-                        >
-                          {layerState[l.key] ? <Eye size={10} /> : <EyeOff size={10} />}
-                          {l.label}
-                        </button>
-                      ))}
-                      <div className="mx-1 h-4 w-px bg-border" />
-                      <button
-                        onClick={() => setThermalMode(!thermalMode)}
-                        className={`flex items-center gap-1 rounded-lg px-2.5 py-1.5 text-[10px] font-semibold transition-all ${
-                          thermalMode
-                            ? "border border-orange-500 bg-gradient-to-r from-orange-500/20 to-red-500/20 text-orange-400"
-                            : "border border-border text-muted-foreground hover:border-orange-500/30 hover:text-orange-400"
-                        }`}
-                      >
-                        <Thermometer size={10} />
-                        Thermique
-                      </button>
+                    <div className="flex items-center gap-1.5 rounded-lg bg-green-500/10 px-2.5 py-1 border border-green-500/30">
+                      <div className="h-1.5 w-1.5 animate-pulse rounded-full bg-green-400" />
+                      <span className="text-[10px] font-semibold text-green-400">Analyse terminee</span>
                     </div>
                   </div>
 
-                  {/* Image with polygon overlays */}
-                  <div className="pb-20 pt-8">
-                    <div className="relative overflow-visible">
+                  {/* Clean image of the single roof */}
+                  <div className="relative">
                     <img
-                    src={capturedImage || ""}
-                    alt="Vue aerienne IGN de la toiture"
-                    className="w-full rounded"
-                    style={{ filter: "contrast(1.1) saturate(1.05) brightness(1.02)" }}
+                      src={capturedImage || ""}
+                      alt="Vue aerienne IGN de la toiture analysee"
+                      className="w-full"
+                      style={{ filter: "contrast(1.1) saturate(1.05) brightness(1.02)" }}
                     />
-                    {/* Tech grid overlay */}
+                    {/* Subtle tech grid overlay */}
                     <div
                       className="pointer-events-none absolute inset-0"
                       style={{
                         backgroundImage:
-                          "linear-gradient(rgba(59,130,246,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(59,130,246,0.04) 1px, transparent 1px)",
+                          "linear-gradient(rgba(59,130,246,0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(59,130,246,0.03) 1px, transparent 1px)",
                         backgroundSize: "30px 30px",
                       }}
                     />
-
-                    {/* Zone overlays - always-visible bounding boxes with info cards */}
-                    {diagnostic.vegetal.zones.map((z, i) => (
-                      <ZonePolygon
-                        key={`v-${i}`}
-                        zone={z}
-                        color="#84cc16"
-                        visible={layerState.vegetal}
-                        label={z.label}
-                        delay={i * 200}
-                        icon={Leaf}
-                        categoryLabel="Vegetal"
-                      />
-                    ))}
-                    {diagnostic.structure.zones.map((z, i) => (
-                      <ZonePolygon
-                        key={`s-${i}`}
-                        zone={z}
-                        color="#ef4444"
-                        visible={layerState.structure}
-                        label={z.label}
-                        delay={(diagnostic.vegetal.zones.length + i) * 200}
-                        icon={Wrench}
-                        categoryLabel="Structure"
-                      />
-                    ))}
-                    {diagnostic.etancheite.zones.map((z, i) => (
-                      <ZonePolygon
-                        key={`e-${i}`}
-                        zone={z}
-                        color="#22c55e"
-                        visible={layerState.etancheite}
-                        label={z.label}
-                        delay={(diagnostic.vegetal.zones.length + diagnostic.structure.zones.length + i) * 200}
-                        icon={Droplets}
-                        categoryLabel="Etancheite"
-                      />
-                    ))}
-
-                    {/* Thermal overlay */}
-                    {diagnostic.thermique && (
-                      <ThermalOverlay
-                        zones={diagnostic.thermique.pertesChaleur}
-                        visible={thermalMode}
-                      />
-                    )}
 
                     {/* Confidence Badge - bottom of image */}
                     <div className="absolute bottom-3 left-3 right-3 flex items-center justify-between">
@@ -1472,12 +1068,7 @@ export function DiagnosticTool() {
                           Ortho-photo IGN - Analyse IA haute resolution
                         </span>
                       </div>
-                      <div className="flex items-center gap-1.5 rounded-lg bg-background/85 px-2.5 py-1.5 backdrop-blur-md">
-                        <div className="h-1.5 w-1.5 animate-pulse rounded-full bg-green-400" />
-                        <span className="font-mono text-[9px] text-green-400">LIVE ANALYSIS</span>
-                      </div>
                     </div>
-                  </div>
                   </div>
                 </div>
               </div>

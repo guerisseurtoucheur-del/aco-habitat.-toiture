@@ -69,7 +69,7 @@ type LayerMode = "satellite" | "plan" | "cadastre"
 
 export default function LeafletMap({
   center,
-  zoom = 18,
+  zoom = 20,
   onCapture,
   onMeasurementsChange,
   className = "",
@@ -120,7 +120,8 @@ export default function LeafletMap({
 
     // Base tile layer (satellite by default)
     const tileLayer = L.tileLayer(IGN_ORTHO, {
-      maxZoom: 20,
+      maxZoom: 21,
+      maxNativeZoom: 20,
       attribution: ATTRIBUTION,
     }).addTo(map)
 
@@ -208,7 +209,7 @@ export default function LeafletMap({
     map.removeLayer(tileLayerRef.current)
 
     const url = activeLayer === "satellite" ? IGN_ORTHO : activeLayer === "plan" ? IGN_PLAN : IGN_ORTHO
-    const newLayer = L.tileLayer(url, { maxZoom: 20, attribution: ATTRIBUTION }).addTo(map)
+    const newLayer = L.tileLayer(url, { maxZoom: 21, maxNativeZoom: 20, attribution: ATTRIBUTION }).addTo(map)
     tileLayerRef.current = newLayer
   }, [activeLayer])
 
@@ -219,7 +220,8 @@ export default function LeafletMap({
 
     if (showCadastre && !cadastreLayerRef.current) {
       cadastreLayerRef.current = L.tileLayer(IGN_CADASTRE, {
-        maxZoom: 20,
+        maxZoom: 21,
+        maxNativeZoom: 20,
         attribution: ATTRIBUTION,
         opacity: 0.7,
       }).addTo(map)
