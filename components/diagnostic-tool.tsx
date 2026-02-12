@@ -205,12 +205,16 @@ function ZonePolygon({
   visible,
   label,
   delay = 0,
+  icon: Icon,
+  categoryLabel,
 }: {
   zone: DiagnosticZone
   color: string
   visible: boolean
   label: string
   delay?: number
+  icon?: React.ElementType
+  categoryLabel?: string
 }) {
   if (!visible) return null
 
@@ -235,15 +239,24 @@ function ZonePolygon({
         animationDelay: `${delay}ms`,
       }}
     >
-      {/* Border with glow - green translucent for healthy zones */}
+      {/* Radial glow background (thermal style) */}
       <div
-        className="absolute inset-0 rounded-sm border-2"
+        className="absolute inset-0 rounded-md"
         style={{
-          borderColor: isHealthy ? "#22c55e60" : severityColor,
+          background: isHealthy
+            ? "rgba(34,197,94,0.06)"
+            : `radial-gradient(ellipse at center, ${severityColor}25, ${severityColor}10, transparent 70%)`,
           boxShadow: isHealthy
             ? "inset 0 0 20px 4px rgba(34,197,94,0.08)"
-            : `0 0 12px 2px ${severityColor}40, inset 0 0 12px 2px ${severityColor}15`,
-          backgroundColor: isHealthy ? "rgba(34,197,94,0.06)" : `${severityColor}10`,
+            : `inset 0 0 20px rgba(${severityColor === "#ef4444" ? "239,68,68" : severityColor === "#f59e0b" ? "245,158,11" : severityColor === "#22c55e" ? "34,197,94" : "59,130,246"},0.15)`,
+        }}
+      />
+
+      {/* Pulsing border (thermal style) */}
+      <div
+        className={`absolute inset-0 rounded-md border-2 ${isHealthy ? "" : "animate-pulse"}`}
+        style={{
+          borderColor: isHealthy ? "#22c55e60" : severityColor,
           borderStyle: isHealthy ? "dashed" : "solid",
         }}
       />
@@ -264,20 +277,24 @@ function ZonePolygon({
           />
         ))}
 
-      {/* Hotspot icon for problem zones */}
+      {/* Center icon indicator (thermal style) */}
       {!isHealthy && (
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
           <div
-            className="animate-hotspot-ring absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full"
-            style={{ width: 16, height: 16, backgroundColor: `${severityColor}25`, border: `1px solid ${severityColor}40` }}
-          />
-          <div
-            className="animate-hotspot-ping flex h-5 w-5 items-center justify-center rounded-full"
-            style={{ backgroundColor: severityColor, boxShadow: `0 0 10px 3px ${severityColor}50` }}
+            className="animate-hotspot-ping flex h-6 w-6 items-center justify-center rounded-full"
+            style={{
+              backgroundColor: `${severityColor}30`,
+              border: `2px solid ${severityColor}80`,
+              boxShadow: `0 0 12px 3px ${severityColor}50`,
+            }}
           >
-            <span className="text-[8px] font-black text-white">
-              {zone.severity === "severe" ? "!!" : "!"}
-            </span>
+            {Icon ? (
+              <Icon size={10} style={{ color: severityColor }} />
+            ) : (
+              <span className="text-[8px] font-black text-white">
+                {zone.severity === "severe" ? "!!" : "!"}
+              </span>
+            )}
           </div>
         </div>
       )}
@@ -293,17 +310,18 @@ function ZonePolygon({
         </div>
       )}
 
-      {/* Label tag */}
+      {/* Label tag (thermal style with icon and category) */}
       <div
-        className="absolute -top-7 left-0 flex items-center gap-1.5 whitespace-nowrap rounded px-2 py-1"
+        className="absolute -top-8 left-0 flex items-center gap-1.5 whitespace-nowrap rounded px-2 py-1 shadow-lg"
         style={{
           backgroundColor: isHealthy ? "#22c55e" : severityColor,
-          boxShadow: `0 2px 8px ${isHealthy ? "#22c55e" : severityColor}50`,
+          boxShadow: `0 2px 10px ${isHealthy ? "#22c55e" : severityColor}50`,
         }}
       >
-        <div className="h-1.5 w-1.5 rounded-full bg-white/80" />
+        {Icon && !isHealthy && <Icon size={9} className="text-white" />}
+        {!Icon && <div className="h-1.5 w-1.5 rounded-full bg-white/80" />}
         <span className="text-[9px] font-bold tracking-wide text-white uppercase">
-          {isHealthy ? "Zone saine" : label}
+          {isHealthy ? "Zone saine" : `${categoryLabel ? categoryLabel + " : " : ""}${label}`}
         </span>
       </div>
     </div>
@@ -1257,7 +1275,7 @@ export function DiagnosticTool() {
                       }}
                     />
 
-                    {/* Zone overlays with colored borders */}
+                    {/* Zone overlays with colored borders (thermal style) */}
                     {diagnostic.vegetal.zones.map((z, i) => (
                       <ZonePolygon
                         key={`v-${i}`}
@@ -1266,6 +1284,8 @@ export function DiagnosticTool() {
                         visible={layerState.vegetal}
                         label={z.label}
                         delay={i * 200}
+                        icon={Leaf}
+                        categoryLabel="Vegetal"
                       />
                     ))}
                     {diagnostic.structure.zones.map((z, i) => (
@@ -1276,6 +1296,8 @@ export function DiagnosticTool() {
                         visible={layerState.structure}
                         label={z.label}
                         delay={(diagnostic.vegetal.zones.length + i) * 200}
+                        icon={Wrench}
+                        categoryLabel="Structure"
                       />
                     ))}
                     {diagnostic.etancheite.zones.map((z, i) => (
@@ -1286,6 +1308,8 @@ export function DiagnosticTool() {
                         visible={layerState.etancheite}
                         label={z.label}
                         delay={(diagnostic.vegetal.zones.length + diagnostic.structure.zones.length + i) * 200}
+                        icon={Droplets}
+                        categoryLabel="Etancheite"
                       />
                     ))}
 
