@@ -17,15 +17,15 @@ import {
 } from "lucide-react"
 
 /* ── IGN WMTS tile URLs (free, no API key) ── */
-/* PM tilematrixset: native tiles available up to zoom 19 for ortho, upscale to 21 */
+/* HR.ORTHOIMAGERY.ORTHOPHOTOS = Haute Resolution layer, supports zoom up to 21 natively */
 const IGN_ORTHO =
-  "https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&TILEMATRIXSET=PM&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}&LAYER=ORTHOIMAGERY.ORTHOPHOTOS&FORMAT=image/jpeg&STYLE=normal"
+  "https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&TILEMATRIXSET=PM&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}&LAYER=HR.ORTHOIMAGERY.ORTHOPHOTOS&STYLE=normal&FORMAT=image/jpeg"
 const IGN_PLAN =
   "https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&TILEMATRIXSET=PM&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}&LAYER=GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2&FORMAT=image/png&STYLE=normal"
 const IGN_CADASTRE =
   "https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&TILEMATRIXSET=PM&TILEMATRIX={z}&TILECOL={x}&TILEROW={y}&LAYER=CADASTRALPARCELS.PARCELLAIRE_EXPRESS&FORMAT=image/png&STYLE=normal"
 
-const ATTRIBUTION = "&copy; <a href='https://www.ign.fr'>IGN</a> - Ortho-photo"
+const ATTRIBUTION = "&copy; <a href='https://www.ign.fr'>IGN</a> - Ortho HR"
 
 /* Half-side of the auto selection box in degrees (~20m at mid-France latitudes) */
 const BOX_HALF_DEG = 0.0001
