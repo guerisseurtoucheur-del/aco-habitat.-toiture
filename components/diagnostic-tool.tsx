@@ -6,7 +6,6 @@ import {
   MapPin,
   Search,
   Loader2,
-  Satellite,
   Brain,
   CheckCircle2,
   AlertTriangle,
@@ -30,6 +29,7 @@ import {
   Thermometer,
   Flame,
   MapPinned,
+  Ruler,
 } from "lucide-react"
 import type { DiagnosticResult, DiagnosticZone } from "@/lib/diagnostic-types"
 import type { MapCaptureData, MapMeasurement } from "./leaflet-map"
@@ -733,15 +733,22 @@ export function DiagnosticTool() {
     [fetchPredictions]
   )
 
-  // Select a prediction => set address and auto-launch scan
+  // Select a prediction => set address and auto-launch map
   const handleSelectPrediction = useCallback((prediction: PlacePrediction) => {
     setAddress(prediction.description)
     setShowDropdown(false)
     setPredictions([])
-    // Auto-launch analysis after a brief delay for UI feedback
-    setTimeout(() => {
-      handleSearchRef.current()
-    }, 100)
+    // If prediction has coords, go straight to map
+    if (prediction.lat && prediction.lng) {
+      setFormattedAddress(prediction.description)
+      setMapCenter({ lat: prediction.lat, lng: prediction.lng })
+      setStep("map")
+    } else {
+      // Fallback: geocode
+      setTimeout(() => {
+        handleSearchRef.current()
+      }, 100)
+    }
   }, [])
 
   // Geolocation via adresse.data.gouv.fr reverse geocoding
@@ -758,12 +765,11 @@ export function DiagnosticTool() {
           const { latitude, longitude } = position.coords
           const res = await fetch(`/api/geocode?lat=${latitude}&lng=${longitude}`)
           const data = await res.json()
-          if (data.address) {
+          if (data.address && data.lat && data.lng) {
             setAddress(data.address)
-            // Auto-launch analysis
-            setTimeout(() => {
-              handleSearchRef.current()
-            }, 100)
+            setFormattedAddress(data.address)
+            setMapCenter({ lat: data.lat, lng: data.lng })
+            setStep("map")
           } else {
             setError("Impossible de trouver votre adresse. Verifiez que vous etes en France.")
           }
@@ -933,8 +939,8 @@ export function DiagnosticTool() {
         {/* Header */}
         <div className="mx-auto mb-16 max-w-3xl text-center">
           <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/30 bg-primary/10 px-4 py-1.5 text-sm font-medium text-primary">
-            <Satellite size={14} />
-            Diagnostic par Satellite
+              <MapPinned size={14} />
+              Diagnostic par carte IGN
           </div>
           <h2
             className="mb-4 text-balance text-4xl font-bold tracking-tight text-foreground md:text-5xl"
@@ -1072,20 +1078,6 @@ export function DiagnosticTool() {
                 </button>
               </div>
 
-              {step === "satellite" && (
-                <div className="mt-6 flex items-center gap-3 rounded-xl border border-primary/20 bg-primary/5 p-4">
-                  <Loader2 size={20} className="animate-spin text-primary" />
-                  <div>
-                    <p className="text-sm font-medium text-foreground">
-                      Recuperation de l{"'"}image satellite...
-                    </p>
-                    <p className="text-xs text-muted-foreground">
-                      Connexion aux serveurs satellite en cours
-                    </p>
-                  </div>
-                </div>
-              )}
-
               {error && (
                 <div className="mt-4 flex items-center gap-3 rounded-xl border border-destructive/30 bg-destructive/10 p-4">
                   <XCircle size={20} className="shrink-0 text-destructive" />
@@ -1095,9 +1087,9 @@ export function DiagnosticTool() {
 
               <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
                 {[
-                  { icon: Satellite, label: "Vue satellite HD", desc: "Resolution x2 doublee" },
+                  { icon: MapPinned, label: "Carte IGN HD", desc: "Ortho-photo IGN officielle" },
                   { icon: Shield, label: "Sans deplacement", desc: "100% a distance" },
-                  { icon: Zap, label: "Resultat en 30s", desc: "Analyse instantanee" },
+                  { icon: Zap, label: "Resultat en 30s", desc: "Analyse IA instantanee" },
                 ].map((f) => (
                   <div key={f.label} className="flex flex-col items-center gap-2 rounded-xl border border-border/50 bg-secondary/30 p-4 text-center">
                     <f.icon size={20} className="text-primary" />
@@ -1110,8 +1102,67 @@ export function DiagnosticTool() {
           </div>
         )}
 
+        {/* Interactive Map Step */}
+        {step === "map" && mapCenter && (
+          <div className="mx-auto max-w-5xl">
+            <div className="rounded-2xl border border-border bg-card">
+              {/* Map header */}
+              <div className="flex items-center justify-between border-b border-border px-5 py-3">
+                <div className="flex items-center gap-3">
+                  <MapPinned size={16} className="text-primary" />
+                  <div>
+                    <p className="text-sm font-semibold text-foreground">Carte interactive IGN</p>
+                    <p className="text-[10px] text-muted-foreground">{formattedAddress}</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => setStep("address")}
+                  className="flex items-center gap-1.5 rounded-lg border border-border px-3 py-1.5 text-xs text-muted-foreground transition-colors hover:text-foreground"
+                >
+                  <RotateCcw size={10} />
+                  Changer adresse
+                </button>
+              </div>
+
+              {/* Instructions */}
+              <div className="flex items-center gap-3 border-b border-border bg-primary/5 px-5 py-2.5">
+                <div className="h-2 w-2 animate-pulse rounded-full bg-primary" />
+                <p className="text-xs text-foreground/70">
+                  Naviguez sur la carte pour centrer votre toiture, puis cliquez sur{" "}
+                  <span className="font-semibold text-primary">Capturer et analyser</span>.
+                  Utilisez les outils de mesure pour calculer la surface ou les longueurs.
+                </p>
+              </div>
+
+              {/* Leaflet Map */}
+              <LeafletMap
+                center={mapCenter}
+                zoom={19}
+                onCapture={handleMapCapture}
+                onMeasurementsChange={(m) => setMapMeasurements(m)}
+                className="h-[450px] md:h-[550px]"
+              />
+
+              {/* Measurements display */}
+              {mapMeasurements.length > 0 && (
+                <div className="flex flex-wrap items-center gap-3 border-t border-border px-5 py-3">
+                  <Ruler size={12} className="text-primary" />
+                  <span className="text-xs font-medium text-foreground">Mesures :</span>
+                  {mapMeasurements.map((m, i) => (
+                    <span key={i} className="rounded-md bg-primary/10 px-2 py-1 text-xs font-semibold text-primary">
+                      {m.type === "area"
+                        ? `${m.value.toFixed(1)} m\u00B2`
+                        : `${m.value.toFixed(1)} m`}
+                    </span>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
         {/* Scanning / Analyzing View */}
-        {(step === "scanning" || step === "analyzing") && satelliteImages.length > 0 && (
+        {(step === "scanning" || step === "analyzing") && capturedImage && (
           <div className="mx-auto max-w-4xl">
             <div className="overflow-hidden rounded-2xl border border-primary/30 bg-card">
               {/* Top HUD bar */}
@@ -1130,10 +1181,10 @@ export function DiagnosticTool() {
               {/* Image with scanner */}
               <div className="relative">
                 <img
-                    src={satelliteImages[0]?.image}
-                    alt="Vue satellite"
+                    src={capturedImage || ""}
+                    alt="Capture IGN de la toiture"
                     className="w-full"
-                    style={{ filter: "url(#sharpen) contrast(1.15) saturate(1.1) brightness(1.05)" }}
+                    style={{ filter: "contrast(1.1) saturate(1.05) brightness(1.02)" }}
                 />
                 <ScannerOverlay phase={step} />
               </div>
@@ -1144,8 +1195,8 @@ export function DiagnosticTool() {
                   <Brain size={14} className="animate-pulse text-primary" />
                   <span className="text-xs text-muted-foreground">
                     {step === "scanning"
-                      ? "Scan lidar simule... Detection des contours de la toiture"
-                      : "Analyse IA multi-calques : vegetation, structure, etancheite"}
+                      ? "Scan de la capture IGN... Detection des contours de la toiture"
+                      : "Analyse IA multi-calques : vegetation, structure, etancheite, thermique"}
                   </span>
                 </div>
                 <div className="ml-auto">
@@ -1157,7 +1208,7 @@ export function DiagnosticTool() {
         )}
 
         {/* Results */}
-        {step === "results" && diagnostic && satelliteImages.length > 0 && (
+        {step === "results" && diagnostic && capturedImage && (
           <div ref={resultsRef} className="animate-fade-up space-y-8">
             {/* Address bar + Material detection */}
             <div className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-border bg-card p-4">
@@ -1166,7 +1217,7 @@ export function DiagnosticTool() {
                 <div>
                   <p className="text-sm font-medium text-foreground">{formattedAddress}</p>
                   <p className="mt-1 text-xs text-muted-foreground">
-                    Diagnostic satellite - {new Date().toLocaleDateString("fr-FR")}
+                    Diagnostic IGN - {new Date().toLocaleDateString("fr-FR")}
                   </p>
                 </div>
               </div>
@@ -1276,6 +1327,21 @@ export function DiagnosticTool() {
                 </div>
               )}
 
+              {/* User-drawn measurements from map */}
+              {mapMeasurements.length > 0 && (
+                <div className="mt-4 flex flex-wrap items-center gap-3 rounded-xl border border-primary/20 bg-primary/5 p-4">
+                  <Ruler size={16} className="text-primary" />
+                  <span className="text-xs font-semibold text-foreground">Mesures manuelles :</span>
+                  {mapMeasurements.map((m, i) => (
+                    <span key={i} className="rounded-md bg-primary/10 px-2.5 py-1 text-xs font-bold text-primary">
+                      {m.type === "area"
+                        ? `Surface : ${m.value.toFixed(1)} m\u00B2`
+                        : `Longueur : ${m.value.toFixed(1)} m`}
+                    </span>
+                  ))}
+                </div>
+              )}
+
               <p className="mt-4 rounded-xl bg-secondary/50 p-4 text-sm leading-relaxed text-muted-foreground">
                 {diagnostic.summary}
               </p>
@@ -1283,30 +1349,14 @@ export function DiagnosticTool() {
 
             {/* Image + Zones + Sidebar */}
             <div className="grid gap-6 lg:grid-cols-3">
-              {/* Satellite image with overlay zones */}
+              {/* IGN aerial image with overlay zones */}
               <div className="lg:col-span-2">
                 <div className="rounded-2xl border border-border bg-card">
                   {/* Toolbar */}
                   <div className="flex flex-wrap items-center justify-between gap-3 border-b border-border px-4 py-3">
                     <div className="flex items-center gap-3">
                       <Layers size={14} className="text-primary" />
-                      <span className="text-xs font-medium text-foreground">Vue satellite avec calques</span>
-                      {satelliteImages.length > 1 && (
-                        <div className="flex items-center gap-0.5 rounded-lg border border-border bg-secondary/50 p-0.5">
-                          {satelliteImages.map((img, i) => (
-                            <button
-                              key={img.zoom}
-                              onClick={() => setActiveZoom(i)}
-                              className={`flex items-center gap-1 rounded-md px-2 py-1 text-[9px] font-medium transition-all ${
-                                activeZoom === i ? "bg-primary text-primary-foreground" : "text-muted-foreground hover:text-foreground"
-                              }`}
-                            >
-                              {i === 0 ? <ZoomIn size={8} /> : i === satelliteImages.length - 1 ? <ZoomOut size={8} /> : null}
-                              {img.label}
-                            </button>
-                          ))}
-                        </div>
-                      )}
+                      <span className="text-xs font-medium text-foreground">Vue aerienne IGN avec calques</span>
                     </div>
                     <div className="flex items-center gap-1">
                       {[
@@ -1347,11 +1397,10 @@ export function DiagnosticTool() {
                   <div className="pb-20 pt-8">
                     <div className="relative overflow-visible">
                     <img
-                    src={satelliteImages[activeZoom]?.image || satelliteImages[0]?.image}
-                    alt="Vue satellite de la toiture"
-                    className="w-full"
-                    crossOrigin="anonymous"
-                    style={{ filter: "url(#sharpen) contrast(1.15) saturate(1.1) brightness(1.05)" }}
+                    src={capturedImage || ""}
+                    alt="Vue aerienne IGN de la toiture"
+                    className="w-full rounded"
+                    style={{ filter: "contrast(1.1) saturate(1.05) brightness(1.02)" }}
                     />
                     {/* Tech grid overlay */}
                     <div
@@ -1420,7 +1469,7 @@ export function DiagnosticTool() {
                       >
                         <ScanLine size={12} className="text-cyan-400" />
                         <span className="font-mono text-[10px] font-semibold tracking-wide text-cyan-400">
-                          Resolution optimisee par IA - Precision 5cm/pixel
+                          Ortho-photo IGN - Analyse IA haute resolution
                         </span>
                       </div>
                       <div className="flex items-center gap-1.5 rounded-lg bg-background/85 px-2.5 py-1.5 backdrop-blur-md">

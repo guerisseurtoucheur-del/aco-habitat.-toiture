@@ -320,8 +320,8 @@ export default function LeafletMap({
       {/* Map container */}
       <div
         ref={mapContainerRef}
-        className="relative z-0 h-[450px] w-full rounded-xl border border-border md:h-[500px]"
-        style={{ background: "var(--color-card)" }}
+        className="relative z-0 w-full flex-1"
+        style={{ background: "var(--color-card)", minHeight: "400px" }}
       />
 
       {/* Custom toolbar overlay */}
@@ -401,7 +401,7 @@ export default function LeafletMap({
           ) : (
             <Camera size={14} />
           )}
-          {isCapturing ? "Capture..." : "Analyser cette zone"}
+          {isCapturing ? "Capture..." : "Capturer et analyser"}
         </button>
       </div>
 
