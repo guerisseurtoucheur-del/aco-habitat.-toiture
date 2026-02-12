@@ -218,16 +218,6 @@ function ZonePolygon({
 }) {
   if (!visible) return null
 
-  const severityColor =
-    zone.severity === "severe"
-      ? "#ef4444"
-      : zone.severity === "modere"
-        ? "#f59e0b"
-        : color
-
-  // Healthy zone = score indicator, not a problem
-  const isHealthy = zone.severity === "faible" && color === "#22c55e"
-
   return (
     <div
       className="animate-zone-reveal absolute"
@@ -239,89 +229,66 @@ function ZonePolygon({
         animationDelay: `${delay}ms`,
       }}
     >
-      {/* Radial glow background (thermal style) */}
+      {/* Transparent fill */}
       <div
-        className="absolute inset-0 rounded-md"
+        className="absolute inset-0 rounded-lg"
         style={{
-          background: isHealthy
-            ? "rgba(34,197,94,0.06)"
-            : `radial-gradient(ellipse at center, ${severityColor}25, ${severityColor}10, transparent 70%)`,
-          boxShadow: isHealthy
-            ? "inset 0 0 20px 4px rgba(34,197,94,0.08)"
-            : `inset 0 0 20px rgba(${severityColor === "#ef4444" ? "239,68,68" : severityColor === "#f59e0b" ? "245,158,11" : severityColor === "#22c55e" ? "34,197,94" : "59,130,246"},0.15)`,
+          backgroundColor: `${color}15`,
         }}
       />
 
-      {/* Pulsing border (thermal style) */}
+      {/* Thin border with rounded corners */}
       <div
-        className={`absolute inset-0 rounded-md border-2 ${isHealthy ? "" : "animate-pulse"}`}
+        className="absolute inset-0 rounded-lg border-[1.5px]"
         style={{
-          borderColor: isHealthy ? "#22c55e60" : severityColor,
-          borderStyle: isHealthy ? "dashed" : "solid",
+          borderColor: color,
         }}
       />
 
-      {/* Pulsing corner dots (not for healthy zones) */}
-      {!isHealthy &&
-        ["top-0 left-0", "top-0 right-0", "bottom-0 left-0", "bottom-0 right-0"].map((pos) => (
-          <div
-            key={pos}
-            className={`absolute ${pos} -translate-x-1/2 -translate-y-1/2`}
-            style={{
-              width: 6,
-              height: 6,
-              borderRadius: "50%",
-              backgroundColor: severityColor,
-              boxShadow: `0 0 6px 2px ${severityColor}60`,
-            }}
-          />
-        ))}
+      {/* Corner dots */}
+      {["top-0 left-0", "top-0 right-0", "bottom-0 left-0", "bottom-0 right-0"].map((pos) => (
+        <div
+          key={pos}
+          className={`absolute ${pos} -translate-x-1/2 -translate-y-1/2`}
+          style={{
+            width: 5,
+            height: 5,
+            borderRadius: "50%",
+            backgroundColor: color,
+            boxShadow: `0 0 4px 1px ${color}60`,
+          }}
+        />
+      ))}
 
-      {/* Center icon indicator (thermal style) */}
-      {!isHealthy && (
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-          <div
-            className="animate-hotspot-ping flex h-6 w-6 items-center justify-center rounded-full"
-            style={{
-              backgroundColor: `${severityColor}30`,
-              border: `2px solid ${severityColor}80`,
-              boxShadow: `0 0 12px 3px ${severityColor}50`,
-            }}
-          >
-            {Icon ? (
-              <Icon size={10} style={{ color: severityColor }} />
-            ) : (
-              <span className="text-[8px] font-black text-white">
-                {zone.severity === "severe" ? "!!" : "!"}
-              </span>
-            )}
-          </div>
+      {/* Center indicator */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+        <div
+          className="animate-hotspot-ping flex h-5 w-5 items-center justify-center rounded-full"
+          style={{
+            backgroundColor: `${color}25`,
+            border: `1.5px solid ${color}90`,
+            boxShadow: `0 0 8px 2px ${color}40`,
+          }}
+        >
+          {Icon ? (
+            <Icon size={9} style={{ color }} />
+          ) : (
+            <div className="h-1.5 w-1.5 rounded-full" style={{ backgroundColor: color }} />
+          )}
         </div>
-      )}
+      </div>
 
-      {/* Checkmark for healthy zones */}
-      {isHealthy && (
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-          <div className="flex h-5 w-5 items-center justify-center rounded-full bg-green-500/20 ring-1 ring-green-500/40">
-            <svg width="10" height="10" viewBox="0 0 10 10" fill="none">
-              <path d="M2 5l2.5 2.5L8 3" stroke="#22c55e" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-            </svg>
-          </div>
-        </div>
-      )}
-
-      {/* Label tag (thermal style with icon and category) */}
+      {/* Label tag above the rectangle */}
       <div
-        className="absolute -top-8 left-0 flex items-center gap-1.5 whitespace-nowrap rounded px-2 py-1 shadow-lg"
+        className="absolute -top-7 left-0 flex items-center gap-1.5 whitespace-nowrap rounded-md px-2.5 py-1 shadow-md"
         style={{
-          backgroundColor: isHealthy ? "#22c55e" : severityColor,
-          boxShadow: `0 2px 10px ${isHealthy ? "#22c55e" : severityColor}50`,
+          backgroundColor: color,
+          boxShadow: `0 2px 8px ${color}40`,
         }}
       >
-        {Icon && !isHealthy && <Icon size={9} className="text-white" />}
-        {!Icon && <div className="h-1.5 w-1.5 rounded-full bg-white/80" />}
+        {Icon && <Icon size={9} className="text-white" />}
         <span className="text-[9px] font-bold tracking-wide text-white uppercase">
-          {isHealthy ? "Zone saine" : `${categoryLabel ? categoryLabel + " : " : ""}${label}`}
+          {categoryLabel || label}
         </span>
       </div>
     </div>
@@ -469,32 +436,46 @@ function ThermalOverlay({
             animationDelay: `${i * 300}ms`,
           }}
         >
-          {/* Hot zone radial glow */}
+          {/* Transparent orange fill */}
           <div
-            className="absolute inset-0 rounded-md"
+            className="absolute inset-0 rounded-lg"
             style={{
-              background: `radial-gradient(ellipse at center, rgba(239,68,68,${0.2 + zone.intensite / 100}), rgba(249,115,22,${0.1 + zone.intensite / 200}), transparent 70%)`,
-              boxShadow: `inset 0 0 20px rgba(239,68,68,${0.15 + zone.intensite / 150})`,
+              backgroundColor: `rgba(249,115,22,${0.1 + zone.intensite / 200})`,
             }}
           />
-          {/* Pulsing border */}
+          {/* Thin orange border */}
           <div
-            className="absolute inset-0 animate-pulse rounded-md border-2"
-            style={{ borderColor: `rgba(239,68,68,${0.4 + zone.intensite / 100})` }}
+            className="absolute inset-0 rounded-lg border-[1.5px]"
+            style={{ borderColor: "#f97316" }}
           />
 
           {/* Label */}
-          <div className="absolute -top-8 left-0 flex items-center gap-1.5 whitespace-nowrap rounded bg-red-600 px-2 py-1 shadow-lg shadow-red-900/40">
+          <div className="absolute -top-7 left-0 flex items-center gap-1.5 whitespace-nowrap rounded-md px-2.5 py-1 shadow-md" style={{ backgroundColor: "#f97316", boxShadow: "0 2px 8px rgba(249,115,22,0.4)" }}>
             <Flame size={9} className="text-white" />
-            <span className="text-[9px] font-bold tracking-wide text-white">
-              Perte de chaleur : +{zone.intensite}%
+            <span className="text-[9px] font-bold tracking-wide text-white uppercase">
+              Thermique : +{zone.intensite}%
             </span>
           </div>
 
+          {/* Corner dots */}
+          {["top-0 left-0", "top-0 right-0", "bottom-0 left-0", "bottom-0 right-0"].map((pos) => (
+            <div
+              key={pos}
+              className={`absolute ${pos} -translate-x-1/2 -translate-y-1/2`}
+              style={{
+                width: 5,
+                height: 5,
+                borderRadius: "50%",
+                backgroundColor: "#f97316",
+                boxShadow: "0 0 4px 1px rgba(249,115,22,0.6)",
+              }}
+            />
+          ))}
+
           {/* Center heat indicator */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-            <div className="animate-hotspot-ping flex h-6 w-6 items-center justify-center rounded-full bg-red-500/30 ring-2 ring-red-500/50">
-              <Thermometer size={10} className="text-red-400" />
+            <div className="animate-hotspot-ping flex h-5 w-5 items-center justify-center rounded-full" style={{ backgroundColor: "rgba(249,115,22,0.25)", border: "1.5px solid rgba(249,115,22,0.9)", boxShadow: "0 0 8px 2px rgba(249,115,22,0.4)" }}>
+              <Thermometer size={9} className="text-orange-400" />
             </div>
           </div>
         </div>
@@ -802,9 +783,9 @@ export function DiagnosticTool() {
 
   const allZones = diagnostic
     ? [
-        ...diagnostic.vegetal.zones.map((z) => ({ ...z, category: "Vegetal" as const, color: "#22c55e", icon: Leaf })),
+        ...diagnostic.vegetal.zones.map((z) => ({ ...z, category: "Vegetal" as const, color: "#84cc16", icon: Leaf })),
         ...diagnostic.structure.zones.map((z) => ({ ...z, category: "Structure" as const, color: "#ef4444", icon: Wrench })),
-        ...diagnostic.etancheite.zones.map((z) => ({ ...z, category: "Etancheite" as const, color: "#3b82f6", icon: Droplets })),
+        ...diagnostic.etancheite.zones.map((z) => ({ ...z, category: "Etancheite" as const, color: "#22c55e", icon: Droplets })),
       ]
     : []
 
@@ -1139,9 +1120,9 @@ export function DiagnosticTool() {
                   </div>
                 </div>
                 <div className="flex items-center justify-center gap-8 md:col-span-3">
-                  <ScoreGauge score={diagnostic.vegetal.score} label="Vegetal" icon={Leaf} color="#22c55e" />
+                  <ScoreGauge score={diagnostic.vegetal.score} label="Vegetal" icon={Leaf} color="#84cc16" />
                   <ScoreGauge score={diagnostic.structure.score} label="Structure" icon={Wrench} color="#ef4444" />
-                  <ScoreGauge score={diagnostic.etancheite.score} label="Etancheite" icon={Droplets} color="#3b82f6" />
+                  <ScoreGauge score={diagnostic.etancheite.score} label="Etancheite" icon={Droplets} color="#22c55e" />
                 </div>
               </div>
               {/* Surface estimation */}
@@ -1223,9 +1204,9 @@ export function DiagnosticTool() {
                     </div>
                     <div className="flex items-center gap-1">
                       {[
-                        { key: "vegetal" as const, label: "Vegetal", color: "#22c55e" },
+                        { key: "vegetal" as const, label: "Vegetal", color: "#84cc16" },
                         { key: "structure" as const, label: "Structure", color: "#ef4444" },
-                        { key: "etancheite" as const, label: "Etancheite", color: "#3b82f6" },
+                        { key: "etancheite" as const, label: "Etancheite", color: "#22c55e" },
                       ].map((l) => (
                         <button
                           key={l.key}
@@ -1280,7 +1261,7 @@ export function DiagnosticTool() {
                       <ZonePolygon
                         key={`v-${i}`}
                         zone={z}
-                        color="#22c55e"
+                        color="#84cc16"
                         visible={layerState.vegetal}
                         label={z.label}
                         delay={i * 200}
@@ -1304,7 +1285,7 @@ export function DiagnosticTool() {
                       <ZonePolygon
                         key={`e-${i}`}
                         zone={z}
-                        color="#3b82f6"
+                        color="#22c55e"
                         visible={layerState.etancheite}
                         label={z.label}
                         delay={(diagnostic.vegetal.zones.length + diagnostic.structure.zones.length + i) * 200}
