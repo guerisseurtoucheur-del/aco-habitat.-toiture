@@ -19,19 +19,11 @@ export default function Checkout({
   onComplete?: (sessionId: string) => void
 }) {
   const fetchClientSecret = useCallback(async () => {
-    try {
-      console.log("[v0] Starting checkout for product:", productId)
-      const { clientSecret, sessionId } = await startCheckoutSession(productId)
-      console.log("[v0] Got clientSecret:", !!clientSecret, "sessionId:", sessionId)
-      // Store sessionId so we can verify payment later
-      if (typeof window !== 'undefined') {
-        window.__stripeSessionId = sessionId
-      }
-      return clientSecret as string
-    } catch (error) {
-      console.error("[v0] Checkout error:", error)
-      throw error
+    const { clientSecret, sessionId } = await startCheckoutSession(productId)
+    if (typeof window !== 'undefined') {
+      window.__stripeSessionId = sessionId
     }
+    return clientSecret as string
   }, [productId])
 
   return (

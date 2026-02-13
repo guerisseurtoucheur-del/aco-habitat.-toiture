@@ -9,7 +9,6 @@ export async function startCheckoutSession(productId: string) {
     throw new Error(`Product with id "${productId}" not found`)
   }
 
-  console.log("[v0] Creating Stripe session for product:", product.name, "price:", product.priceInCents)
   const session = await stripe.checkout.sessions.create({
     ui_mode: 'embedded',
     redirect_on_completion: 'never',
