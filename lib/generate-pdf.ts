@@ -86,7 +86,7 @@ export async function generateDiagnosticPDF(
   addText("ACO-HABITAT", margin, 12, 16, "bold", [255, 255, 255])
   addText("DIAGNOSTIC TOITURE PAR IA", margin, 19, 7, "normal", [160, 160, 170])
   addText("aco-habitat.fr", pageW - margin - 27, 12, 8, "bold", [255, 255, 255])
-  addText("9,90 EUR par diagnostic", pageW - margin - 35, 19, 7, "normal", [160, 160, 170])
+  addText("19,90 EUR par diagnostic", pageW - margin - 35, 19, 7, "normal", [160, 160, 170])
   y = 36
 
   // Title

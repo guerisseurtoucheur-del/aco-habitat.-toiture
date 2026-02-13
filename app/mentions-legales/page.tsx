@@ -152,7 +152,7 @@ export default function MentionsLegalesPage() {
             <div className="mt-4 space-y-4 text-sm leading-relaxed text-muted-foreground">
               <h3 className="text-base font-semibold text-foreground">5.1 Prix et paiement</h3>
               <p>
-                Le diagnostic de toiture est facture <strong className="text-foreground">9,90 EUR TTC</strong> par
+                Le diagnostic de toiture est facture <strong className="text-foreground">19,90 EUR TTC</strong> par
                 analyse, payable en ligne par carte bancaire via la plateforme securisee Stripe.
                 Le prix inclut l{"'"}analyse IA complete (vegetal, structure, etancheite, thermique) et le
                 rapport PDF telechareable.

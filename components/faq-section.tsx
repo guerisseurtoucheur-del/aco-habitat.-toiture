@@ -17,7 +17,7 @@ const faqs = [
   {
     question: "Combien coute un diagnostic ?",
     answer:
-      "Un diagnostic complet coute 9,90 EUR. Le paiement est securise par Stripe. Pas d'abonnement, pas de frais caches. Vous payez uniquement quand vous lancez une analyse. Le rapport PDF est genere instantanement.",
+      "Un diagnostic complet coute 19,90 EUR. Le paiement est securise par Stripe. Pas d'abonnement, pas de frais caches. Vous payez uniquement quand vous lancez une analyse. Le rapport PDF est genere instantanement.",
   },
   {
     question: "Que contient le rapport PDF ?",
