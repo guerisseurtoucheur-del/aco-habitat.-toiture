@@ -856,7 +856,11 @@ export function DiagnosticTool() {
                     src={capturedImage || ""}
                     alt="Capture IGN de la toiture"
                     className="w-full"
-                    style={{ filter: "contrast(1.1) saturate(1.05) brightness(1.02)" }}
+                    style={{
+                      objectFit: "cover",
+                      imageRendering: "crisp-edges",
+                      filter: "contrast(1.1) saturate(1.05) brightness(1.02)",
+                    }}
                 />
                 <ScannerOverlay phase={step} />
               </div>
@@ -1042,7 +1046,11 @@ export function DiagnosticTool() {
                       src={capturedImage || ""}
                       alt="Vue aerienne IGN de la toiture analysee"
                       className="w-full"
-                      style={{ filter: "contrast(1.1) saturate(1.05) brightness(1.02)" }}
+                      style={{
+                        objectFit: "cover",
+                        imageRendering: "crisp-edges",
+                        filter: "contrast(1.1) saturate(1.05) brightness(1.02)",
+                      }}
                     />
                     {/* Subtle tech grid overlay */}
                     <div
