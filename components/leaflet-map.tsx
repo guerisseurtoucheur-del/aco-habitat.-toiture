@@ -33,8 +33,8 @@ const ESRI_SATELLITE =
 const ATTRIBUTION = "&copy; <a href='https://www.ign.fr'>IGN</a>"
 const ESRI_ATTRIBUTION = "&copy; Esri, Maxar, Earthstar Geographics"
 
-/* Half-side of the auto selection box in degrees (~35m at mid-France latitudes) */
-const BOX_HALF_DEG = 0.00035
+/* Half-side of the auto selection box in degrees (~240m at mid-France latitudes) */
+const BOX_HALF_DEG = 0.00108
 
 /* ── Measurement helpers ── */
 function calcPolygonArea(latlngs: L.LatLng[]): number {
@@ -177,18 +177,65 @@ export default function LeafletMap({
       fillColor: "#3b82f6",
       fillOpacity: 0.12,
       dashArray: "6, 4",
-      interactive: false,
+      interactive: true,
+      bubblingMouseEvents: false,
     }).addTo(map)
 
-    // Make the selection box editable (draggable + resizable handles)
+    // Make the selection box editable (resizable handles)
     const editableBox: any = selectionBox
     if (editableBox.editing) {
       editableBox.editing.enable()
     }
+
+    // Make selection box draggable: disable map drag while moving the box
+    let isDraggingBox = false
+    let dragStartLatLng: L.LatLng | null = null
+
+    // Set grab cursor on the selection box
+    const boxElement = (selectionBox as any)._path
+    if (boxElement) {
+      boxElement.style.cursor = "grab"
+    }
+
+    selectionBox.on("mousedown", (e: any) => {
+      isDraggingBox = true
+      dragStartLatLng = e.latlng
+      map.dragging.disable()
+      if (boxElement) boxElement.style.cursor = "grabbing"
+      L.DomEvent.stopPropagation(e)
+    })
+
+    map.on("mousemove", (e: L.LeafletMouseEvent) => {
+      if (!isDraggingBox || !dragStartLatLng) return
+      const currentBounds = selectionBox.getBounds()
+      const dlat = e.latlng.lat - dragStartLatLng.lat
+      const dlng = e.latlng.lng - dragStartLatLng.lng
+      const newBounds = L.latLngBounds(
+        [currentBounds.getSouth() + dlat, currentBounds.getWest() + dlng],
+        [currentBounds.getNorth() + dlat, currentBounds.getEast() + dlng]
+      )
+      selectionBox.setBounds(newBounds)
+      // Re-enable editing handles after bounds change
+      if (editableBox.editing) {
+        editableBox.editing.disable()
+        editableBox.editing.enable()
+      }
+      dragStartLatLng = e.latlng
+    })
+
+    map.on("mouseup", () => {
+      if (isDraggingBox) {
+        isDraggingBox = false
+        dragStartLatLng = null
+        map.dragging.enable()
+        if (boxElement) boxElement.style.cursor = "grab"
+      }
+    })
+
     selectionBoxRef.current = selectionBox
 
-    // Tooltip on hover (click-only, not permanent)
-    selectionBox.bindTooltip("Zone d'analyse (~20x20m)", {
+    // Tooltip on hover
+    selectionBox.bindTooltip("Deplacez ce rectangle sur la toiture", {
       permanent: false,
       direction: "top",
       className: "leaflet-measurement-label",
@@ -389,18 +436,19 @@ export default function LeafletMap({
     setDrawMode("none")
   }, [onMeasurementsChange])
 
-  // Capture map as image via IGN WMS GetMap (avoids CORS blue-canvas issue)
+  // Capture map as image using leaflet-image (captures exactly what user sees)
   const captureMap = useCallback(async () => {
-    if (!mapRef.current) return
+    const map = mapRef.current
+    if (!map) return
     setIsCapturing(true)
 
     try {
-      // CRITICAL: Use the SELECTION BOX bounds, NOT the full viewport.
-      // The selection box covers ~35m, viewport covers ~300m at zoom 19.
-      // Smaller BBOX = much sharper image for the same pixel count.
+      // Dynamically import leaflet-image (client-only)
+      const leafletImage = (await import("leaflet-image")).default
+
       const captureBounds = selectionBoxRef.current
         ? selectionBoxRef.current.getBounds()
-        : mapRef.current.getBounds()
+        : map.getBounds()
 
       const south = captureBounds.getSouth()
       const west = captureBounds.getWest()
@@ -408,40 +456,41 @@ export default function LeafletMap({
       const east = captureBounds.getEast()
       const captureCenter = captureBounds.getCenter()
 
-      // Calculate native pixel dimensions from the zone's real-world size
-      // IGN ORTHOIMAGERY.ORTHOPHOTOS native resolution = 20cm/pixel
-      // Requesting more pixels than native causes server-side upscale artefacts
-      const NATIVE_RES = 0.20 // metres per pixel
-      const latMeters = (north - south) * 110540
-      const lngMeters = (east - west) * 111320 * Math.cos(((north + south) / 2) * Math.PI / 180)
-      const nativeW = Math.round(lngMeters / NATIVE_RES)
-      const nativeH = Math.round(latMeters / NATIVE_RES)
-      // Clamp between 256 and 2048 to avoid too-small or too-large requests
-      const reqW = Math.min(Math.max(nativeW, 256), 2048)
-      const reqH = Math.min(Math.max(nativeH, 256), 2048)
+      // Fit the map to the selection box for the capture
+      const currentCenter = map.getCenter()
+      const currentZoom = map.getZoom()
+      map.fitBounds(captureBounds, { animate: false, padding: [0, 0] })
 
-      const response = await fetch("/api/map-capture", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          bounds: { south, west, north, east },
-          width: reqW,
-          height: reqH,
-        }),
+      // Wait for tiles to load
+      await new Promise<void>((resolve) => {
+        const checkTiles = () => {
+          const container = map.getContainer()
+          const loadingTiles = container.querySelectorAll(".leaflet-tile-loading")
+          if (loadingTiles.length === 0) {
+            resolve()
+          } else {
+            setTimeout(checkTiles, 200)
+          }
+        }
+        setTimeout(checkTiles, 500)
       })
 
-      if (!response.ok) {
-        const errData = await response.json().catch(() => ({}))
-        throw new Error(errData.error || `Capture failed: ${response.status}`)
-      }
+      // Capture with leaflet-image
+      const imageBase64 = await new Promise<string>((resolve, reject) => {
+        leafletImage(map, (err: Error | null, canvas: HTMLCanvasElement) => {
+          if (err) return reject(err)
+          resolve(canvas.toDataURL("image/jpeg", 0.95))
+        })
+      })
 
-      const data = await response.json()
+      // Restore original view
+      map.setView(currentCenter, currentZoom, { animate: false })
 
       onCapture?.({
-        imageBase64: data.imageBase64,
+        imageBase64,
         bounds: { north, south, east, west },
         center: { lat: captureCenter.lat, lng: captureCenter.lng },
-        zoom: mapRef.current.getZoom(),
+        zoom: currentZoom,
         measurements,
       })
     } catch (err) {
