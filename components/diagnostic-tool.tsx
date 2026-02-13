@@ -34,7 +34,8 @@ import {
 import type { DiagnosticResult, DiagnosticZone } from "@/lib/diagnostic-types"
 import type { MapCaptureData, MapMeasurement } from "./leaflet-map"
 
-/* Dynamic import of LeafletMap to avoid SSR issues with Leaflet */
+/* Dynamic imports to avoid SSR issues */
+const StripeCheckout = dynamic(() => import("./checkout"), { ssr: false })
 const LeafletMap = dynamic(() => import("./leaflet-map"), {
   ssr: false,
   loading: () => (
@@ -47,7 +48,7 @@ const LeafletMap = dynamic(() => import("./leaflet-map"), {
   ),
 })
 
-type Step = "address" | "map" | "scanning" | "analyzing" | "results"
+type Step = "address" | "map" | "payment" | "scanning" | "analyzing" | "results"
 type PlacePrediction = {
   placeId: string
   description: string
@@ -249,12 +250,12 @@ function AnomalyCard({
       </div>
       <p className="mb-3 text-xs leading-relaxed text-foreground/80">{zone.label}</p>
       <a
-        href="#contact"
+        href="#couvreurs"
         className="flex items-center justify-center gap-1.5 rounded-lg py-2 text-[10px] font-semibold text-primary-foreground transition-colors"
         style={{ backgroundColor: color }}
       >
         <Send size={10} />
-        Demander un devis
+        Trouver un couvreur
       </a>
     </div>
   )
@@ -519,34 +520,42 @@ export function DiagnosticTool() {
     }
   }, [address])
 
-  // Handle map capture -> run AI analysis
-  const handleMapCapture = useCallback(async (data: MapCaptureData) => {
+  // Pending capture data stored while user pays
+  const pendingCaptureRef = useRef<MapCaptureData | null>(null)
+
+  // Handle map capture -> go to payment
+  const handleMapCapture = useCallback((data: MapCaptureData) => {
     setCapturedImage(data.imageBase64)
     setMapMeasurements(data.measurements)
+    pendingCaptureRef.current = data
+    setStep("payment")
+  }, [])
+
+  // Run the actual AI diagnostic (called after successful payment)
+  const runDiagnostic = useCallback(async () => {
     setStep("scanning")
 
     try {
-      // Show scanning animation for 3 seconds
       await new Promise((r) => setTimeout(r, 3000))
       setStep("analyzing")
 
-      // Send the captured image to the AI diagnostic
+      const capture = pendingCaptureRef.current
       const diagRes = await fetch("/api/diagnostic", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          image: data.imageBase64,
+          image: capturedImage,
           address: formattedAddress,
-          measurements: data.measurements,
-          bounds: data.bounds,
-          zoom: data.zoom,
+          measurements: capture?.measurements || mapMeasurements,
+          bounds: capture?.bounds || null,
+          zoom: capture?.zoom || null,
         }),
       })
       const diagData = await diagRes.json()
 
       if (!diagRes.ok) {
         setError(diagData.error || "Erreur lors de l'analyse IA.")
-        setStep("map")
+        setStep("address")
         return
       }
 
@@ -558,9 +567,9 @@ export function DiagnosticTool() {
       }, 300)
     } catch {
       setError("Une erreur est survenue. Verifiez votre connexion et reessayez.")
-      setStep("map")
+      setStep("address")
     }
-  }, [formattedAddress])
+  }, [capturedImage, formattedAddress, mapMeasurements])
 
   // Compress image to max 1600px and JPEG quality 0.85 to stay under API body limits
   const compressImage = useCallback((file: File): Promise<string> => {
@@ -612,36 +621,8 @@ export function DiagnosticTool() {
       const imageBase64 = await compressImage(file)
       setCapturedImage(imageBase64)
       setFormattedAddress("Photo uploadee par l'utilisateur")
-      setStep("scanning")
-
-      await new Promise((r) => setTimeout(r, 3000))
-      setStep("analyzing")
-
-      const diagRes = await fetch("/api/diagnostic", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          image: imageBase64,
-          address: "Photo uploadee",
-          measurements: [],
-          bounds: null,
-          zoom: null,
-        }),
-      })
-      const diagData = await diagRes.json()
-
-      if (!diagRes.ok) {
-        setError(diagData.error || "Erreur lors de l'analyse IA.")
-        setStep("address")
-        return
-      }
-
-      setDiagnostic(ensureRealisticZones(diagData.diagnostic))
-      setStep("results")
-
-      setTimeout(() => {
-        resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
-      }, 300)
+      pendingCaptureRef.current = null
+      setStep("payment")
     } catch {
       setError("Une erreur est survenue. Verifiez votre connexion et reessayez.")
       setStep("address")
@@ -692,11 +673,11 @@ export function DiagnosticTool() {
   const progressSteps = [
     { key: "address", label: "Adresse", icon: MapPin },
     { key: "map", label: "Carte IGN", icon: MapPinned },
+    { key: "payment", label: "Paiement", icon: Shield },
     { key: "scanning", label: "Scan", icon: Zap },
-    { key: "analyzing", label: "Analyse IA", icon: Brain },
     { key: "results", label: "Resultats", icon: FileText },
   ]
-  const stepsOrder: Step[] = ["address", "map", "scanning", "analyzing", "results"]
+  const stepsOrder: Step[] = ["address", "map", "payment", "scanning", "analyzing", "results"]
   const currentIndex = stepsOrder.indexOf(step)
 
   return (
@@ -717,8 +698,8 @@ export function DiagnosticTool() {
             <span className="text-gradient">par satellite</span>
           </h2>
           <p className="text-lg leading-relaxed text-muted-foreground">
-            Entrez votre adresse pour une analyse satellite, ou uploadez directement
-            une photo (drone, smartphone). Diagnostic complet par IA en quelques secondes.
+            Entrez votre adresse ou uploadez une photo (drone, smartphone).
+            Analyse complete par IA en 30 secondes. Rapport PDF inclus. 9,90 EUR.
           </p>
         </div>
 
@@ -970,6 +951,71 @@ export function DiagnosticTool() {
                   ))}
                 </div>
               )}
+            </div>
+          </div>
+        )}
+
+        {/* Payment Step */}
+        {step === "payment" && (
+          <div className="mx-auto max-w-2xl">
+            <div className="rounded-2xl border border-border bg-card p-8">
+              {/* Header */}
+              <div className="mb-6 text-center">
+                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
+                  <Shield size={24} className="text-primary" />
+                </div>
+                <h3 className="text-xl font-bold text-foreground" style={{ fontFamily: "var(--font-heading)" }}>
+                  Finalisez votre diagnostic
+                </h3>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Paiement securise par Stripe. Rapport PDF complet inclus.
+                </p>
+              </div>
+
+              {/* Preview of captured image */}
+              {capturedImage && (
+                <div className="mb-6 overflow-hidden rounded-xl border border-border">
+                  <img
+                    src={capturedImage}
+                    alt="Apercu de la toiture"
+                    className="h-48 w-full object-cover"
+                  />
+                </div>
+              )}
+
+              {/* What you get */}
+              <div className="mb-6 rounded-xl bg-secondary/30 p-4">
+                <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Inclus dans votre diagnostic
+                </p>
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    "Analyse vegetale (mousse, lichen)",
+                    "Analyse structurelle (tuiles, faitage)",
+                    "Analyse etancheite (infiltrations)",
+                    "Analyse thermique (deperditions)",
+                    "Scores detailles par zone",
+                    "Rapport PDF telechareable",
+                  ].map((item) => (
+                    <div key={item} className="flex items-center gap-2 text-xs text-foreground">
+                      <CheckCircle2 size={12} className="shrink-0 text-primary" />
+                      {item}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Stripe Embedded Checkout */}
+              <div className="rounded-xl border border-border bg-background p-1">
+                <StripeCheckout
+                  productId="diagnostic-toiture"
+                  onComplete={() => runDiagnostic()}
+                />
+              </div>
+
+              <p className="mt-4 text-center text-[10px] text-muted-foreground">
+                Paiement securise 256-bit SSL. Vos donnees bancaires ne transitent jamais par nos serveurs.
+              </p>
             </div>
           </div>
         )}
@@ -1356,9 +1402,9 @@ export function DiagnosticTool() {
                           {hasThermique ? diagnostic.thermique.commentaire : "Pas de deperdition thermique significative."}
                         </p>
                         {hasThermique && (
-                          <a href="#contact" className="mt-2 inline-flex items-center gap-1 text-[10px] font-semibold text-orange-500 hover:underline">
+                          <a href="#couvreurs" className="mt-2 inline-flex items-center gap-1 text-[10px] font-semibold text-orange-500 hover:underline">
                             <Send size={8} />
-                            Bilan energetique gratuit
+                            Trouver un couvreur specialise
                           </a>
                         )}
                       </div>
@@ -1386,9 +1432,9 @@ export function DiagnosticTool() {
                           {hasEtancheite ? diagnostic.etancheite.description : "L'etancheite de votre toiture est en bon etat."}
                         </p>
                         {hasEtancheite && (
-                          <a href="#contact" className="mt-2 inline-flex items-center gap-1 text-[10px] font-semibold text-amber-500 hover:underline">
+                          <a href="#couvreurs" className="mt-2 inline-flex items-center gap-1 text-[10px] font-semibold text-amber-500 hover:underline">
                             <Send size={8} />
-                            Demander un devis etancheite
+                            Trouver un couvreur
                           </a>
                         )}
                       </div>
@@ -1486,7 +1532,7 @@ export function DiagnosticTool() {
                 >
                   <Download size={20} />
                   Telecharger le rapport PDF
-                  <span className="ml-1 rounded-md bg-white/20 px-2 py-0.5 text-[10px] font-semibold">GRATUIT</span>
+                  <span className="ml-1 rounded-md bg-white/20 px-2 py-0.5 text-[10px] font-semibold">INCLUS</span>
                 </button>
                 <p className="mt-3 text-[10px] text-muted-foreground">
                   Telechargement instantane - Aucune inscription requise
@@ -1497,25 +1543,18 @@ export function DiagnosticTool() {
             {/* CTA */}
             <div className="rounded-2xl border border-primary/30 bg-gradient-to-r from-primary/10 to-transparent p-8 text-center">
               <h3 className="mb-2 text-2xl font-bold text-foreground" style={{ fontFamily: "var(--font-heading)" }}>
-                Besoin d{"'"}une intervention ?
+                Prochaine etape : trouver un couvreur
               </h3>
               <p className="mb-6 text-muted-foreground">
-                Nos experts peuvent intervenir sur toute la France pour reparer votre toiture.
+                Transmettez votre rapport PDF a un professionnel qualifie pour obtenir un devis precis.
               </p>
               <div className="flex flex-wrap items-center justify-center gap-4">
                 <a
-                  href="tel:+33233311979"
+                  href="#couvreurs"
                   className="flex items-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90"
                 >
-                  <Phone size={16} />
-                  Appeler le 02 33 31 19 79
-                </a>
-                <a
-                  href="#contact"
-                  className="flex items-center gap-2 rounded-xl border border-border px-6 py-3 text-sm font-medium text-foreground transition-all hover:bg-secondary"
-                >
-                  <Send size={16} />
-                  Demander un devis
+                  <Search size={16} />
+                  Trouver un couvreur pres de chez moi
                 </a>
               </div>
             </div>

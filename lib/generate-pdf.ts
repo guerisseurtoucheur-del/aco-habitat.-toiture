@@ -84,9 +84,9 @@ export async function generateDiagnosticPDF(
   doc.setFillColor(24, 24, 27) // zinc-900
   doc.rect(0, 0, pageW, 28, "F")
   addText("ACO-HABITAT", margin, 12, 16, "bold", [255, 255, 255])
-  addText("EXPERT COUVERTURE & CHARPENTE", margin, 19, 7, "normal", [160, 160, 170])
-  addText("02 33 31 19 79", pageW - margin - 35, 12, 8, "bold", [255, 255, 255])
-  addText("aco-habitat.fr", pageW - margin - 30, 19, 7, "normal", [160, 160, 170])
+  addText("DIAGNOSTIC TOITURE PAR IA", margin, 19, 7, "normal", [160, 160, 170])
+  addText("aco-habitat.fr", pageW - margin - 27, 12, 8, "bold", [255, 255, 255])
+  addText("9,90 EUR par diagnostic", pageW - margin - 35, 19, 7, "normal", [160, 160, 170])
   y = 36
 
   // Title
@@ -305,7 +305,7 @@ export async function generateDiagnosticPDF(
     doc.setFontSize(6)
     doc.setFont("helvetica", "normal")
     doc.setTextColor(120, 120, 130)
-    doc.text("ACO-HABITAT - Expert Couverture & Charpente | 02 33 31 19 79 | contact@aco-habitat.fr", margin, pageH - 7)
+    doc.text("ACO-HABITAT - Diagnostic Toiture par IA | aco-habitat.fr | contact@aco-habitat.fr", margin, pageH - 7)
     doc.text(`Page ${p}/${totalPages}`, pageW - margin - 15, pageH - 7)
     doc.text("Ce rapport est un diagnostic automatise base sur l'imagerie. Il ne remplace pas l'expertise d'un professionnel sur site.", margin, pageH - 3)
   }
