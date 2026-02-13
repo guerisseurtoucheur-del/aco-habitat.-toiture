@@ -436,16 +436,13 @@ export default function LeafletMap({
     setDrawMode("none")
   }, [onMeasurementsChange])
 
-  // Capture map as image using leaflet-image (captures exactly what user sees)
+  // Capture map via server-side IGN WMS (avoids CORS issues with canvas)
   const captureMap = useCallback(async () => {
     const map = mapRef.current
     if (!map) return
     setIsCapturing(true)
 
     try {
-      // Dynamically import leaflet-image (client-only)
-      const leafletImage = (await import("leaflet-image")).default
-
       const captureBounds = selectionBoxRef.current
         ? selectionBoxRef.current.getBounds()
         : map.getBounds()
@@ -456,41 +453,28 @@ export default function LeafletMap({
       const east = captureBounds.getEast()
       const captureCenter = captureBounds.getCenter()
 
-      // Fit the map to the selection box for the capture
-      const currentCenter = map.getCenter()
-      const currentZoom = map.getZoom()
-      map.fitBounds(captureBounds, { animate: false, padding: [0, 0] })
-
-      // Wait for tiles to load
-      await new Promise<void>((resolve) => {
-        const checkTiles = () => {
-          const container = map.getContainer()
-          const loadingTiles = container.querySelectorAll(".leaflet-tile-loading")
-          if (loadingTiles.length === 0) {
-            resolve()
-          } else {
-            setTimeout(checkTiles, 200)
-          }
-        }
-        setTimeout(checkTiles, 500)
+      const response = await fetch("/api/map-capture", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          bounds: { south, west, north, east },
+          width: 1200,
+          height: 1200,
+        }),
       })
 
-      // Capture with leaflet-image
-      const imageBase64 = await new Promise<string>((resolve, reject) => {
-        leafletImage(map, (err: Error | null, canvas: HTMLCanvasElement) => {
-          if (err) return reject(err)
-          resolve(canvas.toDataURL("image/jpeg", 0.95))
-        })
-      })
+      if (!response.ok) {
+        const errData = await response.json().catch(() => ({}))
+        throw new Error(errData.error || `Capture failed: ${response.status}`)
+      }
 
-      // Restore original view
-      map.setView(currentCenter, currentZoom, { animate: false })
+      const data = await response.json()
 
       onCapture?.({
-        imageBase64,
+        imageBase64: data.imageBase64,
         bounds: { north, south, east, west },
         center: { lat: captureCenter.lat, lng: captureCenter.lng },
-        zoom: currentZoom,
+        zoom: map.getZoom(),
         measurements,
       })
     } catch (err) {
