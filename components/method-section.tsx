@@ -45,7 +45,11 @@ const steps = [
 
 export function MethodSection() {
   return (
-    <section id="methode" className="relative border-y border-border bg-card/30 py-28">
+    <section
+      id="methode"
+      className="relative border-y border-border bg-card/30 py-28"
+      aria-label="Comment diagnostiquer votre toiture avec notre IA en 4 etapes"
+    >
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--color-glow-accent),_transparent_60%)]" />
 
       <div className="relative mx-auto max-w-7xl px-6">
@@ -57,44 +61,45 @@ export function MethodSection() {
             className="mt-4 text-balance text-3xl font-bold tracking-tight text-foreground md:text-4xl lg:text-5xl"
             style={{ fontFamily: "var(--font-heading)" }}
           >
-            Du diagnostic a l{"'"}intervention en{" "}
+            Comment diagnostiquer sa toiture ? Du diagnostic a l{"'"}intervention en{" "}
             <span className="text-gradient-accent">4 etapes</span>
           </h2>
           <p className="mt-4 text-pretty text-base leading-relaxed text-muted-foreground">
-            Un processus simple et transparent pour prendre soin de votre toiture.
+            Un processus simple et transparent pour analyser et reparer votre toiture grace a l{"'"}intelligence artificielle.
           </p>
         </div>
 
-        <div className="mt-16 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+        <ol className="mt-16 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 list-none p-0 m-0">
           {steps.map((step, index) => (
-            <div key={step.number} className="relative flex flex-col">
+            <li key={step.number} className="relative flex flex-col">
               {/* Connector line */}
               {index < steps.length - 1 && (
                 <div className="absolute top-10 left-[calc(50%+32px)] hidden h-px w-[calc(100%-32px)] bg-gradient-to-r from-border to-transparent lg:block" />
               )}
 
-              <div className={`flex flex-col gap-5 rounded-2xl border ${step.borderColor} bg-card/50 p-7 transition-all hover:bg-card/80`}>
+              <article className={`flex flex-col gap-5 rounded-2xl border ${step.borderColor} bg-card/50 p-7 transition-all hover:bg-card/80`}>
                 <div className="flex items-center gap-4">
                   <div className={`flex h-12 w-12 items-center justify-center rounded-xl ${step.bgColor}`}>
-                    <step.icon size={22} className={step.color} />
+                    <step.icon size={22} className={step.color} aria-hidden="true" />
                   </div>
                   <span
                     className="text-4xl font-bold text-foreground/10"
                     style={{ fontFamily: "var(--font-heading)" }}
+                    aria-hidden="true"
                   >
                     {step.number}
                   </span>
                 </div>
                 <h3 className="text-lg font-semibold text-foreground">
-                  {step.title}
+                  Etape {step.number} : {step.title}
                 </h3>
                 <p className="text-sm leading-relaxed text-muted-foreground">
                   {step.description}
                 </p>
-              </div>
-            </div>
+              </article>
+            </li>
           ))}
-        </div>
+        </ol>
       </div>
     </section>
   )

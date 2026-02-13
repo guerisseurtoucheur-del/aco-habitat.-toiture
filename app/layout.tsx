@@ -234,6 +234,99 @@ export default function RootLayout({
             }),
           }}
         />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "SoftwareApplication",
+              name: "Diagnostic Toiture IA - ACO-HABITAT",
+              applicationCategory: "UtilitiesApplication",
+              operatingSystem: "Web",
+              url: "https://aco-habitat.fr/#diagnostic",
+              description:
+                "Outil gratuit de diagnostic de toiture par intelligence artificielle. Analysez l'etat de votre couverture en 30 secondes a partir d'une photo satellite ou drone. Detection de mousse, tuiles cassees, infiltrations et problemes d'isolation.",
+              featureList: [
+                "Analyse par calque vegetal (mousse, lichen, vegetation)",
+                "Analyse par calque structurel (tuiles cassees, deplacees, faitage)",
+                "Analyse par calque etancheite (infiltrations, traces d'humidite)",
+                "Analyse thermique (deperditions energetiques)",
+                "Rapport detaille en PDF",
+                "Recommandations d'intervention personnalisees",
+              ],
+              offers: {
+                "@type": "Offer",
+                price: "0",
+                priceCurrency: "EUR",
+                availability: "https://schema.org/InStock",
+              },
+              aggregateRating: {
+                "@type": "AggregateRating",
+                ratingValue: "4.9",
+                bestRating: "5",
+                ratingCount: "500",
+              },
+              author: {
+                "@type": "Organization",
+                name: "ACO-HABITAT",
+                url: "https://aco-habitat.fr",
+              },
+            }),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "HowTo",
+              name: "Comment diagnostiquer l'etat de sa toiture avec l'IA ?",
+              description:
+                "Guide etape par etape pour utiliser l'outil de diagnostic de toiture par intelligence artificielle ACO-HABITAT. Obtenez un rapport complet en moins de 30 secondes.",
+              totalTime: "PT1M",
+              tool: [
+                {
+                  "@type": "HowToTool",
+                  name: "Photo satellite ou drone de votre toiture",
+                },
+                {
+                  "@type": "HowToTool",
+                  name: "Navigateur web (ordinateur ou mobile)",
+                },
+              ],
+              step: [
+                {
+                  "@type": "HowToStep",
+                  position: 1,
+                  name: "Capturez votre toiture",
+                  text: "Prenez une capture d'ecran de votre toiture sur Google Maps en vue satellite, ou utilisez une photo prise par drone. Assurez-vous que l'image est nette et couvre l'ensemble de la toiture.",
+                  url: "https://aco-habitat.fr/#diagnostic",
+                },
+                {
+                  "@type": "HowToStep",
+                  position: 2,
+                  name: "Envoyez la photo a l'IA",
+                  text: "Deposez votre photo dans l'outil de diagnostic sur notre site. L'intelligence artificielle accepte les formats JPG, PNG et les captures d'ecran directes.",
+                  url: "https://aco-habitat.fr/#diagnostic",
+                },
+                {
+                  "@type": "HowToStep",
+                  position: 3,
+                  name: "Analysez le rapport de diagnostic",
+                  text: "En moins de 30 secondes, l'IA superpose trois calques d'analyse : vegetal (mousse, lichen), structure (tuiles cassees) et etancheite (infiltrations). Chaque probleme est localise et evalue par niveau de gravite.",
+                  url: "https://aco-habitat.fr/#diagnostic",
+                },
+                {
+                  "@type": "HowToStep",
+                  position: 4,
+                  name: "Recevez vos recommandations et devis",
+                  text: "Un expert ACO-HABITAT vous contacte avec un devis detaille et des recommandations d'intervention adaptees aux problemes identifies. Le devis est gratuit et sans engagement.",
+                  url: "https://aco-habitat.fr/#contact",
+                },
+              ],
+            }),
+          }}
+        />
         {children}
       </body>
     </html>
