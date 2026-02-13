@@ -177,18 +177,65 @@ export default function LeafletMap({
       fillColor: "#3b82f6",
       fillOpacity: 0.12,
       dashArray: "6, 4",
-      interactive: false,
+      interactive: true,
+      bubblingMouseEvents: false,
     }).addTo(map)
 
-    // Make the selection box editable (draggable + resizable handles)
+    // Make the selection box editable (resizable handles)
     const editableBox: any = selectionBox
     if (editableBox.editing) {
       editableBox.editing.enable()
     }
+
+    // Make selection box draggable: disable map drag while moving the box
+    let isDraggingBox = false
+    let dragStartLatLng: L.LatLng | null = null
+
+    // Set grab cursor on the selection box
+    const boxElement = (selectionBox as any)._path
+    if (boxElement) {
+      boxElement.style.cursor = "grab"
+    }
+
+    selectionBox.on("mousedown", (e: any) => {
+      isDraggingBox = true
+      dragStartLatLng = e.latlng
+      map.dragging.disable()
+      if (boxElement) boxElement.style.cursor = "grabbing"
+      L.DomEvent.stopPropagation(e)
+    })
+
+    map.on("mousemove", (e: L.LeafletMouseEvent) => {
+      if (!isDraggingBox || !dragStartLatLng) return
+      const currentBounds = selectionBox.getBounds()
+      const dlat = e.latlng.lat - dragStartLatLng.lat
+      const dlng = e.latlng.lng - dragStartLatLng.lng
+      const newBounds = L.latLngBounds(
+        [currentBounds.getSouth() + dlat, currentBounds.getWest() + dlng],
+        [currentBounds.getNorth() + dlat, currentBounds.getEast() + dlng]
+      )
+      selectionBox.setBounds(newBounds)
+      // Re-enable editing handles after bounds change
+      if (editableBox.editing) {
+        editableBox.editing.disable()
+        editableBox.editing.enable()
+      }
+      dragStartLatLng = e.latlng
+    })
+
+    map.on("mouseup", () => {
+      if (isDraggingBox) {
+        isDraggingBox = false
+        dragStartLatLng = null
+        map.dragging.enable()
+        if (boxElement) boxElement.style.cursor = "grab"
+      }
+    })
+
     selectionBoxRef.current = selectionBox
 
-    // Tooltip on hover (click-only, not permanent)
-    selectionBox.bindTooltip("Zone d'analyse (~240x240m)", {
+    // Tooltip on hover
+    selectionBox.bindTooltip("Deplacez ce rectangle sur la toiture", {
       permanent: false,
       direction: "top",
       className: "leaflet-measurement-label",
