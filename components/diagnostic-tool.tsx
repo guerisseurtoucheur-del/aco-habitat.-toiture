@@ -341,7 +341,7 @@ function ThermalScoreCard({
 
         {/* CTA */}
         <a
-          href="#contact"
+          href="mailto:aco.habitat@orange.fr?subject=Demande de bilan energetique"
           className="flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-orange-500 to-red-500 px-4 py-2.5 text-xs font-semibold text-white transition-all hover:shadow-lg hover:shadow-orange-500/25"
         >
           <Flame size={12} />
@@ -1372,7 +1372,7 @@ export function DiagnosticTool() {
                           {hasStructure ? diagnostic.structure.description : "Aucun defaut structurel majeur detecte."}
                         </p>
                         {hasStructure && (
-                          <a href="#contact" className="mt-2 inline-flex items-center gap-1 text-[10px] font-semibold text-red-500 hover:underline">
+                          <a href="mailto:aco.habitat@orange.fr?subject=Demande intervention toiture" className="mt-2 inline-flex items-center gap-1 text-[10px] font-semibold text-red-500 hover:underline">
                             <Send size={8} />
                             Demander une intervention
                           </a>
@@ -1462,7 +1462,7 @@ export function DiagnosticTool() {
                           {hasVegetal ? diagnostic.vegetal.description : "Aucune mousse ou lichen problematique detecte."}
                         </p>
                         {hasVegetal && (
-                          <a href="#contact" className="mt-2 inline-flex items-center gap-1 text-[10px] font-semibold hover:underline" style={{ color: "#84cc16" }}>
+                          <a href="mailto:aco.habitat@orange.fr?subject=Demande nettoyage toiture" className="mt-2 inline-flex items-center gap-1 text-[10px] font-semibold hover:underline" style={{ color: "#84cc16" }}>
                             <Send size={8} />
                             Demander un nettoyage
                           </a>

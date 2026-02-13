@@ -459,7 +459,7 @@ export async function generateDiagnosticPDF(
     doc.setFontSize(6)
     doc.setFont("helvetica", "normal")
     doc.setTextColor(120, 120, 130)
-    doc.text("ACO-HABITAT - Diagnostic Toiture par IA | aco-habitat.fr | contact@aco-habitat.fr", margin, pageH - 7)
+    doc.text("ACO-HABITAT - Diagnostic Toiture par IA | aco-habitat.fr | aco.habitat@orange.fr", margin, pageH - 7)
     doc.text(`Page ${p}/${totalPages}`, pageW - margin - 15, pageH - 7)
     doc.text("Ce rapport est un diagnostic automatise base sur l'imagerie. Il ne remplace pas l'expertise d'un professionnel sur site.", margin, pageH - 3)
   }
