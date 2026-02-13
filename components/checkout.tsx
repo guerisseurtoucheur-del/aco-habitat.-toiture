@@ -35,8 +35,8 @@ export default function Checkout({
           fetchClientSecret,
           onComplete: () => {
             const sessionId = typeof window !== 'undefined' ? window.__stripeSessionId : null
-            if (sessionId && onComplete) {
-              onComplete(sessionId)
+            if (onComplete) {
+              onComplete(sessionId || "completed")
             }
           },
         }}
