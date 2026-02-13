@@ -90,7 +90,7 @@ export function HeroSection() {
             href="#diagnostic"
             className="group relative flex items-center gap-2 rounded-xl bg-primary px-8 py-4 text-base font-semibold text-primary-foreground transition-all hover:shadow-xl hover:shadow-primary/20"
           >
-            Analyser ma toiture - 9,90 EUR
+            Analyser ma toiture - 19,90 EUR
             <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
           </a>
           <a
@@ -105,7 +105,7 @@ export function HeroSection() {
         <div className="animate-fade-up-delay-3 mt-12 flex items-center gap-6 text-sm text-muted-foreground">
           <div className="flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-2">
             <Zap size={14} className="text-primary" />
-            <span className="font-semibold text-foreground">9,90 EUR</span>
+            <span className="font-semibold text-foreground">19,90 EUR</span>
             <span>par diagnostic</span>
           </div>
           <div className="h-4 w-px bg-border" />

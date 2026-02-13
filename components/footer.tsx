@@ -59,7 +59,7 @@ export function Footer() {
                 className="group flex items-center gap-2 rounded-xl bg-primary px-8 py-4 text-sm font-semibold text-primary-foreground transition-all hover:shadow-lg hover:shadow-primary/25"
               >
                 <Zap size={16} className="transition-transform group-hover:scale-110" />
-                Analyser ma toiture - 9,90 EUR
+                Analyser ma toiture - 19,90 EUR
               </a>
               <a
                 href="#couvreurs"
@@ -112,7 +112,7 @@ export function Footer() {
               <div className="flex items-center gap-3 rounded-xl border border-primary/20 bg-primary/5 px-4 py-3">
                 <Zap size={16} className="text-primary" />
                 <div className="flex flex-col">
-                  <span className="text-xs font-semibold text-foreground">9,90 EUR par diagnostic</span>
+                  <span className="text-xs font-semibold text-foreground">19,90 EUR par diagnostic</span>
                   <span className="text-[10px] text-muted-foreground">Rapport PDF complet inclus</span>
                 </div>
               </div>

@@ -26,7 +26,7 @@ export function PricingSection() {
             style={{ fontFamily: "var(--font-heading)" }}
           >
             Un diagnostic complet pour{" "}
-            <span className="text-gradient">9,90 EUR</span>
+            <span className="text-gradient">19,90 EUR</span>
           </h2>
           <p className="mt-4 text-pretty text-base leading-relaxed text-muted-foreground">
             Pas d{"'"}abonnement, pas de frais caches. Payez uniquement quand vous en avez besoin.
@@ -43,7 +43,7 @@ export function PricingSection() {
                   className="text-6xl font-bold text-foreground"
                   style={{ fontFamily: "var(--font-heading)" }}
                 >
-                  9,90
+                  19,90
                 </span>
                 <span className="text-xl text-muted-foreground">EUR</span>
                 <span className="ml-2 text-sm text-muted-foreground">/ diagnostic</span>
@@ -87,7 +87,7 @@ export function PricingSection() {
         {/* Comparison */}
         <div className="mx-auto mt-16 max-w-3xl">
           <h3 className="text-center text-sm font-semibold uppercase tracking-widest text-muted-foreground">
-            Pourquoi 9,90 EUR ?
+            Pourquoi 19,90 EUR ?
           </h3>
           <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
             {[
@@ -99,7 +99,7 @@ export function PricingSection() {
               },
               {
                 title: "ACO-HABITAT IA",
-                price: "9,90 EUR",
+                price: "19,90 EUR",
                 desc: "Instantane, depuis chez vous",
                 highlight: true,
               },

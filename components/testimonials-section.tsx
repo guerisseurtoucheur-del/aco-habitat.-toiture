@@ -5,7 +5,7 @@ const testimonials = [
     name: "C. Durand",
     location: "Versailles (78)",
     rating: 5,
-    text: "J'ai paye 9,90 EUR et en 30 secondes j'avais un diagnostic complet de ma toiture. Le rapport PDF m'a permis de negocier avec le couvreur en sachant exactement ce qu'il fallait faire.",
+    text: "J'ai paye 19,90 EUR et en 30 secondes j'avais un diagnostic complet de ma toiture. Le rapport PDF m'a permis de negocier avec le couvreur en sachant exactement ce qu'il fallait faire.",
     service: "Diagnostic complet",
   },
   {

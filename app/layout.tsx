@@ -13,9 +13,9 @@ const _spaceGrotesk = Space_Grotesk({
 })
 
 export const metadata: Metadata = {
-  title: "ACO-HABITAT | Diagnostic Toiture par IA - Analyse Satellite & Photo | 9,90 EUR",
+  title: "ACO-HABITAT | Diagnostic Toiture par IA - Analyse Satellite & Photo | 19,90 EUR",
   description:
-    "Analysez l'etat de votre toiture en 30 secondes par intelligence artificielle. Photo satellite ou drone. Rapport PDF complet : mousse, fissures, etancheite, thermique. 9,90 EUR par analyse.",
+    "Analysez l'etat de votre toiture en 30 secondes par intelligence artificielle. Photo satellite ou drone. Rapport PDF complet : mousse, fissures, etancheite, thermique. 19,90 EUR par analyse.",
   keywords: [
     "diagnostic toiture",
     "diagnostic toiture IA",
@@ -36,7 +36,7 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   openGraph: {
-    title: "ACO-HABITAT | Diagnostic Toiture par IA - 9,90 EUR",
+    title: "ACO-HABITAT | Diagnostic Toiture par IA - 19,90 EUR",
     description:
       "Analysez votre toiture en 30 secondes par IA. Photo satellite ou drone. Rapport PDF complet avec detection mousse, fissures, etancheite.",
     type: "website",
@@ -56,7 +56,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "ACO-HABITAT | Diagnostic Toiture par IA",
     description:
-      "Analysez votre toiture en 30 secondes par IA. Rapport PDF complet. 9,90 EUR par diagnostic.",
+      "Analysez votre toiture en 30 secondes par IA. Rapport PDF complet. 19,90 EUR par diagnostic.",
   },
   robots: {
     index: true,
@@ -103,7 +103,7 @@ export default function RootLayout({
               image: "https://aco-habitat.fr/images/logo-aco-habitat.png",
               offers: {
                 "@type": "Offer",
-                price: "9.90",
+                price: "19.90",
                 priceCurrency: "EUR",
                 availability: "https://schema.org/InStock",
                 name: "Diagnostic Toiture Complet",
@@ -154,7 +154,7 @@ export default function RootLayout({
                   name: "Combien coute un diagnostic ?",
                   acceptedAnswer: {
                     "@type": "Answer",
-                    text: "Un diagnostic complet coute 9,90 EUR. Vous recevez instantanement un rapport PDF detaille avec les zones problematiques identifiees, les scores par categorie et des recommandations.",
+                    text: "Un diagnostic complet coute 19,90 EUR. Vous recevez instantanement un rapport PDF detaille avec les zones problematiques identifiees, les scores par categorie et des recommandations.",
                   },
                 },
                 {
@@ -197,7 +197,7 @@ export default function RootLayout({
                 "Diagnostic de toiture par intelligence artificielle. Analysez l'etat de votre couverture en 30 secondes a partir d'une photo satellite ou drone. Rapport PDF complet.",
               offers: {
                 "@type": "Offer",
-                price: "9.90",
+                price: "19.90",
                 priceCurrency: "EUR",
                 availability: "https://schema.org/InStock",
               },
