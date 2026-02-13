@@ -26,7 +26,12 @@ const IGN_PLAN =
 const IGN_CADASTRE =
   "https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=CADASTRALPARCELS.PARCELLAIRE_EXPRESS&STYLE=normal&FORMAT=image/png&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}"
 
+/* ESRI World Imagery: global high-res satellite with no coverage gaps */
+const ESRI_SATELLITE =
+  "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+
 const ATTRIBUTION = "&copy; <a href='https://www.ign.fr'>IGN</a>"
+const ESRI_ATTRIBUTION = "&copy; Esri, Maxar, Earthstar Geographics"
 
 /* Half-side of the auto selection box in degrees (~35m at mid-France latitudes) */
 const BOX_HALF_DEG = 0.00035
@@ -131,15 +136,28 @@ export default function LeafletMap({
     // Add zoom control top-right
     L.control.zoom({ position: "topright" }).addTo(map)
 
-    // Base tile layer (satellite by default)
-    // maxNativeZoom 19 = highest native IGN ORTHO tile with guaranteed coverage
-    // Leaflet upscales to zoom 20-21 for closer views
+    // ESRI World Imagery as fallback base layer (global coverage, no blue/black gaps)
+    L.tileLayer(ESRI_SATELLITE, {
+      maxZoom: 21,
+      maxNativeZoom: 19,
+      tileSize: 256,
+      attribution: ESRI_ATTRIBUTION,
+    }).addTo(map)
+
+    // IGN ORTHO overlay on top (higher resolution in France, transparent where missing)
     const tileLayer = L.tileLayer(IGN_ORTHO, {
       maxZoom: 21,
       maxNativeZoom: 19,
       tileSize: 256,
       attribution: ATTRIBUTION,
     }).addTo(map)
+
+    // Hide IGN tiles that fail to load so ESRI shows through
+    tileLayer.on("tileerror", (e: any) => {
+      if (e.tile) {
+        e.tile.style.display = "none"
+      }
+    })
 
     // Place marker on the exact geocoded coordinates
     const addressMarker = L.marker([center.lat, center.lng], {
@@ -283,7 +301,17 @@ export default function LeafletMap({
     map.removeLayer(tileLayerRef.current)
 
     const url = activeLayer === "satellite" ? IGN_ORTHO : activeLayer === "plan" ? IGN_PLAN : IGN_ORTHO
-    const newLayer = L.tileLayer(url, { maxZoom: 21, maxNativeZoom: 19, tileSize: 256, attribution: ATTRIBUTION }).addTo(map)
+    const newLayer = L.tileLayer(url, {
+      maxZoom: 21,
+      maxNativeZoom: 19,
+      tileSize: 256,
+      attribution: ATTRIBUTION,
+    }).addTo(map)
+    newLayer.on("tileerror", (e: any) => {
+      if (e.tile) {
+        e.tile.style.display = "none"
+      }
+    })
     tileLayerRef.current = newLayer
   }, [activeLayer])
 
@@ -293,13 +321,19 @@ export default function LeafletMap({
     const map = mapRef.current
 
     if (showCadastre && !cadastreLayerRef.current) {
-      cadastreLayerRef.current = L.tileLayer(IGN_CADASTRE, {
+      const cadastreLayer = L.tileLayer(IGN_CADASTRE, {
         maxZoom: 21,
         maxNativeZoom: 19,
         tileSize: 256,
         attribution: ATTRIBUTION,
         opacity: 0.7,
       }).addTo(map)
+      cadastreLayer.on("tileerror", (e: any) => {
+        if (e.tile) {
+          e.tile.style.display = "none"
+        }
+      })
+      cadastreLayerRef.current = cadastreLayer
     } else if (!showCadastre && cadastreLayerRef.current) {
       map.removeLayer(cadastreLayerRef.current)
       cadastreLayerRef.current = null
@@ -374,15 +408,25 @@ export default function LeafletMap({
       const east = captureBounds.getEast()
       const captureCenter = captureBounds.getCenter()
 
-      // Request a square 1600x1600 image for the ~35m selection box
-      // This gives ~2cm/pixel resolution -- sharp enough to see individual tiles
+      // Calculate native pixel dimensions from the zone's real-world size
+      // IGN ORTHOIMAGERY.ORTHOPHOTOS native resolution = 20cm/pixel
+      // Requesting more pixels than native causes server-side upscale artefacts
+      const NATIVE_RES = 0.20 // metres per pixel
+      const latMeters = (north - south) * 110540
+      const lngMeters = (east - west) * 111320 * Math.cos(((north + south) / 2) * Math.PI / 180)
+      const nativeW = Math.round(lngMeters / NATIVE_RES)
+      const nativeH = Math.round(latMeters / NATIVE_RES)
+      // Clamp between 256 and 2048 to avoid too-small or too-large requests
+      const reqW = Math.min(Math.max(nativeW, 256), 2048)
+      const reqH = Math.min(Math.max(nativeH, 256), 2048)
+
       const response = await fetch("/api/map-capture", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           bounds: { south, west, north, east },
-          width: 1600,
-          height: 1600,
+          width: reqW,
+          height: reqH,
         }),
       })
 
