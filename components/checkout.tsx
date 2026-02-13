@@ -20,7 +20,6 @@ export default function Checkout({
 }) {
   const fetchClientSecret = useCallback(async () => {
     const { clientSecret, sessionId } = await startCheckoutSession(productId)
-    // Store sessionId so we can verify payment later
     if (typeof window !== 'undefined') {
       window.__stripeSessionId = sessionId
     }
