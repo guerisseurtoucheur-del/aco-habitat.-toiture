@@ -39,6 +39,7 @@ export function ContactSection() {
     name: "",
     phone: "",
     email: "",
+    address: "",
     service: "",
     message: "",
   })
@@ -68,7 +69,7 @@ export function ContactSection() {
       }
 
       setStatus("success")
-      setFormData({ name: "", phone: "", email: "", service: "", message: "" })
+      setFormData({ name: "", phone: "", email: "", address: "", service: "", message: "" })
     } catch (err) {
       setStatus("error")
       setErrorMessage(
@@ -253,6 +254,21 @@ export function ContactSection() {
                   value={formData.email}
                   onChange={handleChange}
                   placeholder="jean@exemple.fr"
+                  className="rounded-xl border border-input bg-background/80 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
+                />
+              </div>
+
+              <div className="flex flex-col gap-2">
+                <label htmlFor="address" className="text-sm font-medium text-foreground">
+                  Adresse postale
+                </label>
+                <input
+                  id="address"
+                  type="text"
+                  required
+                  value={formData.address}
+                  onChange={handleChange}
+                  placeholder="12 rue de la Paix, 75002 Paris"
                   className="rounded-xl border border-input bg-background/80 px-4 py-3 text-sm text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-ring focus:border-transparent transition-all"
                 />
               </div>
