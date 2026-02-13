@@ -294,6 +294,159 @@ export async function generateDiagnosticPDF(
   })
 
   // ═══════════════════════════════════════
+  // PAGE 3: Fiche couvreur + legal
+  // ═══════════════════════════════════════
+  doc.addPage()
+  y = margin
+
+  // Reference number
+  const refId = `ACO-${Date.now().toString(36).toUpperCase()}`
+  
+  // "A transmettre" header
+  doc.setFillColor(6, 182, 212) // cyan
+  doc.roundedRect(margin, y, contentW, 22, 3, 3, "F")
+  addText("FICHE SYNTHESE - A TRANSMETTRE A VOTRE COUVREUR", margin + 6, y + 9, 11, "bold", [255, 255, 255])
+  addText(`Ref : ${refId}`, margin + 6, y + 17, 7, "normal", [220, 240, 255])
+  y += 30
+
+  // Client info box
+  doc.setFillColor(245, 245, 250)
+  doc.roundedRect(margin, y, contentW, 22, 2, 2, "F")
+  addText("INFORMATIONS DU BIEN", margin + 4, y + 6, 8, "bold", [24, 24, 27])
+  addText(`Adresse : ${address || "Non renseignee"}`, margin + 4, y + 12, 8, "normal", [60, 60, 60])
+  addText(`Date du diagnostic : ${dateStr}`, margin + 4, y + 17, 8, "normal", [60, 60, 60])
+  if (diagnostic.surfaceEstimeeM2) {
+    addText(`Surface estimee : ${diagnostic.surfaceEstimeeM2} m2 (precision : ${diagnostic.surfacePrecision || "moyenne"})`, margin + contentW / 2, y + 12, 8, "normal", [60, 60, 60])
+  }
+  addText(`Type de couverture : ${diagnostic.toitureType}`, margin + contentW / 2, y + 17, 8, "normal", [60, 60, 60])
+  y += 28
+
+  // Quick score summary
+  addText("SCORES DE DIAGNOSTIC", margin, y, 10, "bold", [24, 24, 27])
+  y += 7
+
+  const scoreItems = [
+    { label: "Score global", score: diagnostic.scoreGlobal },
+    { label: "Vegetal (mousse, lichen)", score: diagnostic.vegetal.score },
+    { label: "Structure (tuiles, faitage)", score: diagnostic.structure.score },
+    { label: "Etancheite (infiltrations)", score: diagnostic.etancheite.score },
+    ...(diagnostic.thermique ? [{ label: "Thermique (isolation)", score: diagnostic.thermique.scoreIsolation }] : []),
+  ]
+
+  scoreItems.forEach((item) => {
+    const color = scoreColor(item.score)
+    const barW = (item.score / 100) * (contentW - 80)
+    
+    addText(item.label, margin, y + 3, 8, "normal", [60, 60, 60])
+    
+    // Background bar
+    doc.setFillColor(230, 230, 235)
+    doc.roundedRect(margin + 70, y, contentW - 80, 5, 1, 1, "F")
+    // Score bar
+    doc.setFillColor(...color)
+    if (barW > 2) doc.roundedRect(margin + 70, y, barW, 5, 1, 1, "F")
+    // Score text
+    addText(`${item.score}/100`, pageW - margin - 15, y + 3.5, 7, "bold", color)
+    y += 9
+  })
+  y += 6
+
+  // Anomalies summary table
+  addText("ANOMALIES DETECTEES", margin, y, 10, "bold", [24, 24, 27])
+  y += 7
+
+  const allZones = [
+    ...diagnostic.vegetal.zones.map(z => ({ ...z, cat: "Vegetal" })),
+    ...diagnostic.structure.zones.map(z => ({ ...z, cat: "Structure" })),
+    ...diagnostic.etancheite.zones.map(z => ({ ...z, cat: "Etancheite" })),
+  ]
+
+  if (allZones.length > 0) {
+    // Table header
+    doc.setFillColor(240, 240, 245)
+    doc.rect(margin, y, contentW, 6, "F")
+    addText("Categorie", margin + 2, y + 4, 7, "bold", [80, 80, 80])
+    addText("Anomalie", margin + 35, y + 4, 7, "bold", [80, 80, 80])
+    addText("Severite", pageW - margin - 22, y + 4, 7, "bold", [80, 80, 80])
+    y += 8
+
+    allZones.forEach((z) => {
+      checkNewPage(7)
+      const sevColor: [number, number, number] =
+        z.severity === "severe" ? [239, 68, 68] :
+        z.severity === "modere" ? [245, 158, 11] : [34, 197, 94]
+      
+      addText(z.cat, margin + 2, y + 3, 7, "normal", [100, 100, 100])
+      
+      doc.setFontSize(7)
+      doc.setFont("helvetica", "normal")
+      doc.setTextColor(40, 40, 40)
+      const labelLines = doc.splitTextToSize(z.label, 85)
+      doc.text(labelLines, margin + 35, y + 3)
+      
+      doc.setFillColor(...sevColor)
+      doc.roundedRect(pageW - margin - 25, y, 22, 5, 1, 1, "F")
+      addText(z.severity.toUpperCase(), pageW - margin - 23, y + 3.5, 6, "bold", [255, 255, 255])
+      
+      y += Math.max(labelLines.length * 4, 7) + 1
+    })
+  } else {
+    addText("Aucune anomalie majeure detectee.", margin, y, 8, "normal", [34, 197, 94])
+    y += 6
+  }
+  y += 6
+
+  // Recommendations summary
+  checkNewPage(30)
+  addText("TRAVAUX RECOMMANDES (par ordre de priorite)", margin, y, 10, "bold", [24, 24, 27])
+  y += 7
+
+  diagnostic.recommandations.forEach((r, i) => {
+    checkNewPage(10)
+    addText(`${i + 1}.`, margin + 2, y, 8, "bold", [59, 130, 246])
+    doc.setFontSize(8)
+    doc.setFont("helvetica", "normal")
+    doc.setTextColor(40, 40, 40)
+    const recLines = doc.splitTextToSize(r, contentW - 12)
+    doc.text(recLines, margin + 10, y)
+    y += recLines.length * 4 + 3
+  })
+
+  // Measurements if any
+  if (measurements.length > 0) {
+    y += 4
+    addText("MESURES MANUELLES EFFECTUEES", margin, y, 10, "bold", [24, 24, 27])
+    y += 7
+    measurements.forEach((m) => {
+      const txt = m.type === "area" ? `Surface mesuree : ${m.value.toFixed(1)} m2` : `Longueur mesuree : ${m.value.toFixed(1)} m`
+      addText(`- ${txt}`, margin + 4, y, 8, "normal", [60, 60, 60])
+      y += 5
+    })
+  }
+
+  // Legal disclaimer
+  checkNewPage(35)
+  y += 6
+  drawLine(y)
+  y += 6
+  doc.setFillColor(255, 251, 235) // amber-50
+  doc.roundedRect(margin, y, contentW, 32, 2, 2, "F")
+  doc.setDrawColor(245, 158, 11)
+  doc.setLineWidth(0.5)
+  doc.roundedRect(margin, y, contentW, 32, 2, 2, "S")
+  
+  addText("AVERTISSEMENT LEGAL", margin + 4, y + 6, 8, "bold", [180, 100, 0])
+  
+  doc.setFontSize(6)
+  doc.setFont("helvetica", "normal")
+  doc.setTextColor(120, 80, 20)
+  const legalText = "Ce rapport est un diagnostic automatise base sur l'analyse d'images par intelligence artificielle. Il constitue une aide a la decision et ne remplace en aucun cas une inspection physique par un professionnel qualifie. Les scores et zones detectees sont indicatifs et dependents de la qualite de l'image fournie. Des defauts non visibles en surface (charpente, sous-couverture, isolation interne) ne peuvent pas etre detectes par ce procede. ACO-HABITAT decline toute responsabilite en cas de decisions prises sur la seule base de ce rapport. Avant tout engagement de travaux, faites realiser une inspection physique par un couvreur professionnel."
+  const legalLines = doc.splitTextToSize(legalText, contentW - 8)
+  doc.text(legalLines, margin + 4, y + 12)
+
+  addText("ACO-HABITAT - Plateforme independante non affiliee a des prestataires de travaux.", margin + 4, y + 28, 6, "bold", [120, 80, 20])
+
+  // ═══════════════════════════════════════
   // Footer on every page
   // ═══════════════════════════════════════
   const totalPages = doc.getNumberOfPages()

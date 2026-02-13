@@ -1558,6 +1558,17 @@ export function DiagnosticTool() {
                 </a>
               </div>
             </div>
+
+            {/* Legal disclaimer */}
+            <div className="mt-8 rounded-xl border border-amber-500/20 bg-amber-500/5 p-4">
+              <p className="text-[10px] leading-relaxed text-amber-200/70">
+                <strong className="text-amber-200/90">Avertissement :</strong> Ce diagnostic est une aide a la decision basee sur
+                l{"'"}analyse automatisee d{"'"}images par intelligence artificielle. Il ne remplace pas une inspection physique par un
+                professionnel qualifie. Les scores et zones detectees sont indicatifs. ACO-HABITAT est une plateforme independante
+                non affiliee a des prestataires de travaux.{" "}
+                <a href="/mentions-legales" className="underline hover:text-amber-200">Mentions legales et CGV</a>
+              </p>
+            </div>
           </div>
         )}
       </div>

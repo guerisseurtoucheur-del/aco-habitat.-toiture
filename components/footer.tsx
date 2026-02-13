@@ -31,8 +31,7 @@ const footerLinks: { title: string; links: FooterLink[] }[] = [
     links: [
       { label: "A propos", href: "#methode" },
       { label: "Contact / Support", href: "mailto:aco.habitat@orange.fr" },
-      { label: "Mentions legales", href: "#" },
-      { label: "CGV", href: "#" },
+      { label: "Mentions legales & CGV", href: "/mentions-legales" },
     ],
   },
 ]
@@ -150,9 +149,8 @@ export function Footer() {
             {"2026 ACO-HABITAT. Tous droits reserves."}
           </p>
           <div className="flex gap-6 text-xs text-muted-foreground">
-            <a href="#" className="hover:text-foreground transition-colors">Mentions legales</a>
-            <a href="#" className="hover:text-foreground transition-colors">Politique de confidentialite</a>
-            <a href="#" className="hover:text-foreground transition-colors">CGV</a>
+            <a href="/mentions-legales" className="hover:text-foreground transition-colors">Mentions legales & CGV</a>
+            <a href="/mentions-legales#donnees" className="hover:text-foreground transition-colors">Confidentialite</a>
           </div>
         </div>
       </div>
