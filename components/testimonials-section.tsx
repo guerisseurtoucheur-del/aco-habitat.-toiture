@@ -2,32 +2,32 @@ import { Star, Quote } from "lucide-react"
 
 const testimonials = [
   {
-    name: "Marie Dubois",
+    name: "C. Durand",
     location: "Versailles (78)",
     rating: 5,
-    text: "Incroyable ! J'ai juste envoye une capture Google Maps de ma toiture et en 30 secondes j'avais un diagnostic complet. L'equipe est intervenue 3 jours apres pour le demoussage. Travail impeccable.",
-    service: "Diagnostic IA + Demoussage",
+    text: "J'ai paye 9,90 EUR et en 30 secondes j'avais un diagnostic complet de ma toiture. Le rapport PDF m'a permis de negocier avec le couvreur en sachant exactement ce qu'il fallait faire.",
+    service: "Diagnostic complet",
   },
   {
-    name: "Philippe Martin",
-    location: "Creteil (94)",
+    name: "M. Garnier",
+    location: "Lyon (69)",
     rating: 5,
-    text: "Le diagnostic IA a detecte des tuiles deplacees que je ne voyais meme pas depuis le sol. Reparation rapide et propre. Je recommande vivement ACO-HABITAT pour leur professionnalisme.",
-    service: "Reparation toiture",
+    text: "Le diagnostic a detecte des tuiles deplacees que je ne voyais meme pas depuis le sol. J'ai transmis le PDF a un couvreur de l'annuaire, il a confirme et intervenu dans la semaine.",
+    service: "Detection structure",
   },
   {
-    name: "Isabelle Moreau",
-    location: "Saint-Denis (93)",
+    name: "S. Lefevre",
+    location: "Nantes (44)",
     rating: 5,
-    text: "Renovation complete de notre toiture suite au diagnostic. Le rapport detaille nous a permis de comprendre exactement les travaux necessaires. Excellent rapport qualite/prix.",
-    service: "Renovation complete",
+    text: "Avant de vendre ma maison, j'ai fait analyser la toiture. Le rapport m'a rassure : tout etait en bon etat. Ca m'a evite de payer un expert 200 EUR pour rien.",
+    service: "Diagnostic pre-vente",
   },
   {
-    name: "Laurent Petit",
-    location: "Boulogne (92)",
+    name: "P. Rousseau",
+    location: "Toulouse (31)",
     rating: 5,
-    text: "L'outil de diagnostic est bluffant. On voit clairement les zones problematiques avec les calques superposes. Intervention rapide pour l'isolation des combles. Tres satisfait.",
-    service: "Isolation thermique",
+    text: "L'analyse thermique est bluffante. On voit clairement les zones de deperdition. J'ai pu cibler exactement ou isoler, ce qui m'a fait economiser sur le devis.",
+    service: "Analyse thermique",
   },
 ]
 
@@ -45,10 +45,10 @@ export function TestimonialsSection() {
             className="mt-4 text-balance text-3xl font-bold tracking-tight text-foreground md:text-4xl lg:text-5xl"
             style={{ fontFamily: "var(--font-heading)" }}
           >
-            Ils nous font confiance
+            Ce que disent nos utilisateurs
           </h2>
           <p className="mt-4 text-pretty text-base leading-relaxed text-muted-foreground">
-            Decouvrez les retours de nos clients partout en France.
+            Des proprietaires qui ont fait analyser leur toiture avec ACO-HABITAT.
           </p>
         </div>
 

@@ -13,35 +13,32 @@ const _spaceGrotesk = Space_Grotesk({
 })
 
 export const metadata: Metadata = {
-  title: "ACO-HABITAT | Expert Couverture & Charpente - Diagnostic Toiture IA | France Entiere",
+  title: "ACO-HABITAT | Diagnostic Toiture par IA - Analyse Satellite & Photo | 9,90 EUR",
   description:
-    "Expert couverture et charpente sur toute la France. Diagnostic toiture par intelligence artificielle en 30 secondes. Reparation, renovation, isolation, demoussage et travaux de charpente. Devis gratuit sous 24h.",
+    "Analysez l'etat de votre toiture en 30 secondes par intelligence artificielle. Photo satellite ou drone. Rapport PDF complet : mousse, fissures, etancheite, thermique. 9,90 EUR par analyse.",
   keywords: [
-    "couvreur",
-    "charpentier",
     "diagnostic toiture",
     "diagnostic toiture IA",
-    "couverture toiture",
-    "charpente bois",
-    "renovation toiture",
-    "reparation toiture",
-    "isolation thermique toiture",
-    "demoussage toiture",
-    "traitement charpente",
-    "couvreur France",
-    "charpentier France",
-    "devis toiture gratuit",
+    "analyse toiture satellite",
+    "analyse toiture drone",
+    "etat toiture",
+    "mousse toiture",
+    "fissure toiture",
+    "infiltration toiture",
+    "rapport toiture PDF",
+    "diagnostic toiture en ligne",
     "ACO-HABITAT",
-    "France entiere",
+    "inspection toiture",
+    "toiture intelligence artificielle",
   ],
   metadataBase: new URL("https://aco-habitat.fr"),
   alternates: {
     canonical: "/",
   },
   openGraph: {
-    title: "ACO-HABITAT | Expert Couverture & Charpente - France Entiere",
+    title: "ACO-HABITAT | Diagnostic Toiture par IA - 9,90 EUR",
     description:
-      "Diagnostic toiture par IA en 30 secondes. Expert couverture et charpente. Reparation, renovation, isolation et charpente. Devis gratuit.",
+      "Analysez votre toiture en 30 secondes par IA. Photo satellite ou drone. Rapport PDF complet avec detection mousse, fissures, etancheite.",
     type: "website",
     locale: "fr_FR",
     siteName: "ACO-HABITAT",
@@ -51,15 +48,15 @@ export const metadata: Metadata = {
         url: "/images/logo-aco-habitat.png",
         width: 1024,
         height: 1024,
-        alt: "ACO-HABITAT - Expert Couverture & Charpente - Diagnostic Toiture IA",
+        alt: "ACO-HABITAT - Diagnostic Toiture par IA",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "ACO-HABITAT | Expert Couverture & Charpente",
+    title: "ACO-HABITAT | Diagnostic Toiture par IA",
     description:
-      "Diagnostic toiture par IA en 30 secondes. Expert couverture et charpente sur toute la France.",
+      "Analysez votre toiture en 30 secondes par IA. Rapport PDF complet. 9,90 EUR par diagnostic.",
   },
   robots: {
     index: true,
@@ -94,84 +91,38 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
-              "@type": "LocalBusiness",
+              "@type": "WebApplication",
               "@id": "https://aco-habitat.fr",
-              name: "ACO-HABITAT",
-              alternateName: "ACO-HABITAT Expert Couverture & Charpente",
+              name: "ACO-HABITAT - Diagnostic Toiture par IA",
               description:
-                "Expert couverture et charpente sur toute la France. Diagnostic toiture par intelligence artificielle. Reparation, renovation, isolation, demoussage et travaux de charpente.",
+                "Plateforme de diagnostic de toiture par intelligence artificielle. Analysez l'etat de votre couverture en 30 secondes a partir d'une photo satellite ou drone. Rapport PDF complet.",
               url: "https://aco-habitat.fr",
+              applicationCategory: "UtilitiesApplication",
+              operatingSystem: "Web",
               logo: "https://aco-habitat.fr/images/logo-aco-habitat.png",
               image: "https://aco-habitat.fr/images/logo-aco-habitat.png",
-              telephone: "+33233311979",
-              email: "aco.habitat@orange.fr",
-              areaServed: {
-                "@type": "Country",
-                name: "France",
+              offers: {
+                "@type": "Offer",
+                price: "9.90",
+                priceCurrency: "EUR",
+                availability: "https://schema.org/InStock",
+                name: "Diagnostic Toiture Complet",
+                description: "Analyse IA complete avec rapport PDF : vegetal, structure, etancheite, thermique.",
               },
-              serviceType: [
-                "Couverture",
-                "Charpente",
-                "Diagnostic toiture",
-                "Reparation de toiture",
-                "Renovation de toiture",
-                "Isolation thermique",
-                "Demoussage",
-                "Traitement de charpente",
+              featureList: [
+                "Analyse satellite IGN 20cm/pixel",
+                "Upload photo drone ou smartphone",
+                "Detection mousse et lichen",
+                "Detection fissures et tuiles cassees",
+                "Analyse etancheite et infiltrations",
+                "Analyse thermique et deperditions",
+                "Rapport PDF telechareable",
               ],
-              hasOfferCatalog: {
-                "@type": "OfferCatalog",
-                name: "Services Toiture & Charpente",
-                itemListElement: [
-                  {
-                    "@type": "Offer",
-                    itemOffered: {
-                      "@type": "Service",
-                      name: "Diagnostic Toiture par IA",
-                      description:
-                        "Analyse complete de votre toiture par intelligence artificielle a partir d'une photo satellite ou drone.",
-                    },
-                  },
-                  {
-                    "@type": "Offer",
-                    itemOffered: {
-                      "@type": "Service",
-                      name: "Travaux de Couverture",
-                      description:
-                        "Reparation, renovation complete, demoussage et isolation de toiture.",
-                    },
-                  },
-                  {
-                    "@type": "Offer",
-                    itemOffered: {
-                      "@type": "Service",
-                      name: "Travaux de Charpente",
-                      description:
-                        "Expertise et travaux de charpente : renforcement, remplacement de pieces, traitement curatif du bois.",
-                    },
-                  },
-                ],
+              author: {
+                "@type": "Organization",
+                name: "ACO-HABITAT",
+                url: "https://aco-habitat.fr",
               },
-              aggregateRating: {
-                "@type": "AggregateRating",
-                ratingValue: "4.9",
-                bestRating: "5",
-                ratingCount: "500",
-              },
-              openingHoursSpecification: {
-                "@type": "OpeningHoursSpecification",
-                dayOfWeek: [
-                  "Monday",
-                  "Tuesday",
-                  "Wednesday",
-                  "Thursday",
-                  "Friday",
-                  "Saturday",
-                ],
-                opens: "08:00",
-                closes: "19:00",
-              },
-              priceRange: "$$",
             }),
           }}
         />
@@ -200,26 +151,10 @@ export default function RootLayout({
                 },
                 {
                   "@type": "Question",
-                  name: "Le diagnostic en ligne est-il vraiment gratuit ?",
+                  name: "Combien coute un diagnostic ?",
                   acceptedAnswer: {
                     "@type": "Answer",
-                    text: "Oui, le diagnostic IA en ligne est 100% gratuit et sans engagement. Vous recevez instantanement un rapport detaille avec les zones problematiques identifiees et des recommandations d'intervention.",
-                  },
-                },
-                {
-                  "@type": "Question",
-                  name: "Dans quelles zones intervenez-vous ?",
-                  acceptedAnswer: {
-                    "@type": "Answer",
-                    text: "ACO-HABITAT intervient sur toute la France. Que vous soyez en Ile-de-France, en Normandie, dans le Nord ou partout ailleurs, nous nous deplacons pour diagnostiquer et reparer votre toiture.",
-                  },
-                },
-                {
-                  "@type": "Question",
-                  name: "Combien coute une intervention de reparation ?",
-                  acceptedAnswer: {
-                    "@type": "Answer",
-                    text: "Le cout depend de la nature et de l'etendue des travaux identifies lors du diagnostic. Nous etablissons un devis gratuit et detaille avant toute intervention. Nos prix sont transparents et competitifs.",
+                    text: "Un diagnostic complet coute 9,90 EUR. Vous recevez instantanement un rapport PDF detaille avec les zones problematiques identifiees, les scores par categorie et des recommandations.",
                   },
                 },
                 {
@@ -227,7 +162,23 @@ export default function RootLayout({
                   name: "Quelle est la precision du diagnostic IA ?",
                   acceptedAnswer: {
                     "@type": "Answer",
-                    text: "Notre IA atteint un taux de precision de 98% pour la detection des problemes de vegetation, de structure et d'etancheite. Le diagnostic est ensuite valide par nos experts couvreurs avant toute intervention.",
+                    text: "Notre IA analyse votre toiture sur 4 axes : vegetal (mousse, lichen), structure (tuiles cassees, deplacees), etancheite (infiltrations) et thermique (deperditions). La precision depend de la qualite de l'image fournie.",
+                  },
+                },
+                {
+                  "@type": "Question",
+                  name: "Puis-je utiliser ma propre photo ?",
+                  acceptedAnswer: {
+                    "@type": "Answer",
+                    text: "Oui, vous pouvez utiliser une photo drone, une photo prise depuis le sol avec votre smartphone, ou une capture Google Maps. Plus l'image est nette et recente, plus le diagnostic sera precis.",
+                  },
+                },
+                {
+                  "@type": "Question",
+                  name: "Comment trouver un couvreur apres le diagnostic ?",
+                  acceptedAnswer: {
+                    "@type": "Answer",
+                    text: "Notre annuaire de couvreurs partenaires vous permet de trouver un professionnel qualifie pres de chez vous. Vous pouvez lui transmettre directement votre rapport PDF pour obtenir un devis precis.",
                   },
                 },
               ],
@@ -239,34 +190,18 @@ export default function RootLayout({
           dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
-              "@type": "SoftwareApplication",
-              name: "Diagnostic Toiture IA - ACO-HABITAT",
-              applicationCategory: "UtilitiesApplication",
-              operatingSystem: "Web",
+              "@type": "Product",
+              name: "Diagnostic Toiture par IA - ACO-HABITAT",
               url: "https://aco-habitat.fr/#diagnostic",
               description:
-                "Outil gratuit de diagnostic de toiture par intelligence artificielle. Analysez l'etat de votre couverture en 30 secondes a partir d'une photo satellite ou drone. Detection de mousse, tuiles cassees, infiltrations et problemes d'isolation.",
-              featureList: [
-                "Analyse par calque vegetal (mousse, lichen, vegetation)",
-                "Analyse par calque structurel (tuiles cassees, deplacees, faitage)",
-                "Analyse par calque etancheite (infiltrations, traces d'humidite)",
-                "Analyse thermique (deperditions energetiques)",
-                "Rapport detaille en PDF",
-                "Recommandations d'intervention personnalisees",
-              ],
+                "Diagnostic de toiture par intelligence artificielle. Analysez l'etat de votre couverture en 30 secondes a partir d'une photo satellite ou drone. Rapport PDF complet.",
               offers: {
                 "@type": "Offer",
-                price: "0",
+                price: "9.90",
                 priceCurrency: "EUR",
                 availability: "https://schema.org/InStock",
               },
-              aggregateRating: {
-                "@type": "AggregateRating",
-                ratingValue: "4.9",
-                bestRating: "5",
-                ratingCount: "500",
-              },
-              author: {
+              brand: {
                 "@type": "Organization",
                 name: "ACO-HABITAT",
                 url: "https://aco-habitat.fr",
@@ -319,9 +254,9 @@ export default function RootLayout({
                 {
                   "@type": "HowToStep",
                   position: 4,
-                  name: "Recevez vos recommandations et devis",
-                  text: "Un expert ACO-HABITAT vous contacte avec un devis detaille et des recommandations d'intervention adaptees aux problemes identifies. Le devis est gratuit et sans engagement.",
-                  url: "https://aco-habitat.fr/#contact",
+                  name: "Telechargez votre rapport PDF",
+                  text: "Telechargez votre rapport PDF complet avec scores, zones detectees et recommandations. Transmettez-le a un couvreur de votre choix via notre annuaire pour obtenir un devis.",
+                  url: "https://aco-habitat.fr/#diagnostic",
                 },
               ],
             }),

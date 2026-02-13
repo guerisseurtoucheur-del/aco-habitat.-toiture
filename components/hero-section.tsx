@@ -1,7 +1,7 @@
 "use client"
 
 import Image from "next/image"
-import { Scan, Shield, Droplets, ArrowRight, Star } from "lucide-react"
+import { Scan, Shield, Droplets, ArrowRight, Zap } from "lucide-react"
 import { useEffect, useState } from "react"
 
 function AnimatedCounter({ target, suffix = "" }: { target: number; suffix?: string }) {
@@ -72,16 +72,16 @@ export function HeroSection() {
         <h1 className="animate-fade-up-delay-1 max-w-5xl text-balance text-center text-4xl font-bold leading-[1.1] tracking-tight text-foreground sm:text-5xl md:text-6xl lg:text-7xl"
           style={{ fontFamily: "var(--font-heading)" }}
         >
-          Votre toiture analysee
+          Diagnostic toiture par IA
           <br />
-          <span className="text-gradient">en quelques secondes</span>
+          <span className="text-gradient">en 30 secondes</span>
         </h1>
 
         {/* Subtitle */}
         <p className="animate-fade-up-delay-2 mt-6 max-w-2xl text-pretty text-center text-base leading-relaxed text-muted-foreground md:text-lg">
-          Uploadez une photo satellite ou aerienne de votre toit. Notre IA
-          detecte la mousse, les fissures et les problemes d{"'"}etancheite
-          avec une precision professionnelle.
+          Uploadez une photo satellite, drone ou smartphone. Notre IA analyse
+          mousse, fissures, etancheite et deperditions thermiques.
+          Recevez un rapport PDF complet instantanement.
         </p>
 
         {/* CTAs */}
@@ -90,27 +90,26 @@ export function HeroSection() {
             href="#diagnostic"
             className="group relative flex items-center gap-2 rounded-xl bg-primary px-8 py-4 text-base font-semibold text-primary-foreground transition-all hover:shadow-xl hover:shadow-primary/20"
           >
-            Lancer un diagnostic gratuit
+            Analyser ma toiture - 9,90 EUR
             <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
           </a>
           <a
             href="#methode"
             className="group flex items-center gap-2 rounded-xl border border-border bg-secondary/50 px-8 py-4 text-base font-medium text-secondary-foreground transition-all hover:bg-secondary hover:border-border/80"
           >
-            Decouvrir notre methode
+            Comment ca marche
           </a>
         </div>
 
-        {/* Social proof */}
+        {/* Price highlight */}
         <div className="animate-fade-up-delay-3 mt-12 flex items-center gap-6 text-sm text-muted-foreground">
-          <div className="flex items-center gap-1">
-            {[...Array(5)].map((_, i) => (
-              <Star key={i} size={14} className="fill-accent text-accent" />
-            ))}
-            <span className="ml-2">4.9/5</span>
+          <div className="flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-2">
+            <Zap size={14} className="text-primary" />
+            <span className="font-semibold text-foreground">9,90 EUR</span>
+            <span>par diagnostic</span>
           </div>
           <div className="h-4 w-px bg-border" />
-          <span>+500 diagnostics realises</span>
+          <span>Rapport PDF inclus</span>
         </div>
 
         {/* Stats bar */}
