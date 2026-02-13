@@ -430,21 +430,22 @@ export async function generateDiagnosticPDF(
   drawLine(y)
   y += 6
   doc.setFillColor(255, 251, 235) // amber-50
-  doc.roundedRect(margin, y, contentW, 32, 2, 2, "F")
+  doc.roundedRect(margin, y, contentW, 40, 2, 2, "F")
   doc.setDrawColor(245, 158, 11)
   doc.setLineWidth(0.5)
-  doc.roundedRect(margin, y, contentW, 32, 2, 2, "S")
+  doc.roundedRect(margin, y, contentW, 40, 2, 2, "S")
   
   addText("AVERTISSEMENT LEGAL", margin + 4, y + 6, 8, "bold", [180, 100, 0])
   
   doc.setFontSize(6)
   doc.setFont("helvetica", "normal")
   doc.setTextColor(120, 80, 20)
-  const legalText = "Ce rapport est un diagnostic automatise base sur l'analyse d'images par intelligence artificielle. Il constitue une aide a la decision et ne remplace en aucun cas une inspection physique par un professionnel qualifie. Les scores et zones detectees sont indicatifs et dependents de la qualite de l'image fournie. Des defauts non visibles en surface (charpente, sous-couverture, isolation interne) ne peuvent pas etre detectes par ce procede. ACO-HABITAT decline toute responsabilite en cas de decisions prises sur la seule base de ce rapport. Avant tout engagement de travaux, faites realiser une inspection physique par un couvreur professionnel."
+  const legalText = "Ce rapport est un diagnostic automatise base sur l'analyse d'images par intelligence artificielle. Il constitue une aide a la decision et ne remplace en aucun cas une inspection physique par un professionnel qualifie. Les scores et zones detectees sont indicatifs et dependent de la qualite de l'image fournie. Des defauts non visibles en surface (charpente, sous-couverture, isolation interne) ne peuvent pas etre detectes par ce procede. ACO-HABITAT decline toute responsabilite en cas de decisions prises sur la seule base de ce rapport. Avant tout engagement de travaux, faites realiser une inspection physique par un couvreur professionnel."
   const legalLines = doc.splitTextToSize(legalText, contentW - 8)
   doc.text(legalLines, margin + 4, y + 12)
 
   addText("ACO-HABITAT - Plateforme independante non affiliee a des prestataires de travaux.", margin + 4, y + 28, 6, "bold", [120, 80, 20])
+  addText("Trouvez un couvreur pres de chez vous sur aco-habitat.fr - CGU completes sur aco-habitat.fr/mentions-legales", margin + 4, y + 34, 6, "normal", [120, 80, 20])
 
   // ═══════════════════════════════════════
   // Footer on every page

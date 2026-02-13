@@ -134,6 +134,13 @@ export default function MentionsLegalesPage() {
                 couvreur choisi. Aucune garantie n{"'"}est accordee quant a la qualite, les delais ou les
                 tarifs des prestataires referencies.
               </p>
+              <p>
+                <strong className="text-foreground">Recherche via Google Maps :</strong> La fonctionnalite de
+                recherche de couvreurs utilise exclusivement l{"'"}API Google Maps Embed. Les resultats affiches
+                sont fournis par Google LLC. ACO-HABITAT n{"'"}a aucun controle sur les resultats de recherche,
+                les avis affiches ou les informations des etablissements. Le site agit uniquement comme
+                outil de visualisation de donnees publiques fournies par Google.
+              </p>
             </div>
           </section>
 
