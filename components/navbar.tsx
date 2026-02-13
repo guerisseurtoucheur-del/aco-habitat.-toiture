@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { Menu, X, Zap, Phone, Mail } from "lucide-react"
+import { Menu, X, Zap, Phone, Mail, Satellite } from "lucide-react"
 
 const navLinks = [
   { href: "#services", label: "Services" },
@@ -17,11 +17,29 @@ const navLinks = [
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const [currentTime, setCurrentTime] = useState<string>("")
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20)
     window.addEventListener("scroll", handleScroll, { passive: true })
     return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
+
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date()
+      setCurrentTime(
+        now.toLocaleTimeString("fr-FR", {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          timeZone: "Europe/Paris",
+        })
+      )
+    }
+    updateTime()
+    const interval = setInterval(updateTime, 1000)
+    return () => clearInterval(interval)
   }, [])
 
   return (
@@ -50,9 +68,23 @@ export function Navbar() {
               <span className="font-medium">aco.habitat@orange.fr</span>
             </a>
           </div>
-          <span className="hidden text-xs text-muted-foreground sm:block">
-            Intervention sur toute la France
-          </span>
+          <div className="hidden items-center gap-4 sm:flex">
+            <span className="text-xs text-muted-foreground">
+              Intervention sur toute la France
+            </span>
+            {currentTime && (
+              <>
+                <span className="h-3 w-px bg-border" />
+                <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <Satellite size={11} className="text-primary" />
+                  <span className="font-mono text-[11px] tracking-wider tabular-nums text-primary/80">
+                    {currentTime}
+                  </span>
+                  <span className="text-[9px] text-muted-foreground/60 uppercase tracking-widest">UTC+1</span>
+                </span>
+              </>
+            )}
+          </div>
         </div>
       </div>
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
