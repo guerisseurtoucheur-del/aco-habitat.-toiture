@@ -84,52 +84,7 @@ export function PricingSection() {
           </div>
         </div>
 
-        {/* Comparison */}
-        <div className="mx-auto mt-16 max-w-3xl">
-          <h3 className="text-center text-sm font-semibold uppercase tracking-widest text-muted-foreground">
-            Pourquoi 19,90 EUR ?
-          </h3>
-          <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
-            {[
-              {
-                title: "Expert sur place",
-                price: "150 - 300 EUR",
-                desc: "Deplacement + attente de RDV",
-                highlight: false,
-              },
-              {
-                title: "ACO-HABITAT IA",
-                price: "19,90 EUR",
-                desc: "Instantane, depuis chez vous",
-                highlight: true,
-              },
-              {
-                title: "Drone professionnel",
-                price: "200 - 500 EUR",
-                desc: "Operateur + post-traitement",
-                highlight: false,
-              },
-            ].map((item) => (
-              <div
-                key={item.title}
-                className={`flex flex-col items-center gap-2 rounded-2xl border p-6 text-center ${
-                  item.highlight
-                    ? "border-primary/30 bg-primary/5"
-                    : "border-border bg-card/30"
-                }`}
-              >
-                <span className="text-xs font-medium text-muted-foreground">{item.title}</span>
-                <span
-                  className={`text-2xl font-bold ${item.highlight ? "text-primary" : "text-foreground"}`}
-                  style={{ fontFamily: "var(--font-heading)" }}
-                >
-                  {item.price}
-                </span>
-                <span className="text-xs text-muted-foreground">{item.desc}</span>
-              </div>
-            ))}
-          </div>
-        </div>
+
       </div>
     </section>
   )
