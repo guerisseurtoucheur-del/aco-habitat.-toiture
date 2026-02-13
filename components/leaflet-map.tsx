@@ -408,15 +408,25 @@ export default function LeafletMap({
       const east = captureBounds.getEast()
       const captureCenter = captureBounds.getCenter()
 
-      // Request a square 1600x1600 image for the ~35m selection box
-      // This gives ~2cm/pixel resolution -- sharp enough to see individual tiles
+      // Calculate native pixel dimensions from the zone's real-world size
+      // IGN ORTHOIMAGERY.ORTHOPHOTOS native resolution = 20cm/pixel
+      // Requesting more pixels than native causes server-side upscale artefacts
+      const NATIVE_RES = 0.20 // metres per pixel
+      const latMeters = (north - south) * 110540
+      const lngMeters = (east - west) * 111320 * Math.cos(((north + south) / 2) * Math.PI / 180)
+      const nativeW = Math.round(lngMeters / NATIVE_RES)
+      const nativeH = Math.round(latMeters / NATIVE_RES)
+      // Clamp between 256 and 2048 to avoid too-small or too-large requests
+      const reqW = Math.min(Math.max(nativeW, 256), 2048)
+      const reqH = Math.min(Math.max(nativeH, 256), 2048)
+
       const response = await fetch("/api/map-capture", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           bounds: { south, west, north, east },
-          width: 1600,
-          height: 1600,
+          width: reqW,
+          height: reqH,
         }),
       })
 
