@@ -562,7 +562,34 @@ export function DiagnosticTool() {
     }
   }, [formattedAddress])
 
-  // Handle photo upload -> run AI analysis directly
+  // Compress image to max 1600px and JPEG quality 0.85 to stay under API body limits
+  const compressImage = useCallback((file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const img = new window.Image()
+      img.crossOrigin = "anonymous"
+      img.onload = () => {
+        const MAX_SIZE = 1600
+        let w = img.width
+        let h = img.height
+        if (w > MAX_SIZE || h > MAX_SIZE) {
+          const ratio = Math.min(MAX_SIZE / w, MAX_SIZE / h)
+          w = Math.round(w * ratio)
+          h = Math.round(h * ratio)
+        }
+        const canvas = document.createElement("canvas")
+        canvas.width = w
+        canvas.height = h
+        const ctx = canvas.getContext("2d")
+        if (!ctx) return reject(new Error("Canvas non supporte"))
+        ctx.drawImage(img, 0, 0, w, h)
+        resolve(canvas.toDataURL("image/jpeg", 0.85))
+      }
+      img.onerror = () => reject(new Error("Impossible de charger l'image"))
+      img.src = URL.createObjectURL(file)
+    })
+  }, [])
+
+  // Handle photo upload -> compress + run AI analysis directly
   const handlePhotoUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (!file) return
@@ -574,59 +601,55 @@ export function DiagnosticTool() {
       return
     }
 
-    // Validate file size (max 10MB)
-    if (file.size > 10 * 1024 * 1024) {
-      setError("L'image est trop volumineuse. Maximum 10 Mo.")
+    // Validate file size (max 20MB raw, will be compressed)
+    if (file.size > 20 * 1024 * 1024) {
+      setError("L'image est trop volumineuse. Maximum 20 Mo.")
       return
     }
 
-    // Convert to base64
-    const reader = new FileReader()
-    reader.onload = async () => {
-      const imageBase64 = reader.result as string
+    try {
+      // Compress image to avoid exceeding API body size limits
+      const imageBase64 = await compressImage(file)
       setCapturedImage(imageBase64)
       setFormattedAddress("Photo uploadee par l'utilisateur")
       setStep("scanning")
 
-      try {
-        await new Promise((r) => setTimeout(r, 3000))
-        setStep("analyzing")
+      await new Promise((r) => setTimeout(r, 3000))
+      setStep("analyzing")
 
-        const diagRes = await fetch("/api/diagnostic", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            image: imageBase64,
-            address: "Photo uploadee",
-            measurements: [],
-            bounds: null,
-            zoom: null,
-          }),
-        })
-        const diagData = await diagRes.json()
+      const diagRes = await fetch("/api/diagnostic", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          image: imageBase64,
+          address: "Photo uploadee",
+          measurements: [],
+          bounds: null,
+          zoom: null,
+        }),
+      })
+      const diagData = await diagRes.json()
 
-        if (!diagRes.ok) {
-          setError(diagData.error || "Erreur lors de l'analyse IA.")
-          setStep("address")
-          return
-        }
-
-        setDiagnostic(ensureRealisticZones(diagData.diagnostic))
-        setStep("results")
-
-        setTimeout(() => {
-          resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
-        }, 300)
-      } catch {
-        setError("Une erreur est survenue. Verifiez votre connexion et reessayez.")
+      if (!diagRes.ok) {
+        setError(diagData.error || "Erreur lors de l'analyse IA.")
         setStep("address")
+        return
       }
+
+      setDiagnostic(ensureRealisticZones(diagData.diagnostic))
+      setStep("results")
+
+      setTimeout(() => {
+        resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
+      }, 300)
+    } catch {
+      setError("Une erreur est survenue. Verifiez votre connexion et reessayez.")
+      setStep("address")
     }
-    reader.readAsDataURL(file)
 
     // Reset input so the same file can be re-selected
     if (fileInputRef.current) fileInputRef.current.value = ""
-  }, [])
+  }, [compressImage])
 
   // Keep ref in sync so auto-launch works from selection/geolocation
   useEffect(() => {

@@ -1,6 +1,8 @@
 import { generateText, Output } from "ai"
 import { diagnosticSchema } from "@/lib/diagnostic-types"
 
+export const maxDuration = 60
+
 export async function POST(req: Request) {
   const { image, address, measurements, bounds, zoom } = await req.json()
 
@@ -34,7 +36,8 @@ export async function POST(req: Request) {
       {
         role: "system",
         content: `Tu es un expert couvreur-charpentier avec 20 ans d'experience.
-Analyse cette image aerienne de toiture (ortho-photo IGN vue du dessus) avec la rigueur d'un diagnostic professionnel.
+Analyse cette image de toiture avec la rigueur d'un diagnostic professionnel.
+L'image peut etre : une ortho-photo IGN vue du dessus, une photo drone, une photo prise depuis le sol avec un smartphone, ou une capture Google Maps. Adapte ton analyse a l'angle de vue disponible.
 ${measurementContext}${boundsContext}
 
 Examine et commente CHACUN de ces points si visible :
@@ -71,7 +74,7 @@ Sois precis, technique et professionnel. Si un element n'est pas visible, indiqu
         content: [
           {
             type: "text",
-            text: "Analyse cette image aerienne IGN avec ton expertise de couvreur-charpentier. Decris avec precision et rigueur professionnelle chaque element que tu observes.",
+            text: "Analyse cette image de toiture avec ton expertise de couvreur-charpentier. Decris avec precision et rigueur professionnelle chaque element que tu observes. Adapte-toi a l'angle de vue (aerien, drone, sol).",
           },
           {
             type: "image",
