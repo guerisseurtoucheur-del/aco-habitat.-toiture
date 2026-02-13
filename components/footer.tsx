@@ -1,3 +1,4 @@
+import Image from "next/image"
 import { Zap, Star, ExternalLink } from "lucide-react"
 
 interface FooterLink {
@@ -85,8 +86,14 @@ export function Footer() {
             {/* Brand */}
             <div className="flex flex-col gap-4">
               <div className="flex items-center gap-3">
-                <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-primary">
-                  <span className="text-sm font-bold text-primary-foreground font-sans">A</span>
+                <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full">
+                  <Image
+                    src="/images/logo-aco-habitat.png"
+                    alt="Logo ACO-HABITAT"
+                    width={48}
+                    height={48}
+                    className="object-cover"
+                  />
                 </div>
                 <div className="flex flex-col">
                   <span className="text-base font-bold text-foreground leading-tight">ACO-HABITAT</span>

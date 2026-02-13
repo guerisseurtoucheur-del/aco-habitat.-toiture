@@ -46,6 +46,14 @@ export const metadata: Metadata = {
     locale: "fr_FR",
     siteName: "ACO-HABITAT",
     url: "https://aco-habitat.fr",
+    images: [
+      {
+        url: "/images/logo-aco-habitat.png",
+        width: 1024,
+        height: 1024,
+        alt: "ACO-HABITAT - Expert Couverture & Charpente - Diagnostic Toiture IA",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
@@ -93,6 +101,8 @@ export default function RootLayout({
               description:
                 "Expert couverture et charpente sur toute la France. Diagnostic toiture par intelligence artificielle. Reparation, renovation, isolation, demoussage et travaux de charpente.",
               url: "https://aco-habitat.fr",
+              logo: "https://aco-habitat.fr/images/logo-aco-habitat.png",
+              image: "https://aco-habitat.fr/images/logo-aco-habitat.png",
               telephone: "+33233311979",
               email: "aco.habitat@orange.fr",
               areaServed: {

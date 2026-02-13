@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
+import Image from "next/image"
 import { Menu, X, Zap, Phone, Mail } from "lucide-react"
 
 const navLinks = [
@@ -56,9 +57,16 @@ export function Navbar() {
       </div>
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
         <Link href="/" className="flex items-center gap-3 group">
-          <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-primary transition-transform group-hover:scale-105">
-            <span className="text-sm font-bold text-primary-foreground font-sans tracking-wide">A</span>
-            <div className="absolute inset-0 rounded-xl bg-primary/50 blur-lg opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full transition-transform group-hover:scale-105">
+            <Image
+              src="/images/logo-aco-habitat.png"
+              alt="Logo ACO-HABITAT"
+              width={44}
+              height={44}
+              className="object-cover"
+              priority
+            />
+            <div className="absolute inset-0 rounded-full ring-1 ring-primary/20 group-hover:ring-primary/40 transition-all" />
           </div>
           <div className="flex flex-col">
             <span className="text-base font-bold tracking-tight text-foreground font-sans leading-tight">

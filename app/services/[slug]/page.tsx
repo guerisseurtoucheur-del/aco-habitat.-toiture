@@ -1,6 +1,7 @@
 import type { Metadata } from "next"
 import { notFound } from "next/navigation"
 import Link from "next/link"
+import Image from "next/image"
 import { ArrowLeft, ArrowRight, CheckCircle, Phone, Zap } from "lucide-react"
 import { servicesData, getServiceBySlug, getAllServiceSlugs } from "@/lib/services-data"
 
@@ -81,8 +82,16 @@ export default async function ServicePage({
               href="/"
               className="flex items-center gap-3 group"
             >
-              <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-primary transition-transform group-hover:scale-105">
-                <span className="text-sm font-bold text-primary-foreground font-sans tracking-wide">A</span>
+              <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full transition-transform group-hover:scale-105">
+                <Image
+                  src="/images/logo-aco-habitat.png"
+                  alt="Logo ACO-HABITAT"
+                  width={44}
+                  height={44}
+                  className="object-cover"
+                  priority
+                />
+                <div className="absolute inset-0 rounded-full ring-1 ring-primary/20 group-hover:ring-primary/40 transition-all" />
               </div>
               <div className="flex flex-col">
                 <span className="text-base font-bold tracking-tight text-foreground font-sans leading-tight">
