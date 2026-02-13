@@ -31,8 +31,10 @@ export async function POST(req: Request) {
     let contentType = response.headers.get("content-type") || ""
 
     // Fallback si HR echoue ou renvoie une erreur XML
+    // ORTHOIMAGERY.ORTHOPHOTOS est un nom WMTS, pas WMS-R
+    // Sur wms-r, le fallback correct est GEOGRAPHICALGRIDSYSTEMS.MAPS
     if (!response.ok || contentType.includes("xml") || contentType.includes("text")) {
-      response = await fetch(buildWmsUrl("ORTHOIMAGERY.ORTHOPHOTOS"))
+      response = await fetch(buildWmsUrl("GEOGRAPHICALGRIDSYSTEMS.MAPS"))
       contentType = response.headers.get("content-type") || ""
     }
 
