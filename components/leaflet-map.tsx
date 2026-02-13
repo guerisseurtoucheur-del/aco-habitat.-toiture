@@ -139,7 +139,15 @@ export default function LeafletMap({
       maxNativeZoom: 19,
       tileSize: 256,
       attribution: ATTRIBUTION,
+      errorTileUrl: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPj/HwADBwIAMCbHYQAAAABJRU5ErkJggg==",
     }).addTo(map)
+
+    // Handle tile loading errors: make failed tiles transparent instead of black
+    tileLayer.on("tileerror", (e: any) => {
+      if (e.tile) {
+        e.tile.style.opacity = "0"
+      }
+    })
 
     // Place marker on the exact geocoded coordinates
     const addressMarker = L.marker([center.lat, center.lng], {
@@ -283,7 +291,18 @@ export default function LeafletMap({
     map.removeLayer(tileLayerRef.current)
 
     const url = activeLayer === "satellite" ? IGN_ORTHO : activeLayer === "plan" ? IGN_PLAN : IGN_ORTHO
-    const newLayer = L.tileLayer(url, { maxZoom: 21, maxNativeZoom: 19, tileSize: 256, attribution: ATTRIBUTION }).addTo(map)
+    const newLayer = L.tileLayer(url, {
+      maxZoom: 21,
+      maxNativeZoom: 19,
+      tileSize: 256,
+      attribution: ATTRIBUTION,
+      errorTileUrl: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPj/HwADBwIAMCbHYQAAAABJRU5ErkJggg==",
+    }).addTo(map)
+    newLayer.on("tileerror", (e: any) => {
+      if (e.tile) {
+        e.tile.style.opacity = "0"
+      }
+    })
     tileLayerRef.current = newLayer
   }, [activeLayer])
 
@@ -293,13 +312,20 @@ export default function LeafletMap({
     const map = mapRef.current
 
     if (showCadastre && !cadastreLayerRef.current) {
-      cadastreLayerRef.current = L.tileLayer(IGN_CADASTRE, {
+      const cadastreLayer = L.tileLayer(IGN_CADASTRE, {
         maxZoom: 21,
         maxNativeZoom: 19,
         tileSize: 256,
         attribution: ATTRIBUTION,
         opacity: 0.7,
+        errorTileUrl: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPj/HwADBwIAMCbHYQAAAABJRU5ErkJggg==",
       }).addTo(map)
+      cadastreLayer.on("tileerror", (e: any) => {
+        if (e.tile) {
+          e.tile.style.opacity = "0"
+        }
+      })
+      cadastreLayerRef.current = cadastreLayer
     } else if (!showCadastre && cadastreLayerRef.current) {
       map.removeLayer(cadastreLayerRef.current)
       cadastreLayerRef.current = null
