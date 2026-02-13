@@ -494,66 +494,66 @@ export default function LeafletMap({
       />
 
       {/* Custom toolbar overlay */}
-      <div className="absolute top-3 left-3 z-[1000] flex flex-col gap-2">
+      <div className="absolute top-3 left-3 z-[1000] flex items-start gap-2">
         {/* Layer switcher */}
         <div className="relative">
           <button
             onClick={() => setShowLayerMenu(!showLayerMenu)}
-            className="flex items-center gap-2 rounded-lg border border-border bg-card/95 px-3 py-2 text-xs font-medium text-foreground shadow-lg backdrop-blur-md transition-colors hover:bg-secondary"
+            className="flex items-center gap-2 rounded-lg border border-border bg-card px-3 py-2 text-xs font-medium text-foreground shadow-lg backdrop-blur-md transition-colors hover:bg-secondary"
           >
             <Layers size={14} />
-            <span className="hidden sm:inline">Couches</span>
+            Couches
           </button>
           {showLayerMenu && (
-            <div className="absolute top-full left-0 mt-1 w-44 rounded-xl border border-border bg-card p-2 shadow-xl backdrop-blur-md">
+            <div className="absolute left-0 top-full mt-2 w-48 rounded-xl border border-border bg-card p-2 shadow-2xl" style={{ zIndex: 9999 }}>
               <button
                 onClick={() => { setActiveLayer("satellite"); setShowLayerMenu(false) }}
-                className={`flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs transition-colors ${activeLayer === "satellite" ? "bg-primary/20 text-primary" : "text-foreground hover:bg-secondary"}`}
+                className={`flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-xs font-medium transition-colors ${activeLayer === "satellite" ? "bg-primary/20 text-primary" : "text-foreground hover:bg-secondary"}`}
               >
-                <Mountain size={12} />
+                <Mountain size={14} />
                 Satellite IGN
               </button>
               <button
                 onClick={() => { setActiveLayer("plan"); setShowLayerMenu(false) }}
-                className={`flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs transition-colors ${activeLayer === "plan" ? "bg-primary/20 text-primary" : "text-foreground hover:bg-secondary"}`}
+                className={`flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-xs font-medium transition-colors ${activeLayer === "plan" ? "bg-primary/20 text-primary" : "text-foreground hover:bg-secondary"}`}
               >
-                <MapIcon size={12} />
+                <MapIcon size={14} />
                 Plan IGN
               </button>
-              <div className="my-1 border-t border-border" />
+              <div className="my-1.5 border-t border-border" />
               <button
                 onClick={() => { setShowCadastre(!showCadastre); setShowLayerMenu(false) }}
-                className={`flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-xs transition-colors ${showCadastre ? "bg-primary/20 text-primary" : "text-foreground hover:bg-secondary"}`}
+                className={`flex w-full items-center gap-2 rounded-lg px-3 py-2.5 text-left text-xs font-medium transition-colors ${showCadastre ? "bg-primary/20 text-primary" : "text-foreground hover:bg-secondary"}`}
               >
-                <Landmark size={12} />
+                <Landmark size={14} />
                 Cadastre {showCadastre ? "(actif)" : ""}
               </button>
             </div>
           )}
         </div>
 
-        {/* Measurement tools */}
+        {/* Measurement tools - horizontal row */}
         <button
           onClick={startDrawPolygon}
-          className={`flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-xs font-medium shadow-lg backdrop-blur-md transition-colors ${drawMode === "polygon" ? "bg-primary text-primary-foreground" : "bg-card/95 text-foreground hover:bg-secondary"}`}
+          className={`flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-xs font-medium shadow-lg backdrop-blur-md transition-colors ${drawMode === "polygon" ? "bg-primary text-primary-foreground" : "bg-card text-foreground hover:bg-secondary"}`}
         >
           <Maximize2 size={14} />
-          <span className="hidden sm:inline">Surface</span>
+          Surface
         </button>
         <button
           onClick={startDrawPolyline}
-          className={`flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-xs font-medium shadow-lg backdrop-blur-md transition-colors ${drawMode === "polyline" ? "bg-accent text-accent-foreground" : "bg-card/95 text-foreground hover:bg-secondary"}`}
+          className={`flex items-center gap-2 rounded-lg border border-border px-3 py-2 text-xs font-medium shadow-lg backdrop-blur-md transition-colors ${drawMode === "polyline" ? "bg-accent text-accent-foreground" : "bg-card text-foreground hover:bg-secondary"}`}
         >
           <Ruler size={14} />
-          <span className="hidden sm:inline">Longueur</span>
+          Longueur
         </button>
         {measurements.length > 0 && (
           <button
             onClick={clearDrawings}
-            className="flex items-center gap-2 rounded-lg border border-destructive/50 bg-card/95 px-3 py-2 text-xs font-medium text-destructive shadow-lg backdrop-blur-md transition-colors hover:bg-destructive/10"
+            className="flex items-center gap-2 rounded-lg border border-destructive/50 bg-card px-3 py-2 text-xs font-medium text-destructive shadow-lg backdrop-blur-md transition-colors hover:bg-destructive/10"
           >
             <Trash2 size={14} />
-            <span className="hidden sm:inline">Effacer</span>
+            Effacer
           </button>
         )}
       </div>
