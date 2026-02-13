@@ -1466,26 +1466,30 @@ export function DiagnosticTool() {
                   RAPPORT COMPLET
                 </div>
                 <h3 className="mb-2 text-2xl font-bold text-foreground" style={{ fontFamily: "var(--font-heading)" }}>
-                  {"Generer mon rapport d'entretien PDF complet"}
+                  {"Telecharger mon rapport PDF complet"}
                 </h3>
                 <p className="mx-auto mb-6 max-w-lg text-sm text-muted-foreground">
-                  Recevez un document professionnel detaille avec photos satellite annotees,
-                  scores de diagnostic, zones detectees et recommandations d{"'"}intervention.
+                  Document professionnel detaille avec photo satellite, scores de diagnostic,
+                  zones detectees, analyse thermique et recommandations d{"'"}intervention.
                 </p>
                 <button
-                  onClick={() => {
-                    const link = document.createElement("a")
-                    link.href = "#contact"
-                    link.click()
+                  onClick={async () => {
+                    const { generateDiagnosticPDF } = await import("@/lib/generate-pdf")
+                    await generateDiagnosticPDF(
+                      diagnostic,
+                      capturedImage || "",
+                      formattedAddress,
+                      mapMeasurements
+                    )
                   }}
                   className="group relative inline-flex items-center gap-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-8 py-4 text-base font-bold text-white shadow-lg shadow-cyan-500/25 transition-all hover:shadow-xl hover:shadow-cyan-500/30"
                 >
                   <Download size={20} />
-                  Generer mon rapport PDF complet
+                  Telecharger le rapport PDF
                   <span className="ml-1 rounded-md bg-white/20 px-2 py-0.5 text-[10px] font-semibold">GRATUIT</span>
                 </button>
                 <p className="mt-3 text-[10px] text-muted-foreground">
-                  Le rapport sera envoye par email apres verification par nos experts.
+                  Telechargement instantane - Aucune inscription requise
                 </p>
               </div>
             </div>
