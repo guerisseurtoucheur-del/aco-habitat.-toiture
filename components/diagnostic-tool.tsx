@@ -27,6 +27,9 @@ import {
   Flame,
   MapPinned,
   Ruler,
+  Upload,
+  Camera,
+  ImageIcon,
 } from "lucide-react"
 import type { DiagnosticResult, DiagnosticZone } from "@/lib/diagnostic-types"
 import type { MapCaptureData, MapMeasurement } from "./leaflet-map"
@@ -375,6 +378,8 @@ export function DiagnosticTool() {
   const [formattedAddress, setFormattedAddress] = useState("")
   const [diagnostic, setDiagnostic] = useState<DiagnosticResult | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [uploadMode, setUploadMode] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const resultsRef = useRef<HTMLDivElement>(null)
   const handleSearchRef = useRef<() => void>(() => {})
 
@@ -557,6 +562,72 @@ export function DiagnosticTool() {
     }
   }, [formattedAddress])
 
+  // Handle photo upload -> run AI analysis directly
+  const handlePhotoUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setError(null)
+
+    // Validate file type
+    if (!file.type.startsWith("image/")) {
+      setError("Veuillez selectionner une image (JPG, PNG, WEBP).")
+      return
+    }
+
+    // Validate file size (max 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      setError("L'image est trop volumineuse. Maximum 10 Mo.")
+      return
+    }
+
+    // Convert to base64
+    const reader = new FileReader()
+    reader.onload = async () => {
+      const imageBase64 = reader.result as string
+      setCapturedImage(imageBase64)
+      setFormattedAddress("Photo uploadee par l'utilisateur")
+      setStep("scanning")
+
+      try {
+        await new Promise((r) => setTimeout(r, 3000))
+        setStep("analyzing")
+
+        const diagRes = await fetch("/api/diagnostic", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            image: imageBase64,
+            address: "Photo uploadee",
+            measurements: [],
+            bounds: null,
+            zoom: null,
+          }),
+        })
+        const diagData = await diagRes.json()
+
+        if (!diagRes.ok) {
+          setError(diagData.error || "Erreur lors de l'analyse IA.")
+          setStep("address")
+          return
+        }
+
+        setDiagnostic(ensureRealisticZones(diagData.diagnostic))
+        setStep("results")
+
+        setTimeout(() => {
+          resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
+        }, 300)
+      } catch {
+        setError("Une erreur est survenue. Verifiez votre connexion et reessayez.")
+        setStep("address")
+      }
+    }
+    reader.readAsDataURL(file)
+
+    // Reset input so the same file can be re-selected
+    if (fileInputRef.current) fileInputRef.current.value = ""
+  }, [])
+
   // Keep ref in sync so auto-launch works from selection/geolocation
   useEffect(() => {
     handleSearchRef.current = handleSearch
@@ -572,6 +643,7 @@ export function DiagnosticTool() {
     setMapMeasurements([])
     setDiagnostic(null)
     setError(null)
+    setUploadMode(false)
   }
 
   const getSeverityIcon = (score: number) => {
@@ -622,8 +694,8 @@ export function DiagnosticTool() {
             <span className="text-gradient">par satellite</span>
           </h2>
           <p className="text-lg leading-relaxed text-muted-foreground">
-            Entrez simplement votre adresse. Notre IA analyse l{"'"}image satellite
-            de votre toit et vous fournit un diagnostic complet en quelques secondes.
+            Entrez votre adresse pour une analyse satellite, ou uploadez directement
+            une photo (drone, smartphone). Diagnostic complet par IA en quelques secondes.
           </p>
         </div>
 
@@ -750,6 +822,51 @@ export function DiagnosticTool() {
                 </button>
               </div>
 
+              {/* Separator */}
+              <div className="relative my-6">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-border" />
+                </div>
+                <div className="relative flex justify-center">
+                  <span className="bg-card px-4 text-xs font-medium uppercase tracking-widest text-muted-foreground">
+                    ou analysez votre propre photo
+                  </span>
+                </div>
+              </div>
+
+              {/* Photo Upload Zone */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handlePhotoUpload}
+                className="hidden"
+                id="photo-upload"
+              />
+              <label
+                htmlFor="photo-upload"
+                className="group flex cursor-pointer flex-col items-center gap-4 rounded-xl border-2 border-dashed border-border bg-secondary/20 p-8 transition-all hover:border-primary/40 hover:bg-primary/5"
+              >
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 transition-transform group-hover:scale-110">
+                  <Camera size={24} className="text-primary" />
+                </div>
+                <div className="text-center">
+                  <p className="text-sm font-semibold text-foreground">
+                    Deposez une photo de votre toiture
+                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Photo drone, photo depuis le sol, capture Google Maps...
+                  </p>
+                  <p className="mt-2 text-[10px] text-muted-foreground/60">
+                    JPG, PNG ou WEBP - Max 10 Mo
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 rounded-lg bg-primary/10 px-4 py-2 text-xs font-semibold text-primary transition-colors group-hover:bg-primary/20">
+                  <Upload size={14} />
+                  Choisir une photo
+                </div>
+              </label>
+
               {error && (
                 <div className="mt-4 flex items-center gap-3 rounded-xl border border-destructive/30 bg-destructive/10 p-4">
                   <XCircle size={20} className="shrink-0 text-destructive" />
@@ -757,9 +874,10 @@ export function DiagnosticTool() {
                 </div>
               )}
 
-              <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
+              <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-4">
                 {[
-                  { icon: MapPinned, label: "Carte IGN HD", desc: "Ortho-photo IGN officielle" },
+                  { icon: MapPinned, label: "Carte IGN HD", desc: "Ortho-photo 20cm/pixel" },
+                  { icon: Camera, label: "Photo perso", desc: "Drone, smartphone, etc." },
                   { icon: Shield, label: "Sans deplacement", desc: "100% a distance" },
                   { icon: Zap, label: "Resultat en 30s", desc: "Analyse IA instantanee" },
                 ].map((f) => (
