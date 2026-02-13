@@ -26,7 +26,12 @@ const IGN_PLAN =
 const IGN_CADASTRE =
   "https://data.geopf.fr/wmts?SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0&LAYER=CADASTRALPARCELS.PARCELLAIRE_EXPRESS&STYLE=normal&FORMAT=image/png&TILEMATRIXSET=PM&TILEMATRIX={z}&TILEROW={y}&TILECOL={x}"
 
+/* ESRI World Imagery: global high-res satellite with no coverage gaps */
+const ESRI_SATELLITE =
+  "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
+
 const ATTRIBUTION = "&copy; <a href='https://www.ign.fr'>IGN</a>"
+const ESRI_ATTRIBUTION = "&copy; Esri, Maxar, Earthstar Geographics"
 
 /* Half-side of the auto selection box in degrees (~35m at mid-France latitudes) */
 const BOX_HALF_DEG = 0.00035
@@ -131,21 +136,26 @@ export default function LeafletMap({
     // Add zoom control top-right
     L.control.zoom({ position: "topright" }).addTo(map)
 
-    // Base tile layer (satellite by default)
-    // maxNativeZoom 19 = highest native IGN ORTHO tile with guaranteed coverage
-    // Leaflet upscales to zoom 20-21 for closer views
+    // ESRI World Imagery as fallback base layer (global coverage, no blue/black gaps)
+    L.tileLayer(ESRI_SATELLITE, {
+      maxZoom: 21,
+      maxNativeZoom: 19,
+      tileSize: 256,
+      attribution: ESRI_ATTRIBUTION,
+    }).addTo(map)
+
+    // IGN ORTHO overlay on top (higher resolution in France, transparent where missing)
     const tileLayer = L.tileLayer(IGN_ORTHO, {
       maxZoom: 21,
       maxNativeZoom: 19,
       tileSize: 256,
       attribution: ATTRIBUTION,
-      errorTileUrl: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPj/HwADBwIAMCbHYQAAAABJRU5ErkJggg==",
     }).addTo(map)
 
-    // Handle tile loading errors: make failed tiles transparent instead of black
+    // Hide IGN tiles that fail to load so ESRI shows through
     tileLayer.on("tileerror", (e: any) => {
       if (e.tile) {
-        e.tile.style.opacity = "0"
+        e.tile.style.display = "none"
       }
     })
 
@@ -296,11 +306,10 @@ export default function LeafletMap({
       maxNativeZoom: 19,
       tileSize: 256,
       attribution: ATTRIBUTION,
-      errorTileUrl: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPj/HwADBwIAMCbHYQAAAABJRU5ErkJggg==",
     }).addTo(map)
     newLayer.on("tileerror", (e: any) => {
       if (e.tile) {
-        e.tile.style.opacity = "0"
+        e.tile.style.display = "none"
       }
     })
     tileLayerRef.current = newLayer
@@ -318,11 +327,10 @@ export default function LeafletMap({
         tileSize: 256,
         attribution: ATTRIBUTION,
         opacity: 0.7,
-        errorTileUrl: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPj/HwADBwIAMCbHYQAAAABJRU5ErkJggg==",
       }).addTo(map)
       cadastreLayer.on("tileerror", (e: any) => {
         if (e.tile) {
-          e.tile.style.opacity = "0"
+          e.tile.style.display = "none"
         }
       })
       cadastreLayerRef.current = cadastreLayer
