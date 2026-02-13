@@ -318,22 +318,32 @@ export default function LeafletMap({
     const map = mapRef.current
     if (!map) return
 
-    // Instant position (no animation to avoid _leaflet_pos issues)
-    map.setView([center.lat, center.lng], 19, { animate: false })
+    try {
+      // Check map container is still in DOM
+      const container = map.getContainer()
+      if (!container || !container.parentNode) return
+
+      // Instant position (no animation to avoid _leaflet_pos issues)
+      map.setView([center.lat, center.lng], 19, { animate: false })
+    } catch {
+      // map was unmounted, safe to ignore
+      return
+    }
 
     // Delayed smooth animation - must check map is still alive
     const timeoutId = setTimeout(() => {
       try {
-        if (mapRef.current && mapRef.current.getContainer()) {
-          mapRef.current.flyTo([center.lat, center.lng], 19, {
+        const m = mapRef.current
+        if (m && m.getContainer() && m.getContainer().parentNode) {
+          m.flyTo([center.lat, center.lng], 19, {
             animate: true,
             duration: 0.8,
           })
         }
       } catch {
-        // map was unmounted between setView and flyTo, safe to ignore
+        // map was unmounted, safe to ignore
       }
-    }, 100)
+    }, 150)
 
     // Update marker to the exact geocoded position
     if (markerRef.current) {
