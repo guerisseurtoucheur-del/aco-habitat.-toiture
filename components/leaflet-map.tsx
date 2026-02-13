@@ -318,13 +318,21 @@ export default function LeafletMap({
     const map = mapRef.current
     if (!map) return
 
-    // Instant position then smooth animation to zoom 19
+    // Instant position (no animation to avoid _leaflet_pos issues)
     map.setView([center.lat, center.lng], 19, { animate: false })
-    setTimeout(() => {
-      map.flyTo([center.lat, center.lng], 19, {
-        animate: true,
-        duration: 0.8,
-      })
+
+    // Delayed smooth animation - must check map is still alive
+    const timeoutId = setTimeout(() => {
+      try {
+        if (mapRef.current && mapRef.current.getContainer()) {
+          mapRef.current.flyTo([center.lat, center.lng], 19, {
+            animate: true,
+            duration: 0.8,
+          })
+        }
+      } catch {
+        // map was unmounted between setView and flyTo, safe to ignore
+      }
     }, 100)
 
     // Update marker to the exact geocoded position
@@ -339,6 +347,8 @@ export default function LeafletMap({
         [center.lat + BOX_HALF_DEG, center.lng + BOX_HALF_DEG],
       ])
     }
+
+    return () => clearTimeout(timeoutId)
   }, [center.lat, center.lng, zoom])
 
   // Switch base tile layer
