@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Phone, Mail, MapPin, Clock, ArrowRight, CheckCircle, Loader2 } from "lucide-react"
+import { Phone, Mail, MapPin, Clock, ArrowRight, CheckCircle, Loader2, Star, ExternalLink } from "lucide-react"
 
 const contactInfo = [
   {
@@ -118,6 +118,55 @@ export function ContactSection() {
                   </Wrapper>
                 )
               })}
+            </div>
+
+            {/* Google Business CTA */}
+            <div className="mt-8 flex flex-col gap-4">
+              <a
+                href="https://g.page/r/YOUR_GOOGLE_BUSINESS_ID/review"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="group flex items-center justify-between rounded-2xl border border-accent/20 bg-accent/5 p-5 transition-all hover:border-accent/40 hover:bg-accent/10"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-accent/15">
+                    <Star size={20} className="fill-accent text-accent" />
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-foreground">
+                      Laissez-nous un avis Google
+                    </p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <div className="flex items-center gap-0.5">
+                        {[...Array(5)].map((_, i) => (
+                          <Star key={i} size={11} className="fill-accent text-accent" />
+                        ))}
+                      </div>
+                      <span className="text-xs text-muted-foreground">
+                        4.9/5 - Plus de 500 avis
+                      </span>
+                    </div>
+                  </div>
+                </div>
+                <ExternalLink
+                  size={16}
+                  className="text-muted-foreground transition-all group-hover:text-accent group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                />
+              </a>
+
+              {/* Google Maps embed */}
+              <div className="overflow-hidden rounded-2xl border border-border">
+                <iframe
+                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2600000!2d2.3514!3d48.8566!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2sACO-HABITAT!5e0!3m2!1sfr!2sfr!4v1700000000000"
+                  width="100%"
+                  height="200"
+                  style={{ border: 0, filter: "invert(90%) hue-rotate(180deg) contrast(0.9)" }}
+                  allowFullScreen
+                  loading="lazy"
+                  referrerPolicy="no-referrer-when-downgrade"
+                  title="Localisation ACO-HABITAT sur Google Maps"
+                />
+              </div>
             </div>
           </div>
 
