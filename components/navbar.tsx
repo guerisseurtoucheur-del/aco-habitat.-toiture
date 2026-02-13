@@ -6,12 +6,11 @@ import Image from "next/image"
 import { Menu, X, Zap, Phone, Mail, Satellite } from "lucide-react"
 
 const navLinks = [
-  { href: "#services", label: "Services" },
   { href: "#diagnostic", label: "Diagnostic IA" },
-  { href: "#methode", label: "Methode" },
-  { href: "#temoignages", label: "Temoignages" },
+  { href: "#methode", label: "Comment ca marche" },
+  { href: "#tarifs", label: "Tarifs" },
   { href: "#faq", label: "FAQ" },
-  { href: "#contact", label: "Contact" },
+  { href: "#couvreurs", label: "Trouver un couvreur" },
 ]
 
 export function Navbar() {
@@ -70,7 +69,7 @@ export function Navbar() {
           </div>
           <div className="hidden items-center gap-4 sm:flex">
             <span className="text-xs text-muted-foreground">
-              Intervention sur toute la France
+              Analyse par satellite disponible partout en France
             </span>
             {currentTime && (
               <>
@@ -105,7 +104,7 @@ export function Navbar() {
               ACO-HABITAT
             </span>
             <span className="text-[10px] font-medium text-muted-foreground tracking-widest uppercase">
-              Expert Couverture & Charpente
+              Diagnostic Toiture par IA
             </span>
           </div>
         </Link>
@@ -124,17 +123,17 @@ export function Navbar() {
 
         <div className="hidden lg:flex items-center gap-3">
           <a
-            href="tel:+33233311979"
+            href="#tarifs"
             className="rounded-lg border border-border px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-secondary"
           >
-            02 33 31 19 79
+            Voir les tarifs
           </a>
           <a
             href="#diagnostic"
             className="group relative flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition-all hover:shadow-lg hover:shadow-primary/25"
           >
             <Zap size={14} className="transition-transform group-hover:scale-110" />
-            Diagnostic gratuit
+            Analyser ma toiture - 9,90 EUR
           </a>
         </div>
 
@@ -162,11 +161,11 @@ export function Navbar() {
             ))}
             <div className="mt-4 flex flex-col gap-3">
               <a
-                href="tel:+33233311979"
+                href="#tarifs"
                 onClick={() => setMobileOpen(false)}
                 className="rounded-lg border border-border px-4 py-3 text-center text-sm font-medium text-foreground"
               >
-                02 33 31 19 79
+                Voir les tarifs
               </a>
               <a
                 href="#diagnostic"
@@ -174,7 +173,7 @@ export function Navbar() {
                 className="flex items-center justify-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-medium text-primary-foreground"
               >
                 <Zap size={14} />
-                Diagnostic gratuit
+                Analyser ma toiture - 9,90 EUR
               </a>
             </div>
           </div>

@@ -5,34 +5,34 @@ import { ChevronDown } from "lucide-react"
 
 const faqs = [
   {
-    question: "Comment fonctionne le diagnostic IA de toiture ?",
+    question: "Comment fonctionne le diagnostic IA ?",
     answer:
-      "Notre intelligence artificielle analyse votre photo satellite ou aerienne en superposant trois calques de diagnostic : vegetal (mousse, lichen), structure (tuiles cassees, deplacees) et etancheite (traces d'humidite, infiltrations). Le resultat est disponible en moins de 30 secondes.",
+      "Notre intelligence artificielle analyse votre photo satellite ou aerienne en superposant quatre calques de diagnostic : vegetal (mousse, lichen), structure (tuiles cassees, deplacees), etancheite (traces d'humidite, infiltrations) et thermique (deperditions de chaleur). Le resultat est disponible en moins de 30 secondes.",
   },
   {
-    question: "Quelle photo dois-je utiliser pour le diagnostic ?",
+    question: "Quelle photo dois-je utiliser ?",
     answer:
-      "Vous pouvez utiliser une capture d'ecran de Google Maps en vue satellite, une photo prise par drone, ou toute photo aerienne de votre toiture. Plus l'image est nette et recente, plus le diagnostic sera precis.",
+      "Vous pouvez utiliser notre carte satellite IGN integree (20cm/pixel), une capture Google Maps en vue satellite, une photo prise par drone, ou une photo prise depuis le sol avec votre smartphone. Plus l'image est nette et recente, plus le diagnostic sera precis.",
   },
   {
-    question: "Le diagnostic en ligne est-il vraiment gratuit ?",
+    question: "Combien coute un diagnostic ?",
     answer:
-      "Oui, le diagnostic IA en ligne est 100% gratuit et sans engagement. Vous recevez instantanement un rapport detaille avec les zones problematiques identifiees et des recommandations d'intervention.",
+      "Un diagnostic complet coute 9,90 EUR. Le paiement est securise par Stripe. Pas d'abonnement, pas de frais caches. Vous payez uniquement quand vous lancez une analyse. Le rapport PDF est genere instantanement.",
   },
   {
-    question: "Dans quelles zones intervenez-vous ?",
+    question: "Que contient le rapport PDF ?",
     answer:
-      "ACO-HABITAT intervient sur toute la France. Que vous soyez en Ile-de-France, en Normandie, dans le Nord ou partout ailleurs, nous nous deplacons pour diagnostiquer et reparer votre toiture.",
+      "Le rapport inclut : la photo analysee, les scores detailles par categorie (vegetal, structure, etancheite, thermique), les zones problematiques detectees avec leur localisation, les recommandations d'intervention prioritaires, et une estimation des couts de reparation.",
   },
   {
-    question: "Combien coute une intervention de reparation ?",
+    question: "Comment trouver un couvreur apres le diagnostic ?",
     answer:
-      "Le cout depend de la nature et de l'etendue des travaux identifies lors du diagnostic. Nous etablissons un devis gratuit et detaille avant toute intervention. Nos prix sont transparents et competitifs.",
+      "Notre annuaire de couvreurs vous permet de trouver un professionnel qualifie pres de chez vous. Vous pouvez lui transmettre directement votre rapport PDF pour obtenir un devis precis adapte aux problemes detectes.",
   },
   {
-    question: "Quelle est la precision du diagnostic IA ?",
+    question: "Le diagnostic est-il disponible partout en France ?",
     answer:
-      "Notre IA atteint un taux de precision de 98% pour la detection des problemes de vegetation, de structure et d'etancheite. Le diagnostic est ensuite valide par nos experts couvreurs avant toute intervention.",
+      "Oui, la couverture satellite IGN couvre l'integralite de la France metropolitaine avec une resolution de 20 cm par pixel. Vous pouvez aussi uploader vos propres photos pour n'importe quelle localisation.",
   },
 ]
 
@@ -54,10 +54,10 @@ export function FaqSection() {
             className="mt-4 text-balance text-3xl font-bold tracking-tight text-foreground md:text-4xl lg:text-5xl"
             style={{ fontFamily: "var(--font-heading)" }}
           >
-            Questions frequentes sur le diagnostic de toiture
+            Questions frequentes
           </h2>
           <p className="mt-4 text-pretty text-base leading-relaxed text-muted-foreground">
-            Tout ce que vous devez savoir sur notre service de diagnostic toiture par intelligence artificielle.
+            Tout ce que vous devez savoir sur notre diagnostic toiture par IA.
           </p>
         </div>
 

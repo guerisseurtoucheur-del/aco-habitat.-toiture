@@ -1,4 +1,4 @@
-import { Upload, Brain, FileText, Wrench } from "lucide-react"
+import { Upload, Brain, FileText, Search } from "lucide-react"
 
 const steps = [
   {
@@ -33,10 +33,10 @@ const steps = [
   },
   {
     number: "04",
-    icon: Wrench,
-    title: "Intervention pro",
+    icon: Search,
+    title: "Trouvez un couvreur",
     description:
-      "Si necessaire, notre equipe intervient rapidement pour les reparations identifiees.",
+      "Transmettez votre rapport PDF a un couvreur via notre annuaire pour obtenir un devis precis et adapte.",
     color: "text-vegetal-red",
     bgColor: "bg-vegetal-red/10",
     borderColor: "border-vegetal-red/20",
@@ -61,11 +61,12 @@ export function MethodSection() {
             className="mt-4 text-balance text-3xl font-bold tracking-tight text-foreground md:text-4xl lg:text-5xl"
             style={{ fontFamily: "var(--font-heading)" }}
           >
-            Comment diagnostiquer sa toiture ? Du diagnostic a l{"'"}intervention en{" "}
+
+            Du diagnostic au couvreur en{" "}
             <span className="text-gradient-accent">4 etapes</span>
           </h2>
           <p className="mt-4 text-pretty text-base leading-relaxed text-muted-foreground">
-            Un processus simple et transparent pour analyser et reparer votre toiture grace a l{"'"}intelligence artificielle.
+            Un processus simple et rapide pour analyser votre toiture et trouver un professionnel qualifie.
           </p>
         </div>
 

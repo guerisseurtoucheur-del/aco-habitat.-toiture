@@ -27,11 +27,15 @@ import {
   Flame,
   MapPinned,
   Ruler,
+  Upload,
+  Camera,
+  ImageIcon,
 } from "lucide-react"
 import type { DiagnosticResult, DiagnosticZone } from "@/lib/diagnostic-types"
 import type { MapCaptureData, MapMeasurement } from "./leaflet-map"
 
-/* Dynamic import of LeafletMap to avoid SSR issues with Leaflet */
+/* Dynamic imports to avoid SSR issues */
+const StripeCheckout = dynamic(() => import("./checkout"), { ssr: false })
 const LeafletMap = dynamic(() => import("./leaflet-map"), {
   ssr: false,
   loading: () => (
@@ -44,7 +48,7 @@ const LeafletMap = dynamic(() => import("./leaflet-map"), {
   ),
 })
 
-type Step = "address" | "map" | "scanning" | "analyzing" | "results"
+type Step = "address" | "map" | "payment" | "scanning" | "analyzing" | "results"
 type PlacePrediction = {
   placeId: string
   description: string
@@ -246,12 +250,12 @@ function AnomalyCard({
       </div>
       <p className="mb-3 text-xs leading-relaxed text-foreground/80">{zone.label}</p>
       <a
-        href="#contact"
+        href="#couvreurs"
         className="flex items-center justify-center gap-1.5 rounded-lg py-2 text-[10px] font-semibold text-primary-foreground transition-colors"
         style={{ backgroundColor: color }}
       >
         <Send size={10} />
-        Demander un devis
+        Trouver un couvreur
       </a>
     </div>
   )
@@ -375,6 +379,8 @@ export function DiagnosticTool() {
   const [formattedAddress, setFormattedAddress] = useState("")
   const [diagnostic, setDiagnostic] = useState<DiagnosticResult | null>(null)
   const [error, setError] = useState<string | null>(null)
+  const [uploadMode, setUploadMode] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
   const resultsRef = useRef<HTMLDivElement>(null)
   const handleSearchRef = useRef<() => void>(() => {})
 
@@ -514,34 +520,42 @@ export function DiagnosticTool() {
     }
   }, [address])
 
-  // Handle map capture -> run AI analysis
-  const handleMapCapture = useCallback(async (data: MapCaptureData) => {
+  // Pending capture data stored while user pays
+  const pendingCaptureRef = useRef<MapCaptureData | null>(null)
+
+  // Handle map capture -> go to payment
+  const handleMapCapture = useCallback((data: MapCaptureData) => {
     setCapturedImage(data.imageBase64)
     setMapMeasurements(data.measurements)
+    pendingCaptureRef.current = data
+    setStep("payment")
+  }, [])
+
+  // Run the actual AI diagnostic (called after successful payment)
+  const runDiagnostic = useCallback(async () => {
     setStep("scanning")
 
     try {
-      // Show scanning animation for 3 seconds
       await new Promise((r) => setTimeout(r, 3000))
       setStep("analyzing")
 
-      // Send the captured image to the AI diagnostic
+      const capture = pendingCaptureRef.current
       const diagRes = await fetch("/api/diagnostic", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          image: data.imageBase64,
+          image: capturedImage,
           address: formattedAddress,
-          measurements: data.measurements,
-          bounds: data.bounds,
-          zoom: data.zoom,
+          measurements: capture?.measurements || mapMeasurements,
+          bounds: capture?.bounds || null,
+          zoom: capture?.zoom || null,
         }),
       })
       const diagData = await diagRes.json()
 
       if (!diagRes.ok) {
         setError(diagData.error || "Erreur lors de l'analyse IA.")
-        setStep("map")
+        setStep("address")
         return
       }
 
@@ -553,9 +567,70 @@ export function DiagnosticTool() {
       }, 300)
     } catch {
       setError("Une erreur est survenue. Verifiez votre connexion et reessayez.")
-      setStep("map")
+      setStep("address")
     }
-  }, [formattedAddress])
+  }, [capturedImage, formattedAddress, mapMeasurements])
+
+  // Compress image to max 1600px and JPEG quality 0.85 to stay under API body limits
+  const compressImage = useCallback((file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const img = new window.Image()
+      img.crossOrigin = "anonymous"
+      img.onload = () => {
+        const MAX_SIZE = 1600
+        let w = img.width
+        let h = img.height
+        if (w > MAX_SIZE || h > MAX_SIZE) {
+          const ratio = Math.min(MAX_SIZE / w, MAX_SIZE / h)
+          w = Math.round(w * ratio)
+          h = Math.round(h * ratio)
+        }
+        const canvas = document.createElement("canvas")
+        canvas.width = w
+        canvas.height = h
+        const ctx = canvas.getContext("2d")
+        if (!ctx) return reject(new Error("Canvas non supporte"))
+        ctx.drawImage(img, 0, 0, w, h)
+        resolve(canvas.toDataURL("image/jpeg", 0.85))
+      }
+      img.onerror = () => reject(new Error("Impossible de charger l'image"))
+      img.src = URL.createObjectURL(file)
+    })
+  }, [])
+
+  // Handle photo upload -> compress + run AI analysis directly
+  const handlePhotoUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0]
+    if (!file) return
+    setError(null)
+
+    // Validate file type
+    if (!file.type.startsWith("image/")) {
+      setError("Veuillez selectionner une image (JPG, PNG, WEBP).")
+      return
+    }
+
+    // Validate file size (max 20MB raw, will be compressed)
+    if (file.size > 20 * 1024 * 1024) {
+      setError("L'image est trop volumineuse. Maximum 20 Mo.")
+      return
+    }
+
+    try {
+      // Compress image to avoid exceeding API body size limits
+      const imageBase64 = await compressImage(file)
+      setCapturedImage(imageBase64)
+      setFormattedAddress("Photo uploadee par l'utilisateur")
+      pendingCaptureRef.current = null
+      setStep("payment")
+    } catch {
+      setError("Une erreur est survenue. Verifiez votre connexion et reessayez.")
+      setStep("address")
+    }
+
+    // Reset input so the same file can be re-selected
+    if (fileInputRef.current) fileInputRef.current.value = ""
+  }, [compressImage])
 
   // Keep ref in sync so auto-launch works from selection/geolocation
   useEffect(() => {
@@ -572,6 +647,7 @@ export function DiagnosticTool() {
     setMapMeasurements([])
     setDiagnostic(null)
     setError(null)
+    setUploadMode(false)
   }
 
   const getSeverityIcon = (score: number) => {
@@ -597,11 +673,11 @@ export function DiagnosticTool() {
   const progressSteps = [
     { key: "address", label: "Adresse", icon: MapPin },
     { key: "map", label: "Carte IGN", icon: MapPinned },
+    { key: "payment", label: "Paiement", icon: Shield },
     { key: "scanning", label: "Scan", icon: Zap },
-    { key: "analyzing", label: "Analyse IA", icon: Brain },
     { key: "results", label: "Resultats", icon: FileText },
   ]
-  const stepsOrder: Step[] = ["address", "map", "scanning", "analyzing", "results"]
+  const stepsOrder: Step[] = ["address", "map", "payment", "scanning", "analyzing", "results"]
   const currentIndex = stepsOrder.indexOf(step)
 
   return (
@@ -622,8 +698,8 @@ export function DiagnosticTool() {
             <span className="text-gradient">par satellite</span>
           </h2>
           <p className="text-lg leading-relaxed text-muted-foreground">
-            Entrez simplement votre adresse. Notre IA analyse l{"'"}image satellite
-            de votre toit et vous fournit un diagnostic complet en quelques secondes.
+            Entrez votre adresse ou uploadez une photo (drone, smartphone).
+            Analyse complete par IA en 30 secondes. Rapport PDF inclus. 9,90 EUR.
           </p>
         </div>
 
@@ -750,6 +826,51 @@ export function DiagnosticTool() {
                 </button>
               </div>
 
+              {/* Separator */}
+              <div className="relative my-6">
+                <div className="absolute inset-0 flex items-center">
+                  <div className="w-full border-t border-border" />
+                </div>
+                <div className="relative flex justify-center">
+                  <span className="bg-card px-4 text-xs font-medium uppercase tracking-widest text-muted-foreground">
+                    ou analysez votre propre photo
+                  </span>
+                </div>
+              </div>
+
+              {/* Photo Upload Zone */}
+              <input
+                ref={fileInputRef}
+                type="file"
+                accept="image/*"
+                onChange={handlePhotoUpload}
+                className="hidden"
+                id="photo-upload"
+              />
+              <label
+                htmlFor="photo-upload"
+                className="group flex cursor-pointer flex-col items-center gap-4 rounded-xl border-2 border-dashed border-border bg-secondary/20 p-8 transition-all hover:border-primary/40 hover:bg-primary/5"
+              >
+                <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10 transition-transform group-hover:scale-110">
+                  <Camera size={24} className="text-primary" />
+                </div>
+                <div className="text-center">
+                  <p className="text-sm font-semibold text-foreground">
+                    Deposez une photo de votre toiture
+                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Photo drone, photo depuis le sol, capture Google Maps...
+                  </p>
+                  <p className="mt-2 text-[10px] text-muted-foreground/60">
+                    JPG, PNG ou WEBP - Max 10 Mo
+                  </p>
+                </div>
+                <div className="flex items-center gap-2 rounded-lg bg-primary/10 px-4 py-2 text-xs font-semibold text-primary transition-colors group-hover:bg-primary/20">
+                  <Upload size={14} />
+                  Choisir une photo
+                </div>
+              </label>
+
               {error && (
                 <div className="mt-4 flex items-center gap-3 rounded-xl border border-destructive/30 bg-destructive/10 p-4">
                   <XCircle size={20} className="shrink-0 text-destructive" />
@@ -757,9 +878,10 @@ export function DiagnosticTool() {
                 </div>
               )}
 
-              <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
+              <div className="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-4">
                 {[
-                  { icon: MapPinned, label: "Carte IGN HD", desc: "Ortho-photo IGN officielle" },
+                  { icon: MapPinned, label: "Carte IGN HD", desc: "Ortho-photo 20cm/pixel" },
+                  { icon: Camera, label: "Photo perso", desc: "Drone, smartphone, etc." },
                   { icon: Shield, label: "Sans deplacement", desc: "100% a distance" },
                   { icon: Zap, label: "Resultat en 30s", desc: "Analyse IA instantanee" },
                 ].map((f) => (
@@ -829,6 +951,71 @@ export function DiagnosticTool() {
                   ))}
                 </div>
               )}
+            </div>
+          </div>
+        )}
+
+        {/* Payment Step */}
+        {step === "payment" && (
+          <div className="mx-auto max-w-2xl">
+            <div className="rounded-2xl border border-border bg-card p-8">
+              {/* Header */}
+              <div className="mb-6 text-center">
+                <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl bg-primary/10">
+                  <Shield size={24} className="text-primary" />
+                </div>
+                <h3 className="text-xl font-bold text-foreground" style={{ fontFamily: "var(--font-heading)" }}>
+                  Finalisez votre diagnostic
+                </h3>
+                <p className="mt-2 text-sm text-muted-foreground">
+                  Paiement securise par Stripe. Rapport PDF complet inclus.
+                </p>
+              </div>
+
+              {/* Preview of captured image */}
+              {capturedImage && (
+                <div className="mb-6 overflow-hidden rounded-xl border border-border">
+                  <img
+                    src={capturedImage}
+                    alt="Apercu de la toiture"
+                    className="h-48 w-full object-cover"
+                  />
+                </div>
+              )}
+
+              {/* What you get */}
+              <div className="mb-6 rounded-xl bg-secondary/30 p-4">
+                <p className="mb-3 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                  Inclus dans votre diagnostic
+                </p>
+                <div className="grid grid-cols-2 gap-2">
+                  {[
+                    "Analyse vegetale (mousse, lichen)",
+                    "Analyse structurelle (tuiles, faitage)",
+                    "Analyse etancheite (infiltrations)",
+                    "Analyse thermique (deperditions)",
+                    "Scores detailles par zone",
+                    "Rapport PDF telechareable",
+                  ].map((item) => (
+                    <div key={item} className="flex items-center gap-2 text-xs text-foreground">
+                      <CheckCircle2 size={12} className="shrink-0 text-primary" />
+                      {item}
+                    </div>
+                  ))}
+                </div>
+              </div>
+
+              {/* Stripe Embedded Checkout */}
+              <div className="rounded-xl border border-border bg-background p-1">
+                <StripeCheckout
+                  productId="diagnostic-toiture"
+                  onComplete={() => runDiagnostic()}
+                />
+              </div>
+
+              <p className="mt-4 text-center text-[10px] text-muted-foreground">
+                Paiement securise 256-bit SSL. Vos donnees bancaires ne transitent jamais par nos serveurs.
+              </p>
             </div>
           </div>
         )}
@@ -1215,9 +1402,9 @@ export function DiagnosticTool() {
                           {hasThermique ? diagnostic.thermique.commentaire : "Pas de deperdition thermique significative."}
                         </p>
                         {hasThermique && (
-                          <a href="#contact" className="mt-2 inline-flex items-center gap-1 text-[10px] font-semibold text-orange-500 hover:underline">
+                          <a href="#couvreurs" className="mt-2 inline-flex items-center gap-1 text-[10px] font-semibold text-orange-500 hover:underline">
                             <Send size={8} />
-                            Bilan energetique gratuit
+                            Trouver un couvreur specialise
                           </a>
                         )}
                       </div>
@@ -1245,9 +1432,9 @@ export function DiagnosticTool() {
                           {hasEtancheite ? diagnostic.etancheite.description : "L'etancheite de votre toiture est en bon etat."}
                         </p>
                         {hasEtancheite && (
-                          <a href="#contact" className="mt-2 inline-flex items-center gap-1 text-[10px] font-semibold text-amber-500 hover:underline">
+                          <a href="#couvreurs" className="mt-2 inline-flex items-center gap-1 text-[10px] font-semibold text-amber-500 hover:underline">
                             <Send size={8} />
-                            Demander un devis etancheite
+                            Trouver un couvreur
                           </a>
                         )}
                       </div>
@@ -1325,26 +1512,30 @@ export function DiagnosticTool() {
                   RAPPORT COMPLET
                 </div>
                 <h3 className="mb-2 text-2xl font-bold text-foreground" style={{ fontFamily: "var(--font-heading)" }}>
-                  {"Generer mon rapport d'entretien PDF complet"}
+                  {"Telecharger mon rapport PDF complet"}
                 </h3>
                 <p className="mx-auto mb-6 max-w-lg text-sm text-muted-foreground">
-                  Recevez un document professionnel detaille avec photos satellite annotees,
-                  scores de diagnostic, zones detectees et recommandations d{"'"}intervention.
+                  Document professionnel detaille avec photo satellite, scores de diagnostic,
+                  zones detectees, analyse thermique et recommandations d{"'"}intervention.
                 </p>
                 <button
-                  onClick={() => {
-                    const link = document.createElement("a")
-                    link.href = "#contact"
-                    link.click()
+                  onClick={async () => {
+                    const { generateDiagnosticPDF } = await import("@/lib/generate-pdf")
+                    await generateDiagnosticPDF(
+                      diagnostic,
+                      capturedImage || "",
+                      formattedAddress,
+                      mapMeasurements
+                    )
                   }}
                   className="group relative inline-flex items-center gap-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-8 py-4 text-base font-bold text-white shadow-lg shadow-cyan-500/25 transition-all hover:shadow-xl hover:shadow-cyan-500/30"
                 >
                   <Download size={20} />
-                  Generer mon rapport PDF complet
-                  <span className="ml-1 rounded-md bg-white/20 px-2 py-0.5 text-[10px] font-semibold">GRATUIT</span>
+                  Telecharger le rapport PDF
+                  <span className="ml-1 rounded-md bg-white/20 px-2 py-0.5 text-[10px] font-semibold">INCLUS</span>
                 </button>
                 <p className="mt-3 text-[10px] text-muted-foreground">
-                  Le rapport sera envoye par email apres verification par nos experts.
+                  Telechargement instantane - Aucune inscription requise
                 </p>
               </div>
             </div>
@@ -1352,27 +1543,31 @@ export function DiagnosticTool() {
             {/* CTA */}
             <div className="rounded-2xl border border-primary/30 bg-gradient-to-r from-primary/10 to-transparent p-8 text-center">
               <h3 className="mb-2 text-2xl font-bold text-foreground" style={{ fontFamily: "var(--font-heading)" }}>
-                Besoin d{"'"}une intervention ?
+                Prochaine etape : trouver un couvreur
               </h3>
               <p className="mb-6 text-muted-foreground">
-                Nos experts peuvent intervenir sur toute la France pour reparer votre toiture.
+                Transmettez votre rapport PDF a un professionnel qualifie pour obtenir un devis precis.
               </p>
               <div className="flex flex-wrap items-center justify-center gap-4">
                 <a
-                  href="tel:+33233311979"
+                  href="#couvreurs"
                   className="flex items-center gap-2 rounded-xl bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90"
                 >
-                  <Phone size={16} />
-                  Appeler le 02 33 31 19 79
-                </a>
-                <a
-                  href="#contact"
-                  className="flex items-center gap-2 rounded-xl border border-border px-6 py-3 text-sm font-medium text-foreground transition-all hover:bg-secondary"
-                >
-                  <Send size={16} />
-                  Demander un devis
+                  <Search size={16} />
+                  Trouver un couvreur pres de chez moi
                 </a>
               </div>
+            </div>
+
+            {/* Legal disclaimer */}
+            <div className="mt-8 rounded-xl border border-amber-500/20 bg-amber-500/5 p-4">
+              <p className="text-[10px] leading-relaxed text-amber-200/70">
+                <strong className="text-amber-200/90">Avertissement :</strong> Ce diagnostic est une aide a la decision basee sur
+                l{"'"}analyse automatisee d{"'"}images par intelligence artificielle. Il ne remplace pas une inspection physique par un
+                professionnel qualifie. Les scores et zones detectees sont indicatifs. ACO-HABITAT est une plateforme independante
+                non affiliee a des prestataires de travaux.{" "}
+                <a href="/mentions-legales" className="underline hover:text-amber-200">Mentions legales et CGV</a>
+              </p>
             </div>
           </div>
         )}
