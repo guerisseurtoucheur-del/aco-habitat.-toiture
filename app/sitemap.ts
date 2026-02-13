@@ -13,11 +13,25 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "demoussage",
   ]
 
+  const guides = [
+    "diagnostic-toiture-satellite",
+    "quand-renover-toiture",
+    "prix-renovation-toiture",
+    "mousse-toiture-dangers",
+  ]
+
   const servicePages = services.map((service) => ({
     url: `${baseUrl}/services/${service}`,
     lastModified: new Date(),
     changeFrequency: "monthly" as const,
     priority: 0.8,
+  }))
+
+  const guidePages = guides.map((guide) => ({
+    url: `${baseUrl}/guide/${guide}`,
+    lastModified: new Date(),
+    changeFrequency: "monthly" as const,
+    priority: 0.7,
   }))
 
   return [
@@ -28,5 +42,6 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 1,
     },
     ...servicePages,
+    ...guidePages,
   ]
 }

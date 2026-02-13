@@ -21,6 +21,15 @@ const footerLinks: { title: string; links: FooterLink[] }[] = [
     ],
   },
   {
+    title: "Guides experts",
+    links: [
+      { label: "Diagnostic par satellite", href: "/guide/diagnostic-toiture-satellite" },
+      { label: "Quand renover sa toiture", href: "/guide/quand-renover-toiture" },
+      { label: "Prix renovation 2026", href: "/guide/prix-renovation-toiture" },
+      { label: "Dangers de la mousse", href: "/guide/mousse-toiture-dangers" },
+    ],
+  },
+  {
     title: "Entreprise",
     links: [
       { label: "Notre methode", href: "#methode" },

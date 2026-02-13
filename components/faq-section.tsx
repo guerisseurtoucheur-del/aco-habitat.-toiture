@@ -40,7 +40,11 @@ export function FaqSection() {
   const [openIndex, setOpenIndex] = useState<number | null>(0)
 
   return (
-    <section id="faq" className="relative border-y border-border bg-card/30 py-28">
+    <section
+      id="faq"
+      className="relative border-y border-border bg-card/30 py-28"
+      aria-label="Questions frequentes sur le diagnostic de toiture par IA"
+    >
       <div className="relative mx-auto max-w-3xl px-6">
         <div className="text-center">
           <span className="inline-block rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-xs font-medium text-primary tracking-wide">
@@ -50,14 +54,14 @@ export function FaqSection() {
             className="mt-4 text-balance text-3xl font-bold tracking-tight text-foreground md:text-4xl lg:text-5xl"
             style={{ fontFamily: "var(--font-heading)" }}
           >
-            Questions frequentes
+            Questions frequentes sur le diagnostic de toiture
           </h2>
           <p className="mt-4 text-pretty text-base leading-relaxed text-muted-foreground">
-            Tout ce que vous devez savoir sur notre service de diagnostic IA.
+            Tout ce que vous devez savoir sur notre service de diagnostic toiture par intelligence artificielle.
           </p>
         </div>
 
-        <div className="mt-14 flex flex-col gap-3">
+        <dl className="mt-14 flex flex-col gap-3">
           {faqs.map((faq, index) => {
             const isOpen = openIndex === index
             return (
@@ -67,31 +71,36 @@ export function FaqSection() {
                   isOpen ? "border-primary/30 bg-card/80" : "border-border bg-card/30 hover:bg-card/50"
                 }`}
               >
-                <button
-                  onClick={() => setOpenIndex(isOpen ? null : index)}
-                  className="flex w-full items-center justify-between px-6 py-5 text-left"
-                >
-                  <span className={`text-sm font-semibold pr-4 ${isOpen ? "text-foreground" : "text-foreground/80"}`}>
-                    {faq.question}
-                  </span>
-                  <ChevronDown
-                    size={18}
-                    className={`shrink-0 text-muted-foreground transition-transform duration-200 ${
-                      isOpen ? "rotate-180" : ""
-                    }`}
-                  />
-                </button>
+                <dt>
+                  <button
+                    onClick={() => setOpenIndex(isOpen ? null : index)}
+                    className="flex w-full items-center justify-between px-6 py-5 text-left"
+                    aria-expanded={isOpen}
+                    aria-controls={`faq-answer-${index}`}
+                  >
+                    <span className={`text-sm font-semibold pr-4 ${isOpen ? "text-foreground" : "text-foreground/80"}`}>
+                      {faq.question}
+                    </span>
+                    <ChevronDown
+                      size={18}
+                      className={`shrink-0 text-muted-foreground transition-transform duration-200 ${
+                        isOpen ? "rotate-180" : ""
+                      }`}
+                      aria-hidden="true"
+                    />
+                  </button>
+                </dt>
                 {isOpen && (
-                  <div className="px-6 pb-5">
+                  <dd id={`faq-answer-${index}`} className="px-6 pb-5">
                     <p className="text-sm leading-relaxed text-muted-foreground">
                       {faq.answer}
                     </p>
-                  </div>
+                  </dd>
                 )}
               </div>
             )
           })}
-        </div>
+        </dl>
       </div>
     </section>
   )
