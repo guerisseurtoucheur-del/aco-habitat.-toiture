@@ -1,0 +1,26 @@
+{
+  "name": "ACO-HABITAT - Diagnostic Toiture par IA",
+  "short_name": "ACO-HABITAT",
+  "description": "Analysez votre toiture en 30 secondes par IA. Rapport PDF complet.",
+  "start_url": "/#diagnostic",
+  "display": "standalone",
+  "background_color": "#060a13",
+  "theme_color": "#060a13",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/apple-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "categories": ["utilities", "business"],
+  "lang": "fr"
+}
