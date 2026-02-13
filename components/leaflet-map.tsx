@@ -33,8 +33,8 @@ const ESRI_SATELLITE =
 const ATTRIBUTION = "&copy; <a href='https://www.ign.fr'>IGN</a>"
 const ESRI_ATTRIBUTION = "&copy; Esri, Maxar, Earthstar Geographics"
 
-/* Half-side of the auto selection box in degrees (~35m at mid-France latitudes) */
-const BOX_HALF_DEG = 0.00035
+/* Half-side of the auto selection box in degrees (~240m at mid-France latitudes) */
+const BOX_HALF_DEG = 0.00108
 
 /* ── Measurement helpers ── */
 function calcPolygonArea(latlngs: L.LatLng[]): number {
@@ -188,7 +188,7 @@ export default function LeafletMap({
     selectionBoxRef.current = selectionBox
 
     // Tooltip on hover (click-only, not permanent)
-    selectionBox.bindTooltip("Zone d'analyse (~20x20m)", {
+    selectionBox.bindTooltip("Zone d'analyse (~240x240m)", {
       permanent: false,
       direction: "top",
       className: "leaflet-measurement-label",
@@ -408,25 +408,15 @@ export default function LeafletMap({
       const east = captureBounds.getEast()
       const captureCenter = captureBounds.getCenter()
 
-      // Calculate native pixel dimensions from the zone's real-world size
-      // IGN ORTHOIMAGERY.ORTHOPHOTOS native resolution = 20cm/pixel
-      // Requesting more pixels than native causes server-side upscale artefacts
-      const NATIVE_RES = 0.20 // metres per pixel
-      const latMeters = (north - south) * 110540
-      const lngMeters = (east - west) * 111320 * Math.cos(((north + south) / 2) * Math.PI / 180)
-      const nativeW = Math.round(lngMeters / NATIVE_RES)
-      const nativeH = Math.round(latMeters / NATIVE_RES)
-      // Clamp between 256 and 2048 to avoid too-small or too-large requests
-      const reqW = Math.min(Math.max(nativeW, 256), 2048)
-      const reqH = Math.min(Math.max(nativeH, 256), 2048)
-
+      // Request exactly 1200x1200 from IGN WMS
+      // For a ~240m zone, this gives ~20cm/pixel = native IGN resolution
       const response = await fetch("/api/map-capture", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           bounds: { south, west, north, east },
-          width: reqW,
-          height: reqH,
+          width: 1200,
+          height: 1200,
         }),
       })
 
