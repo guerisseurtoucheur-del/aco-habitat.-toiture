@@ -1,5 +1,11 @@
+// PDF generation module v2 - safe property access
 import jsPDF from "jspdf"
 import type { DiagnosticResult } from "./diagnostic-types"
+
+function safeScore(obj: { score?: number } | undefined | null): number {
+  if (!obj) return 0
+  return typeof obj.score === "number" ? obj.score : 0
+}
 
 function scoreColor(score: number): [number, number, number] {
   if (score >= 75) return [34, 197, 94]   // green
@@ -150,18 +156,18 @@ async function buildPDF(
   const globalCy = y + 18
   drawScoreCircle(globalCx, globalCy, 14, diagnostic.scoreGlobal, severityLabel(diagnostic.scoreGlobal))
 
-  // Sub-scores (safe access)
+  // Sub-scores v2
   const subStartX = margin + 65
   const subGap = 35
-  const vegetalScore = diagnostic.vegetal ? diagnostic.vegetal.score : 0
-  const structureScore = diagnostic.structure ? diagnostic.structure.score : 0
-  const etancheiteScore = diagnostic.etancheite ? diagnostic.etancheite.score : 0
-  const thermiqueScore = diagnostic.thermique ? diagnostic.thermique.scoreIsolation : 0
-  drawScoreCircle(subStartX, globalCy, 10, vegetalScore || 0, "Vegetal")
-  drawScoreCircle(subStartX + subGap, globalCy, 10, structureScore || 0, "Structure")
-  drawScoreCircle(subStartX + subGap * 2, globalCy, 10, etancheiteScore || 0, "Etancheite")
+  const _vScore = safeScore(diagnostic.vegetal)
+  const _sScore = safeScore(diagnostic.structure)
+  const _eScore = safeScore(diagnostic.etancheite)
+  const _tScore = diagnostic.thermique && typeof diagnostic.thermique.scoreIsolation === "number" ? diagnostic.thermique.scoreIsolation : 0
+  drawScoreCircle(subStartX, globalCy, 10, _vScore, "Vegetal")
+  drawScoreCircle(subStartX + subGap, globalCy, 10, _sScore, "Structure")
+  drawScoreCircle(subStartX + subGap * 2, globalCy, 10, _eScore, "Etancheite")
   if (diagnostic.thermique) {
-    drawScoreCircle(subStartX + subGap * 3, globalCy, 10, thermiqueScore || 0, "Thermique")
+    drawScoreCircle(subStartX + subGap * 3, globalCy, 10, _tScore, "Thermique")
   }
   y = globalCy + 26
 
