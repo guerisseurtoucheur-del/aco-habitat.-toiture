@@ -32,6 +32,7 @@ const footerLinks: { title: string; links: FooterLink[] }[] = [
       { label: "A propos", href: "#methode" },
       { label: "Contact / Support", href: "mailto:aco.habitat@orange.fr" },
       { label: "Mentions legales & CGV", href: "/mentions-legales" },
+      { label: "Espace pro", href: "/admin" },
     ],
   },
 ]
