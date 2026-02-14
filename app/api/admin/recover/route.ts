@@ -18,13 +18,17 @@ export async function POST(req: Request) {
 
   // Email matches - send password by email (never return it in the response)
   try {
+    const smtpPort = Number(process.env.SMTP_PORT) || 587
     const transporter = nodemailer.createTransport({
       host: process.env.SMTP_HOST || "smtp.gmail.com",
-      port: Number(process.env.SMTP_PORT) || 587,
-      secure: false,
+      port: smtpPort,
+      secure: smtpPort === 465,
       auth: {
         user: process.env.SMTP_USER,
         pass: process.env.SMTP_PASS,
+      },
+      tls: {
+        rejectUnauthorized: false,
       },
     })
 
@@ -57,7 +61,8 @@ export async function POST(req: Request) {
       `,
     })
   } catch (err) {
-    console.error("Failed to send recovery email:", err)
+    console.error("[v0] SMTP config:", { host: process.env.SMTP_HOST, port: process.env.SMTP_PORT, user: process.env.SMTP_USER ? "SET" : "MISSING", pass: process.env.SMTP_PASS ? "SET" : "MISSING" })
+    console.error("[v0] SMTP error:", err)
     return NextResponse.json({ error: "Erreur envoi email. Verifiez la configuration SMTP." }, { status: 500 })
   }
 

@@ -150,14 +150,18 @@ async function buildPDF(
   const globalCy = y + 18
   drawScoreCircle(globalCx, globalCy, 14, diagnostic.scoreGlobal, severityLabel(diagnostic.scoreGlobal))
 
-  // Sub-scores
+  // Sub-scores (safe access)
   const subStartX = margin + 65
   const subGap = 35
-  drawScoreCircle(subStartX, globalCy, 10, diagnostic.vegetal?.score ?? 0, "Vegetal")
-  drawScoreCircle(subStartX + subGap, globalCy, 10, diagnostic.structure?.score ?? 0, "Structure")
-  drawScoreCircle(subStartX + subGap * 2, globalCy, 10, diagnostic.etancheite?.score ?? 0, "Etancheite")
+  const vegetalScore = diagnostic.vegetal ? diagnostic.vegetal.score : 0
+  const structureScore = diagnostic.structure ? diagnostic.structure.score : 0
+  const etancheiteScore = diagnostic.etancheite ? diagnostic.etancheite.score : 0
+  const thermiqueScore = diagnostic.thermique ? diagnostic.thermique.scoreIsolation : 0
+  drawScoreCircle(subStartX, globalCy, 10, vegetalScore || 0, "Vegetal")
+  drawScoreCircle(subStartX + subGap, globalCy, 10, structureScore || 0, "Structure")
+  drawScoreCircle(subStartX + subGap * 2, globalCy, 10, etancheiteScore || 0, "Etancheite")
   if (diagnostic.thermique) {
-    drawScoreCircle(subStartX + subGap * 3, globalCy, 10, diagnostic.thermique?.scoreIsolation ?? 0, "Thermique")
+    drawScoreCircle(subStartX + subGap * 3, globalCy, 10, thermiqueScore || 0, "Thermique")
   }
   y = globalCy + 26
 
