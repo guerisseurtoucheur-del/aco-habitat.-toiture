@@ -76,6 +76,66 @@ export function PricingSection() {
               <button
                 onClick={async () => {
                   const { generateDiagnosticPDF } = await import("@/lib/generate-pdf")
+
+                  // Generate a realistic satellite-style roof image via canvas
+                  const canvas = document.createElement("canvas")
+                  canvas.width = 800
+                  canvas.height = 600
+                  const ctx = canvas.getContext("2d")!
+
+                  // Load a Google Maps satellite tile of a real roof (Versailles area)
+                  const img = new Image()
+                  img.crossOrigin = "anonymous"
+
+                  const imageUrl = `https://maps.googleapis.com/maps/api/staticmap?center=48.8049,2.1204&zoom=19&size=800x600&maptype=satellite&key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg`
+
+                  await new Promise<void>((resolve) => {
+                    img.onload = () => {
+                      ctx.drawImage(img, 0, 0, 800, 600)
+                      resolve()
+                    }
+                    img.onerror = () => {
+                      // Fallback: generate a synthetic aerial view
+                      ctx.fillStyle = "#3a5a2a"
+                      ctx.fillRect(0, 0, 800, 600)
+                      // Roof shape
+                      ctx.fillStyle = "#8B6914"
+                      ctx.beginPath()
+                      ctx.moveTo(200, 150)
+                      ctx.lineTo(600, 150)
+                      ctx.lineTo(650, 400)
+                      ctx.lineTo(150, 400)
+                      ctx.closePath()
+                      ctx.fill()
+                      // Ridge line
+                      ctx.strokeStyle = "#6B4F10"
+                      ctx.lineWidth = 3
+                      ctx.beginPath()
+                      ctx.moveTo(200, 275)
+                      ctx.lineTo(600, 275)
+                      ctx.stroke()
+                      // Tile texture
+                      ctx.strokeStyle = "rgba(0,0,0,0.15)"
+                      ctx.lineWidth = 1
+                      for (let y = 160; y < 400; y += 15) {
+                        ctx.beginPath()
+                        ctx.moveTo(160, y)
+                        ctx.lineTo(640, y)
+                        ctx.stroke()
+                      }
+                      // Garden
+                      ctx.fillStyle = "#4a7a3a"
+                      ctx.fillRect(0, 420, 800, 180)
+                      // Driveway
+                      ctx.fillStyle = "#7a7a7a"
+                      ctx.fillRect(650, 200, 150, 400)
+                      resolve()
+                    }
+                    img.src = imageUrl
+                  })
+
+                  const roofImage = canvas.toDataURL("image/jpeg", 0.85)
+
                   await generateDiagnosticPDF(
                     {
                       toitureType: "tuiles",
@@ -121,8 +181,8 @@ export function PricingSection() {
                         commentaire: "Isolation correcte dans l'ensemble. Deperdition detectee au niveau de la jonction toiture-mur pignon.",
                       },
                     } as never,
-                    "/placeholder.svg?height=400&width=600",
-                    "12 Rue des Lilas, 78000 Versailles",
+                    roofImage,
+                    "12 Rue des Lilas, 78000 Versailles (EXEMPLE)",
                     [{ type: "area", value: 85 }, { type: "perimeter", value: 42 }, { type: "ridge", value: 9 }]
                   )
                 }}
