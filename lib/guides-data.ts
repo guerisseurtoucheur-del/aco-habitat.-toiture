@@ -363,6 +363,70 @@ export const guidesData: GuideData[] = [
       "diagnostic-toiture-satellite",
     ],
   },
+  {
+    slug: "diagnostic-toiture-avant-achat",
+    title: "Diagnostic toiture avant achat immobilier",
+    metaTitle: "Diagnostic Toiture Avant Achat Immobilier : Ce Qu'il Faut Verifier | ACO-HABITAT",
+    metaDescription: "Vous achetez une maison ? Decouvrez pourquoi et comment faire verifier la toiture avant de signer. Evitez les mauvaises surprises et negociez le prix en connaissance de cause.",
+    heroTitle: "Pourquoi faire un diagnostic toiture avant d'acheter une maison ?",
+    heroDescription: "La toiture represente jusqu'a 20% de la valeur d'une maison. Une renovation non anticipee peut couter entre 10 000 et 30 000 euros. Voici comment verifier l'etat du toit avant de signer le compromis et eviter une mauvaise surprise financiere.",
+    datePublished: "2026-02-05",
+    dateModified: "2026-02-14",
+    readTime: "9 min",
+    sections: [
+      {
+        title: "Le diagnostic toiture n'est pas obligatoire... mais indispensable",
+        content: "Contrairement au DPE, a l'amiante ou au plomb, le diagnostic de toiture n'est pas obligatoire lors d'une vente immobiliere. C'est un angle mort de la legislation que beaucoup d'acheteurs decouvrent trop tard. Le vendeur n'a aucune obligation de vous informer sur l'etat de la couverture, sauf vice cache avere. Resultat : des milliers d'acheteurs chaque annee decouvrent apres la signature que leur toiture necessite des travaux importants. Un diagnostic preventif de 19,90 euros peut vous eviter une facture de 15 000 euros.",
+      },
+      {
+        title: "Les 5 points a verifier sur la toiture avant d'acheter",
+        content: "Lors de la visite, concentrez-vous sur ces elements visibles depuis le sol et depuis les combles :",
+        list: [
+          "L'age de la couverture : demandez au vendeur quand la toiture a ete posee ou renovee pour la derniere fois. Au-dela de 25 ans sans entretien, prevoyez des travaux.",
+          "La presence de mousse et lichen : un versant nord tres vert indique un manque d'entretien. Le demoussage coute entre 1 500 et 3 000 euros pour une maison standard.",
+          "Les tuiles cassees ou deplacees : visibles depuis la rue avec des jumelles ou via une image satellite. Chaque tuile cassee est une porte ouverte aux infiltrations.",
+          "L'etat des combles : inspectez les combles avec une lampe torche. Cherchez les traces d'humidite, les taches sombres sur le bois, l'odeur de moisi et les traces d'insectes.",
+          "La zinguerie et les points singuliers : gouttieres, noues, faitage, solins autour de la cheminee. Ce sont les points faibles les plus frequents d'une toiture.",
+        ],
+      },
+      {
+        title: "Comment le diagnostic IA vous aide a negocier le prix",
+        content: "Le rapport PDF du diagnostic IA detaille chaque probleme detecte avec un niveau de gravite et une estimation de cout. Ce document objectif et factuel est un outil de negociation puissant : vous pouvez le presenter au vendeur ou a l'agent immobilier pour justifier une baisse de prix equivalente aux travaux a prevoir. Nos clients negocient en moyenne entre 3 000 et 10 000 euros de reduction grace au rapport diagnostic.",
+      },
+      {
+        title: "Que faire si le diagnostic revele des problemes graves ?",
+        content: "Si le diagnostic revele un score inferieur a 50/100, cela signifie que des travaux importants sont necessaires a court terme. Vous avez trois options :",
+        list: [
+          "Negocier le prix a la baisse : deduisez le cout estime des travaux du prix de vente. Le rapport PDF chiffre vous donne les arguments.",
+          "Demander au vendeur de faire les travaux avant la vente : c'est possible mais rare. Le vendeur risque de faire au moins cher.",
+          "Renoncer a l'achat : si les travaux sont trop importants et que le vendeur refuse de negocier, il est parfois plus sage de passer son chemin.",
+        ],
+      },
+      {
+        title: "Le bon timing pour le diagnostic",
+        content: "Idealement, faites le diagnostic IA des la premiere visite pour avoir une idee rapide de l'etat de la toiture. Si le bien vous interesse, vous pouvez ensuite demander une inspection physique par un couvreur avant de signer le compromis. Inserez une clause suspensive dans le compromis : 'sous reserve d'un diagnostic de toiture satisfaisant'. Cela vous laisse une porte de sortie si l'inspection physique revele des problemes non detectables par satellite.",
+      },
+    ],
+    faq: [
+      {
+        question: "Le diagnostic toiture est-il obligatoire pour vendre une maison ?",
+        answer: "Non, le diagnostic toiture n'est pas obligatoire dans le dossier de diagnostics immobiliers (DDT). Seuls le DPE, l'amiante, le plomb, les termites (selon les zones) et l'electricite/gaz sont obligatoires. Cependant, le vendeur peut etre tenu responsable au titre des vices caches si un probleme grave de toiture n'a pas ete signale.",
+      },
+      {
+        question: "Peut-on se retourner contre le vendeur si la toiture fuit apres l'achat ?",
+        answer: "Oui, si la fuite existait avant la vente et que le vendeur le savait (ou aurait du le savoir), vous pouvez invoquer la garantie des vices caches. Vous avez 2 ans apres la decouverte du vice pour agir. Un diagnostic prealable vous protege en documentant l'etat de la toiture au moment de l'achat.",
+      },
+      {
+        question: "Combien coute un diagnostic toiture avant achat ?",
+        answer: "Le diagnostic IA ACO-HABITAT coute 19,90 euros et prend moins de 30 secondes. Pour une inspection physique complete par un couvreur, comptez entre 150 et 300 euros. Le rapport IA suffit souvent pour une premiere evaluation et pour la negociation.",
+      },
+    ],
+    relatedServices: ["diagnostic-ia", "couverture", "renovation-toiture"],
+    relatedGuides: [
+      "quand-renover-toiture",
+      "prix-renovation-toiture",
+    ],
+  },
 ]
 
 export function getGuideBySlug(slug: string): GuideData | undefined {

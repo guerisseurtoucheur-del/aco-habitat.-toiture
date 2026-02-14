@@ -2,32 +2,46 @@ import { Star, Quote } from "lucide-react"
 
 const testimonials = [
   {
-    name: "C. Durand",
-    location: "Versailles (78)",
+    name: "N. Teixeira",
+    location: "Meudon (92)",
     rating: 5,
-    text: "J'ai paye 19,90 EUR et en 30 secondes j'avais un diagnostic complet de ma toiture. Le rapport PDF m'a permis de negocier avec le couvreur en sachant exactement ce qu'il fallait faire.",
+    text: "On visitait une maison a acheter et la toiture nous inquietait. En 2 minutes on avait le diagnostic : mousse importante et faitage a reprendre. On a negocie 8 000 EUR de moins sur le prix. L'achat le plus rentable de ma vie.",
+    service: "Achat immobilier",
+  },
+  {
+    name: "V. Kratzer",
+    location: "Colmar (68)",
+    rating: 5,
+    text: "Apres la grele de juin, je voulais savoir si ma toiture avait souffert avant d'appeler un couvreur. Le rapport a detecte 3 zones de tuiles deplacees. Le couvreur m'a dit que le PDF etait plus precis que certains devis qu'il recoit.",
     service: "Diagnostic complet",
   },
   {
-    name: "M. Garnier",
-    location: "Lyon (69)",
+    name: "A. Benkhedda",
+    location: "Villeurbanne (69)",
     rating: 5,
-    text: "Le diagnostic a detecte des tuiles deplacees que je ne voyais meme pas depuis le sol. J'ai transmis le PDF a un couvreur de l'annuaire, il a confirme et intervenu dans la semaine.",
-    service: "Detection structure",
+    text: "Je mets en vente mon pavillon et l'agent immobilier m'a conseille de faire verifier la toiture. Le diagnostic IA montre que tout est en bon etat, je l'ai mis en annexe de l'annonce. Ca rassure les acheteurs.",
+    service: "Vente immobiliere",
   },
   {
-    name: "S. Lefevre",
-    location: "Nantes (44)",
+    name: "E. Lindqvist",
+    location: "Bayonne (64)",
     rating: 5,
-    text: "Avant de vendre ma maison, j'ai fait analyser la toiture. Le rapport m'a rassure : tout etait en bon etat. Ca m'a evite de payer un expert 200 EUR pour rien.",
-    service: "Diagnostic pre-vente",
+    text: "On a achete une longere en Bearn sans pouvoir monter sur le toit. Le diagnostic a revele des problemes d'etancheite au niveau de la noue. On a fait chiffrer les travaux avant de signer, ca nous a evite une mauvaise surprise.",
+    service: "Achat immobilier",
   },
   {
-    name: "P. Rousseau",
-    location: "Toulouse (31)",
+    name: "H. Marechal",
+    location: "Chartres (28)",
     rating: 5,
-    text: "L'analyse thermique est bluffante. On voit clairement les zones de deperdition. J'ai pu cibler exactement ou isoler, ce qui m'a fait economiser sur le devis.",
-    service: "Analyse thermique",
+    text: "Ma toiture a 25 ans et je me demandais si c'etait le moment de la refaire. Le score global de 72/100 m'a rassure : encore quelques annees tranquille, juste un nettoyage a prevoir. J'ai economise un devis inutile.",
+    service: "Diagnostic preventif",
+  },
+  {
+    name: "S. Oliveira",
+    location: "Perpignan (66)",
+    rating: 5,
+    text: "J'ai fait le diagnostic avant de vendre pour anticiper les remarques des acheteurs. Le rapport a montre une zone de mousse et un debut de fissure au faitage. J'ai fait reparer avant les visites, ca m'a coute 400 EUR au lieu de perdre 5 000 EUR en negociation.",
+    service: "Vente immobiliere",
   },
 ]
 
@@ -52,7 +66,7 @@ export function TestimonialsSection() {
           </p>
         </div>
 
-        <div className="mt-14 grid grid-cols-1 gap-5 sm:grid-cols-2">
+        <div className="mt-14 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {testimonials.map((testimonial) => (
             <div
               key={testimonial.name}
