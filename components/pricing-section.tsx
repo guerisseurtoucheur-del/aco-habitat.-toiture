@@ -83,58 +83,167 @@ export function PricingSection() {
                   canvas.height = 600
                   const ctx = canvas.getContext("2d")!
 
-                  // Load a Google Maps satellite tile of a real roof (Versailles area)
-                  const img = new Image()
-                  img.crossOrigin = "anonymous"
+                  // Background: grass/garden with realistic texture
+                  const grassGrad = ctx.createRadialGradient(400, 300, 50, 400, 300, 500)
+                  grassGrad.addColorStop(0, "#3d6b2e")
+                  grassGrad.addColorStop(0.5, "#2d5a20")
+                  grassGrad.addColorStop(1, "#1e4a15")
+                  ctx.fillStyle = grassGrad
+                  ctx.fillRect(0, 0, 800, 600)
 
-                  const imageUrl = `https://maps.googleapis.com/maps/api/staticmap?center=48.8049,2.1204&zoom=19&size=800x600&maptype=satellite&key=AIzaSyB41DRUbKWJHPxaFjMAwdrzWzbVKartNGg`
+                  // Grass texture noise
+                  for (let i = 0; i < 3000; i++) {
+                    const gx = Math.random() * 800
+                    const gy = Math.random() * 600
+                    ctx.fillStyle = `rgba(${30 + Math.random() * 40}, ${60 + Math.random() * 50}, ${15 + Math.random() * 30}, 0.4)`
+                    ctx.fillRect(gx, gy, 2, 2)
+                  }
 
-                  await new Promise<void>((resolve) => {
-                    img.onload = () => {
-                      ctx.drawImage(img, 0, 0, 800, 600)
-                      resolve()
-                    }
-                    img.onerror = () => {
-                      // Fallback: generate a synthetic aerial view
-                      ctx.fillStyle = "#3a5a2a"
-                      ctx.fillRect(0, 0, 800, 600)
-                      // Roof shape
-                      ctx.fillStyle = "#8B6914"
-                      ctx.beginPath()
-                      ctx.moveTo(200, 150)
-                      ctx.lineTo(600, 150)
-                      ctx.lineTo(650, 400)
-                      ctx.lineTo(150, 400)
-                      ctx.closePath()
-                      ctx.fill()
-                      // Ridge line
-                      ctx.strokeStyle = "#6B4F10"
-                      ctx.lineWidth = 3
-                      ctx.beginPath()
-                      ctx.moveTo(200, 275)
-                      ctx.lineTo(600, 275)
-                      ctx.stroke()
-                      // Tile texture
-                      ctx.strokeStyle = "rgba(0,0,0,0.15)"
-                      ctx.lineWidth = 1
-                      for (let y = 160; y < 400; y += 15) {
-                        ctx.beginPath()
-                        ctx.moveTo(160, y)
-                        ctx.lineTo(640, y)
-                        ctx.stroke()
+                  // Driveway / path
+                  ctx.fillStyle = "#6b6b6b"
+                  ctx.fillRect(620, 0, 120, 600)
+                  ctx.fillStyle = "#5e5e5e"
+                  for (let py = 0; py < 600; py += 8) {
+                    ctx.fillRect(620, py, 120, 4)
+                  }
+
+                  // Terrace next to house
+                  ctx.fillStyle = "#8a7a6a"
+                  ctx.fillRect(140, 410, 480, 70)
+                  ctx.fillStyle = "#7d6d5d"
+                  for (let tx = 140; tx < 620; tx += 25) {
+                    ctx.strokeStyle = "rgba(0,0,0,0.15)"
+                    ctx.lineWidth = 1
+                    ctx.beginPath()
+                    ctx.moveTo(tx, 410)
+                    ctx.lineTo(tx, 480)
+                    ctx.stroke()
+                  }
+
+                  // House shadow (south-east)
+                  ctx.fillStyle = "rgba(0,0,0,0.25)"
+                  ctx.fillRect(170, 395, 460, 25)
+                  ctx.fillRect(610, 115, 25, 290)
+
+                  // Main roof body
+                  ctx.fillStyle = "#9B5523"
+                  ctx.fillRect(155, 100, 470, 300)
+
+                  // Roof gradient for depth (south side lighter)
+                  const roofGrad = ctx.createLinearGradient(155, 100, 155, 400)
+                  roofGrad.addColorStop(0, "rgba(0,0,0,0.15)")
+                  roofGrad.addColorStop(0.48, "rgba(0,0,0,0.05)")
+                  roofGrad.addColorStop(0.52, "rgba(255,255,255,0.08)")
+                  roofGrad.addColorStop(1, "rgba(0,0,0,0.1)")
+                  ctx.fillStyle = roofGrad
+                  ctx.fillRect(155, 100, 470, 300)
+
+                  // Individual tile rows
+                  for (let row = 0; row < 20; row++) {
+                    const y = 100 + row * 15
+                    const isNorthSide = row < 10
+                    for (let col = 0; col < 32; col++) {
+                      const x = 155 + col * 14.7
+                      const offset = row % 2 === 0 ? 7 : 0
+                      // Vary tile color
+                      const r = 140 + Math.random() * 30
+                      const g = 70 + Math.random() * 20
+                      const b = 30 + Math.random() * 15
+                      ctx.fillStyle = `rgb(${r},${g},${b})`
+                      ctx.fillRect(x + offset, y, 13.5, 14)
+                      // Tile edge shadow
+                      ctx.strokeStyle = "rgba(0,0,0,0.2)"
+                      ctx.lineWidth = 0.5
+                      ctx.strokeRect(x + offset, y, 13.5, 14)
+
+                      // Moss on north side (top rows)
+                      if (isNorthSide && Math.random() > 0.6) {
+                        ctx.fillStyle = `rgba(${50 + Math.random() * 30}, ${90 + Math.random() * 40}, ${30 + Math.random() * 20}, ${0.3 + Math.random() * 0.4})`
+                        ctx.fillRect(x + offset + 2, y + 2, 9, 10)
                       }
-                      // Garden
-                      ctx.fillStyle = "#4a7a3a"
-                      ctx.fillRect(0, 420, 800, 180)
-                      // Driveway
-                      ctx.fillStyle = "#7a7a7a"
-                      ctx.fillRect(650, 200, 150, 400)
-                      resolve()
                     }
-                    img.src = imageUrl
-                  })
+                  }
 
-                  const roofImage = canvas.toDataURL("image/jpeg", 0.85)
+                  // Ridge line (faitage)
+                  ctx.strokeStyle = "#6B4010"
+                  ctx.lineWidth = 6
+                  ctx.beginPath()
+                  ctx.moveTo(155, 250)
+                  ctx.lineTo(625, 250)
+                  ctx.stroke()
+                  // Ridge highlight
+                  ctx.strokeStyle = "rgba(255,220,180,0.3)"
+                  ctx.lineWidth = 2
+                  ctx.beginPath()
+                  ctx.moveTo(155, 249)
+                  ctx.lineTo(625, 249)
+                  ctx.stroke()
+
+                  // Chimney
+                  ctx.fillStyle = "#7a6a5a"
+                  ctx.fillRect(480, 140, 35, 40)
+                  ctx.fillStyle = "#5a4a3a"
+                  ctx.fillRect(480, 140, 35, 4)
+                  ctx.fillStyle = "#333"
+                  ctx.fillRect(488, 148, 8, 8)
+                  ctx.fillRect(504, 148, 8, 8)
+                  // Chimney shadow
+                  ctx.fillStyle = "rgba(0,0,0,0.2)"
+                  ctx.fillRect(515, 145, 8, 35)
+
+                  // Gutters (gouttieres)
+                  ctx.strokeStyle = "#999"
+                  ctx.lineWidth = 3
+                  ctx.beginPath()
+                  ctx.moveTo(155, 100)
+                  ctx.lineTo(155, 400)
+                  ctx.stroke()
+                  ctx.beginPath()
+                  ctx.moveTo(625, 100)
+                  ctx.lineTo(625, 400)
+                  ctx.stroke()
+
+                  // Small extension / garage roof
+                  ctx.fillStyle = "#8a5020"
+                  ctx.fillRect(520, 400, 100, 80)
+                  for (let row = 0; row < 5; row++) {
+                    for (let col = 0; col < 7; col++) {
+                      const r = 125 + Math.random() * 25
+                      const g = 65 + Math.random() * 15
+                      const b = 25 + Math.random() * 10
+                      ctx.fillStyle = `rgb(${r},${g},${b})`
+                      ctx.fillRect(520 + col * 14.3 + (row % 2 === 0 ? 7 : 0), 400 + row * 16, 13, 15)
+                    }
+                  }
+
+                  // Trees (circular canopy)
+                  const trees = [[70, 200, 35], [80, 500, 28], [700, 80, 30], [720, 520, 25]]
+                  for (const [tx, ty, tr] of trees) {
+                    ctx.fillStyle = "rgba(0,0,0,0.15)"
+                    ctx.beginPath()
+                    ctx.arc(tx + 5, ty + 5, tr, 0, Math.PI * 2)
+                    ctx.fill()
+                    const treeGrad = ctx.createRadialGradient(tx - 5, ty - 5, 2, tx, ty, tr)
+                    treeGrad.addColorStop(0, "#4a8a30")
+                    treeGrad.addColorStop(0.7, "#2a6a18")
+                    treeGrad.addColorStop(1, "#1a5010")
+                    ctx.fillStyle = treeGrad
+                    ctx.beginPath()
+                    ctx.arc(tx, ty, tr, 0, Math.PI * 2)
+                    ctx.fill()
+                  }
+
+                  // "EXEMPLE" watermark
+                  ctx.save()
+                  ctx.translate(400, 300)
+                  ctx.rotate(-0.3)
+                  ctx.font = "bold 60px sans-serif"
+                  ctx.fillStyle = "rgba(255,255,255,0.15)"
+                  ctx.textAlign = "center"
+                  ctx.fillText("EXEMPLE", 0, 0)
+                  ctx.restore()
+
+                  const roofImage = canvas.toDataURL("image/jpeg", 0.9)
 
                   await generateDiagnosticPDF(
                     {
