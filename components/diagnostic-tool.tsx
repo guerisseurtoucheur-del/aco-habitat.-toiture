@@ -380,6 +380,8 @@ export function DiagnosticTool() {
   const [diagnostic, setDiagnostic] = useState<DiagnosticResult | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [uploadMode, setUploadMode] = useState(false)
+  const [clientName, setClientName] = useState("")
+  const [clientPhone, setClientPhone] = useState("")
   const [clientEmail, setClientEmail] = useState("")
   const [emailSent, setEmailSent] = useState(false)
   const [sendingEmail, setSendingEmail] = useState(false)
@@ -572,12 +574,14 @@ export function DiagnosticTool() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
+            name: clientName,
+            phone: clientPhone,
             email: clientEmail,
             address: formattedAddress,
-            globalScore: finalDiag.scores?.global || 0,
-            structureScore: finalDiag.scores?.structure || 0,
-            vegetalScore: finalDiag.scores?.vegetation || 0,
-            thermalScore: finalDiag.scores?.thermal || 0,
+            globalScore: finalDiag.scoreGlobal || 0,
+            structureScore: finalDiag.structure?.score || 0,
+            vegetalScore: finalDiag.vegetal?.score || 0,
+            thermalScore: finalDiag.thermique?.scoreIsolation || 0,
             stripeSessionId: typeof window !== "undefined" ? window.__stripeSessionId || "" : "",
           }),
         })
@@ -590,7 +594,7 @@ export function DiagnosticTool() {
       setError("Une erreur est survenue. Verifiez votre connexion et reessayez.")
       setStep("address")
     }
-  }, [capturedImage, formattedAddress, mapMeasurements])
+  }, [capturedImage, formattedAddress, mapMeasurements, clientName, clientPhone, clientEmail])
 
   // Compress image to max 1600px and JPEG quality 0.85 to stay under API body limits
   const compressImage = useCallback((file: File): Promise<string> => {
@@ -1026,21 +1030,55 @@ export function DiagnosticTool() {
                 </div>
               </div>
 
-              {/* Email field */}
-              <div className="mb-4">
-                <label htmlFor="client-email" className="mb-2 block text-xs font-semibold text-muted-foreground">
-                  Votre email (pour recevoir le rapport PDF)
-                </label>
-                <input
-                  id="client-email"
-                  type="email"
-                  value={clientEmail}
-                  onChange={(e) => setClientEmail(e.target.value)}
-                  placeholder="votre@email.fr"
-                  className="h-11 w-full rounded-xl border border-border bg-background px-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-                />
-                <p className="mt-1 text-[10px] text-muted-foreground">
-                  Le rapport PDF sera envoye a cette adresse apres l{"'"}analyse.
+              {/* Client info form */}
+              <div className="mb-5 space-y-3 rounded-xl border border-border bg-secondary/30 p-4">
+                <p className="text-xs font-semibold text-foreground">Vos coordonnees</p>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <div>
+                    <label htmlFor="client-name" className="mb-1 block text-[11px] font-medium text-muted-foreground">
+                      Nom complet *
+                    </label>
+                    <input
+                      id="client-name"
+                      type="text"
+                      value={clientName}
+                      onChange={(e) => setClientName(e.target.value)}
+                      placeholder="Jean Dupont"
+                      className="h-10 w-full rounded-lg border border-border bg-background px-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="client-phone" className="mb-1 block text-[11px] font-medium text-muted-foreground">
+                      Telephone *
+                    </label>
+                    <input
+                      id="client-phone"
+                      type="tel"
+                      value={clientPhone}
+                      onChange={(e) => setClientPhone(e.target.value)}
+                      placeholder="06 12 34 56 78"
+                      className="h-10 w-full rounded-lg border border-border bg-background px-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                      required
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label htmlFor="client-email" className="mb-1 block text-[11px] font-medium text-muted-foreground">
+                    Adresse email *
+                  </label>
+                  <input
+                    id="client-email"
+                    type="email"
+                    value={clientEmail}
+                    onChange={(e) => setClientEmail(e.target.value)}
+                    placeholder="votre@email.fr"
+                    className="h-10 w-full rounded-lg border border-border bg-background px-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    required
+                  />
+                </div>
+                <p className="text-[10px] text-muted-foreground">
+                  Le rapport PDF sera envoye a cette adresse. Vos coordonnees restent confidentielles.
                 </p>
               </div>
 

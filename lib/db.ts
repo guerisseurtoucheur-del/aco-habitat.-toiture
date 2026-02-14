@@ -3,6 +3,8 @@ import { neon } from "@neondatabase/serverless"
 const sql = neon(process.env.DATABASE_URL!)
 
 export async function saveDiagnostic(data: {
+  name: string
+  phone: string
   email: string
   address: string
   globalScore: number
@@ -12,8 +14,8 @@ export async function saveDiagnostic(data: {
   stripeSessionId: string
 }) {
   await sql`
-    INSERT INTO diagnostics (email, address, global_score, structure_score, vegetal_score, thermal_score, stripe_session_id)
-    VALUES (${data.email}, ${data.address}, ${data.globalScore}, ${data.structureScore}, ${data.vegetalScore}, ${data.thermalScore}, ${data.stripeSessionId})
+    INSERT INTO diagnostics (client_name, client_phone, email, address, global_score, structure_score, vegetal_score, thermal_score, stripe_session_id)
+    VALUES (${data.name}, ${data.phone}, ${data.email}, ${data.address}, ${data.globalScore}, ${data.structureScore}, ${data.vegetalScore}, ${data.thermalScore}, ${data.stripeSessionId})
   `
   // Increment counter
   await sql`

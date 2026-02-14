@@ -5,6 +5,8 @@ export async function POST(req: Request) {
   try {
     const data = await req.json()
     await saveDiagnostic({
+      name: data.name || "",
+      phone: data.phone || "",
       email: data.email || "",
       address: data.address || "",
       globalScore: data.globalScore || 0,
