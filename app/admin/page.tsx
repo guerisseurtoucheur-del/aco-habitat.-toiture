@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Lock, Search, Download, Phone, Mail, MapPin, BarChart3, Users, ArrowLeft, Eye } from "lucide-react"
+import { Lock, Search, Download, Phone, Mail, MapPin, BarChart3, Users, ArrowLeft, Eye, KeyRound, ShieldCheck } from "lucide-react"
 import Link from "next/link"
 
 interface DiagnosticRecord {
@@ -44,6 +44,12 @@ export default function AdminPage() {
   const [totalCount, setTotalCount] = useState(0)
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedDiag, setSelectedDiag] = useState<DiagnosticRecord | null>(null)
+  const [recoveryMode, setRecoveryMode] = useState<"off" | "email" | "code" | "success">("off")
+  const [recoveryEmail, setRecoveryEmail] = useState("")
+  const [recoveryCode, setRecoveryCode] = useState("")
+  const [recoveryLoading, setRecoveryLoading] = useState(false)
+  const [recoveryError, setRecoveryError] = useState("")
+  const [recoveredPassword, setRecoveredPassword] = useState("")
 
   async function handleLogin() {
     setLoading(true)
@@ -66,6 +72,50 @@ export default function AdminPage() {
       setError("Erreur de connexion")
     } finally {
       setLoading(false)
+    }
+  }
+
+  async function handleSendRecoveryCode() {
+    setRecoveryLoading(true)
+    setRecoveryError("")
+    try {
+      const res = await fetch("/api/admin/recover", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email: recoveryEmail }),
+      })
+      if (res.ok) {
+        setRecoveryMode("code")
+      } else {
+        setRecoveryError("Erreur lors de l'envoi.")
+      }
+    } catch {
+      setRecoveryError("Erreur de connexion.")
+    } finally {
+      setRecoveryLoading(false)
+    }
+  }
+
+  async function handleVerifyCode() {
+    setRecoveryLoading(true)
+    setRecoveryError("")
+    try {
+      const res = await fetch("/api/admin/recover", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ code: recoveryCode }),
+      })
+      const data = await res.json()
+      if (!res.ok) {
+        setRecoveryError(data.error || "Code invalide.")
+        return
+      }
+      setRecoveredPassword(data.password)
+      setRecoveryMode("success")
+    } catch {
+      setRecoveryError("Erreur de connexion.")
+    } finally {
+      setRecoveryLoading(false)
     }
   }
 
@@ -100,35 +150,158 @@ export default function AdminPage() {
         <div className="w-full max-w-sm">
           <div className="mb-8 text-center">
             <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-2xl border border-border bg-card">
-              <Lock size={24} className="text-primary" />
+              {recoveryMode === "off" ? <Lock size={24} className="text-primary" /> : <KeyRound size={24} className="text-primary" />}
             </div>
-            <h1 className="text-xl font-bold text-foreground">Administration</h1>
+            <h1 className="text-xl font-bold text-foreground">
+              {recoveryMode === "off" ? "Administration" : "Recuperation"}
+            </h1>
             <p className="mt-1 text-sm text-muted-foreground">ACO-HABITAT - Tableau de bord</p>
           </div>
-          <div className="rounded-2xl border border-border bg-card p-6">
-            <label className="mb-2 block text-xs font-medium text-muted-foreground">
-              Mot de passe administrateur
-            </label>
-            <input
-              type="password"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleLogin()}
-              placeholder="Entrez le mot de passe"
-              className="mb-4 h-11 w-full rounded-xl border border-border bg-secondary/50 px-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-              autoFocus
-            />
-            {error && (
-              <p className="mb-3 text-xs font-medium text-destructive">{error}</p>
-            )}
-            <button
-              onClick={handleLogin}
-              disabled={loading || !password}
-              className="h-11 w-full rounded-xl bg-primary text-sm font-bold text-primary-foreground transition-all hover:bg-primary/90 disabled:opacity-50"
-            >
-              {loading ? "Connexion..." : "Se connecter"}
-            </button>
-          </div>
+
+          {/* Normal login */}
+          {recoveryMode === "off" && (
+            <div className="rounded-2xl border border-border bg-card p-6">
+              <label className="mb-2 block text-xs font-medium text-muted-foreground">
+                Mot de passe administrateur
+              </label>
+              <input
+                type="password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleLogin()}
+                placeholder="Entrez le mot de passe"
+                className="mb-4 h-11 w-full rounded-xl border border-border bg-secondary/50 px-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                autoFocus
+              />
+              {error && (
+                <p className="mb-3 text-xs font-medium text-destructive">{error}</p>
+              )}
+              <button
+                onClick={handleLogin}
+                disabled={loading || !password}
+                className="h-11 w-full rounded-xl bg-primary text-sm font-bold text-primary-foreground transition-all hover:bg-primary/90 disabled:opacity-50"
+              >
+                {loading ? "Connexion..." : "Se connecter"}
+              </button>
+              <button
+                onClick={() => { setRecoveryMode("email"); setError("") }}
+                className="mt-4 w-full text-center text-xs text-muted-foreground hover:text-primary transition-colors"
+              >
+                Mot de passe oublie ?
+              </button>
+            </div>
+          )}
+
+          {/* Step 1: Enter email */}
+          {recoveryMode === "email" && (
+            <div className="rounded-2xl border border-border bg-card p-6">
+              <p className="mb-4 text-sm text-muted-foreground">
+                Entrez l{"'"}adresse email associee au compte admin. Un code de verification a 6 chiffres vous sera envoye.
+              </p>
+              <label className="mb-2 block text-xs font-medium text-muted-foreground">
+                Adresse email admin
+              </label>
+              <input
+                type="email"
+                value={recoveryEmail}
+                onChange={(e) => setRecoveryEmail(e.target.value)}
+                onKeyDown={(e) => e.key === "Enter" && handleSendRecoveryCode()}
+                placeholder="votre@email.fr"
+                className="mb-4 h-11 w-full rounded-xl border border-border bg-secondary/50 px-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                autoFocus
+              />
+              {recoveryError && (
+                <p className="mb-3 text-xs font-medium text-destructive">{recoveryError}</p>
+              )}
+              <button
+                onClick={handleSendRecoveryCode}
+                disabled={recoveryLoading || !recoveryEmail}
+                className="h-11 w-full rounded-xl bg-primary text-sm font-bold text-primary-foreground transition-all hover:bg-primary/90 disabled:opacity-50"
+              >
+                {recoveryLoading ? "Envoi en cours..." : "Envoyer le code"}
+              </button>
+              <button
+                onClick={() => { setRecoveryMode("off"); setRecoveryError("") }}
+                className="mt-4 w-full text-center text-xs text-muted-foreground hover:text-primary transition-colors"
+              >
+                Retour a la connexion
+              </button>
+            </div>
+          )}
+
+          {/* Step 2: Enter code */}
+          {recoveryMode === "code" && (
+            <div className="rounded-2xl border border-border bg-card p-6">
+              <div className="mb-4 rounded-xl border border-primary/20 bg-primary/5 p-3">
+                <p className="text-xs text-primary">
+                  Un code a 6 chiffres a ete envoye a votre adresse email. Verifiez aussi les spams.
+                </p>
+              </div>
+              <label className="mb-2 block text-xs font-medium text-muted-foreground">
+                Code de verification
+              </label>
+              <input
+                type="text"
+                inputMode="numeric"
+                maxLength={6}
+                value={recoveryCode}
+                onChange={(e) => setRecoveryCode(e.target.value.replace(/\D/g, ""))}
+                onKeyDown={(e) => e.key === "Enter" && recoveryCode.length === 6 && handleVerifyCode()}
+                placeholder="000000"
+                className="mb-4 h-14 w-full rounded-xl border border-border bg-secondary/50 px-4 text-center text-2xl font-bold tracking-[0.5em] text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                autoFocus
+              />
+              {recoveryError && (
+                <p className="mb-3 text-xs font-medium text-destructive">{recoveryError}</p>
+              )}
+              <button
+                onClick={handleVerifyCode}
+                disabled={recoveryLoading || recoveryCode.length !== 6}
+                className="h-11 w-full rounded-xl bg-primary text-sm font-bold text-primary-foreground transition-all hover:bg-primary/90 disabled:opacity-50"
+              >
+                {recoveryLoading ? "Verification..." : "Verifier le code"}
+              </button>
+              <button
+                onClick={() => { setRecoveryMode("email"); setRecoveryCode(""); setRecoveryError("") }}
+                className="mt-4 w-full text-center text-xs text-muted-foreground hover:text-primary transition-colors"
+              >
+                Renvoyer un nouveau code
+              </button>
+            </div>
+          )}
+
+          {/* Step 3: Password revealed */}
+          {recoveryMode === "success" && (
+            <div className="rounded-2xl border border-border bg-card p-6">
+              <div className="mb-5 flex items-center justify-center">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-500/10 border border-green-500/20">
+                  <ShieldCheck size={24} className="text-green-400" />
+                </div>
+              </div>
+              <p className="mb-4 text-center text-sm text-muted-foreground">
+                Identite verifiee. Voici votre mot de passe :
+              </p>
+              <div className="mb-5 rounded-xl border border-primary/20 bg-primary/5 p-4 text-center">
+                <p className="font-mono text-lg font-bold text-primary select-all">{recoveredPassword}</p>
+              </div>
+              <p className="mb-5 text-center text-[11px] text-muted-foreground">
+                Notez-le dans un endroit sur. Vous pouvez le modifier dans les parametres Vercel (Variables d{"'"}environnement).
+              </p>
+              <button
+                onClick={() => {
+                  setPassword(recoveredPassword)
+                  setRecoveryMode("off")
+                  setRecoveryEmail("")
+                  setRecoveryCode("")
+                  setRecoveredPassword("")
+                }}
+                className="h-11 w-full rounded-xl bg-primary text-sm font-bold text-primary-foreground transition-all hover:bg-primary/90"
+              >
+                Se connecter maintenant
+              </button>
+            </div>
+          )}
+
           <Link href="/" className="mt-6 flex items-center justify-center gap-2 text-xs text-muted-foreground hover:text-foreground">
             <ArrowLeft size={14} />
             Retour au site
