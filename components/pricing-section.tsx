@@ -78,17 +78,50 @@ export function PricingSection() {
                   const { generateDiagnosticPDF } = await import("@/lib/generate-pdf")
                   await generateDiagnosticPDF(
                     {
-                      scores: { global: 68, structure: 72, vegetation: 55, thermal: 78, etancheite: 65 },
-                      layers: {
-                        vegetal: { zones: [{ location: "Versant nord", severity: "modere", details: "Mousse presente sur environ 30% de la surface, concentration au niveau des joints entre tuiles.", recommendation: "Nettoyage anti-mousse recommande dans les 6 mois." }] },
-                        structure: { zones: [{ location: "Faitage", severity: "leger", details: "Legere usure du mortier de faitage sur 2 metres lineaires.", recommendation: "Surveillance annuelle, refection a envisager sous 2-3 ans." }] },
-                        etancheite: { zones: [{ location: "Noue gauche", severity: "modere", details: "Traces d'humidite anciennes au niveau de la noue. Joint de raccord a verifier.", recommendation: "Inspection rapprochee recommandee par un couvreur." }] },
-                        thermal: { deperditions: [{ zone: "Combles", severity: "modere", details: "Deperdition thermique detectee au niveau de la jonction toiture-mur pignon.", recommendation: "Verifier l'isolation des combles et le raccord avec le mur pignon." }] },
-                      },
+                      toitureType: "tuiles",
+                      toitureDescription: "Toiture en tuiles terre cuite de type canal, orientation sud/nord, surface estimee a 85m2. Presence de mousse visible sur le versant nord.",
+                      surfaceEstimeeM2: 85,
+                      surfacePrecision: "moyenne",
+                      scoreGlobal: 68,
                       summary: "Toiture en etat correct necessitant un entretien preventif. Mousse a traiter sur le versant nord, faitage a surveiller. Pas d'urgence mais des travaux d'entretien sont recommandes dans les 12 prochains mois.",
-                      disclaimer: "Ce rapport est un diagnostic automatise base sur l'imagerie aerienne. Il ne remplace pas l'expertise d'un professionnel sur site.",
-                    },
-                    "/images/hero-roof.jpg",
+                      vegetal: {
+                        description: "Mousse presente sur environ 30% de la surface du versant nord, concentration au niveau des joints entre tuiles. Lichen visible sur les rives.",
+                        zones: [
+                          { x: 20, y: 15, width: 30, height: 20, severity: "modere" as const, label: "Mousse versant nord" },
+                          { x: 60, y: 10, width: 15, height: 10, severity: "faible" as const, label: "Lichen sur rive" },
+                        ],
+                        score: 55,
+                      },
+                      structure: {
+                        description: "Legere usure du mortier de faitage sur 2 metres lineaires. Ensemble de la charpente en bon etat apparent.",
+                        zones: [
+                          { x: 30, y: 5, width: 25, height: 8, severity: "faible" as const, label: "Usure faitage" },
+                        ],
+                        score: 72,
+                      },
+                      etancheite: {
+                        description: "Traces d'humidite anciennes au niveau de la noue gauche. Joint de raccord a verifier. Gouttieres en bon etat.",
+                        zones: [
+                          { x: 5, y: 40, width: 12, height: 15, severity: "modere" as const, label: "Noue a verifier" },
+                        ],
+                        score: 65,
+                      },
+                      recommandations: [
+                        "Nettoyage anti-mousse du versant nord dans les 6 mois",
+                        "Surveillance annuelle du faitage, refection a envisager sous 2-3 ans",
+                        "Inspection rapprochee de la noue par un couvreur",
+                        "Verifier l'isolation des combles et le raccord mur pignon",
+                      ],
+                      thermique: {
+                        scoreIsolation: 78,
+                        pertesChaleur: [
+                          { x: 40, y: 30, width: 20, height: 15, intensite: 12, label: "Jonction mur pignon" },
+                        ],
+                        economieEstimee: 680,
+                        commentaire: "Isolation correcte dans l'ensemble. Deperdition detectee au niveau de la jonction toiture-mur pignon.",
+                      },
+                    } as never,
+                    "/placeholder.svg?height=400&width=600",
                     "12 Rue des Lilas, 78000 Versailles",
                     [{ type: "area", value: 85 }, { type: "perimeter", value: 42 }, { type: "ridge", value: 9 }]
                   )
