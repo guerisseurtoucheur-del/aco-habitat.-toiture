@@ -587,6 +587,33 @@ export function DiagnosticTool() {
         })
       } catch { /* silent */ }
 
+      // Auto-download PDF
+      try {
+        const { generateDiagnosticPDF, generateDiagnosticPDFBase64 } = await import("@/lib/generate-pdf")
+        await generateDiagnosticPDF(finalDiag, capturedImage || "", formattedAddress, mapMeasurements)
+
+        // Auto-send PDF by email
+        if (clientEmail) {
+          setSendingEmail(true)
+          try {
+            const pdfBase64 = await generateDiagnosticPDFBase64(finalDiag, capturedImage || "", formattedAddress, mapMeasurements)
+            await fetch("/api/send-report", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                email: clientEmail,
+                name: clientName,
+                address: formattedAddress,
+                globalScore: finalDiag.scoreGlobal || 0,
+                pdfBase64,
+              }),
+            })
+            setEmailSent(true)
+          } catch { /* silent */ }
+          finally { setSendingEmail(false) }
+        }
+      } catch { /* silent - PDF generation failed */ }
+
       setTimeout(() => {
         resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
       }, 300)
@@ -1597,57 +1624,33 @@ export function DiagnosticTool() {
                 </p>
                 <button
                   onClick={async () => {
-                    const { generateDiagnosticPDF, generateDiagnosticPDFBase64 } = await import("@/lib/generate-pdf")
+                    const { generateDiagnosticPDF } = await import("@/lib/generate-pdf")
                     await generateDiagnosticPDF(
                       diagnostic,
                       capturedImage || "",
                       formattedAddress,
                       mapMeasurements
                     )
-                    // Send PDF by email in background
-                    if (clientEmail && !emailSent) {
-                      setSendingEmail(true)
-                      try {
-                        const pdfBase64 = await generateDiagnosticPDFBase64(
-                          diagnostic,
-                          capturedImage || "",
-                          formattedAddress,
-                          mapMeasurements
-                        )
-                        await fetch("/api/send-report", {
-                          method: "POST",
-                          headers: { "Content-Type": "application/json" },
-                          body: JSON.stringify({
-                            email: clientEmail,
-                            address: formattedAddress,
-                            globalScore: diagnostic.scores?.global || 0,
-                            pdfBase64,
-                          }),
-                        })
-                        setEmailSent(true)
-                      } catch { /* silent */ }
-                      finally { setSendingEmail(false) }
-                    }
                   }}
                   className="group relative inline-flex items-center gap-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-8 py-4 text-base font-bold text-white shadow-lg shadow-cyan-500/25 transition-all hover:shadow-xl hover:shadow-cyan-500/30"
                 >
                   <Download size={20} />
-                  Telecharger le rapport PDF
+                  Re-telecharger le rapport PDF
                   <span className="ml-1 rounded-md bg-white/20 px-2 py-0.5 text-[10px] font-semibold">INCLUS</span>
                 </button>
                 {emailSent ? (
                   <p className="mt-3 flex items-center justify-center gap-1.5 text-xs font-medium text-green-400">
                     <CheckCircle2 size={12} />
-                    Rapport envoye a {clientEmail}
+                    Rapport PDF telecharge et envoye a {clientEmail}
                   </p>
                 ) : sendingEmail ? (
                   <p className="mt-3 flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
                     <Loader2 size={12} className="animate-spin" />
-                    Envoi du rapport par email...
+                    Envoi du rapport par email en cours...
                   </p>
                 ) : (
                   <p className="mt-3 text-[10px] text-muted-foreground">
-                    {clientEmail ? `Le rapport sera aussi envoye a ${clientEmail}` : "Telechargement instantane - Aucune inscription requise"}
+                    Le rapport PDF a ete telecharge automatiquement.
                   </p>
                 )}
               </div>
