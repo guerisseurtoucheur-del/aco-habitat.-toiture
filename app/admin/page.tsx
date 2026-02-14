@@ -50,6 +50,7 @@ export default function AdminPage() {
   const [recoveryLoading, setRecoveryLoading] = useState(false)
   const [recoveryError, setRecoveryError] = useState("")
   const [recoveredPassword, setRecoveredPassword] = useState("")
+  const [showPassword, setShowPassword] = useState(false)
 
   async function handleLogin() {
     setLoading(true)
@@ -75,7 +76,7 @@ export default function AdminPage() {
     }
   }
 
-  async function handleSendRecoveryCode() {
+  async function handleRecoverPassword() {
     setRecoveryLoading(true)
     setRecoveryError("")
     try {
@@ -84,30 +85,9 @@ export default function AdminPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email: recoveryEmail }),
       })
-      if (res.ok) {
-        setRecoveryMode("code")
-      } else {
-        setRecoveryError("Erreur lors de l'envoi.")
-      }
-    } catch {
-      setRecoveryError("Erreur de connexion.")
-    } finally {
-      setRecoveryLoading(false)
-    }
-  }
-
-  async function handleVerifyCode() {
-    setRecoveryLoading(true)
-    setRecoveryError("")
-    try {
-      const res = await fetch("/api/admin/recover", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ code: recoveryCode }),
-      })
       const data = await res.json()
       if (!res.ok) {
-        setRecoveryError(data.error || "Code invalide.")
+        setRecoveryError(data.error || "Email non reconnu.")
         return
       }
       setRecoveredPassword(data.password)
@@ -164,15 +144,29 @@ export default function AdminPage() {
               <label className="mb-2 block text-xs font-medium text-muted-foreground">
                 Mot de passe administrateur
               </label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleLogin()}
-                placeholder="Entrez le mot de passe"
-                className="mb-4 h-11 w-full rounded-xl border border-border bg-secondary/50 px-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-                autoFocus
-              />
+              <div className="relative mb-4">
+                <input
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && handleLogin()}
+                  placeholder="Entrez le mot de passe"
+                  className="h-11 w-full rounded-xl border border-border bg-secondary/50 px-4 pr-11 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                  autoFocus
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  aria-label={showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}
+                >
+                  {showPassword ? (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><path d="m2 2 20 20"/><path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/></svg>
+                  ) : (
+                    <Eye size={18} />
+                  )}
+                </button>
+              </div>
               {error && (
                 <p className="mb-3 text-xs font-medium text-destructive">{error}</p>
               )}
@@ -192,11 +186,11 @@ export default function AdminPage() {
             </div>
           )}
 
-          {/* Step 1: Enter email */}
+          {/* Recovery: Enter email */}
           {recoveryMode === "email" && (
             <div className="rounded-2xl border border-border bg-card p-6">
               <p className="mb-4 text-sm text-muted-foreground">
-                Entrez l{"'"}adresse email associee au compte admin. Un code de verification a 6 chiffres vous sera envoye.
+                Entrez l{"'"}adresse email associee au compte admin pour recuperer votre mot de passe.
               </p>
               <label className="mb-2 block text-xs font-medium text-muted-foreground">
                 Adresse email admin
@@ -205,7 +199,7 @@ export default function AdminPage() {
                 type="email"
                 value={recoveryEmail}
                 onChange={(e) => setRecoveryEmail(e.target.value)}
-                onKeyDown={(e) => e.key === "Enter" && handleSendRecoveryCode()}
+                onKeyDown={(e) => e.key === "Enter" && handleRecoverPassword()}
                 placeholder="votre@email.fr"
                 className="mb-4 h-11 w-full rounded-xl border border-border bg-secondary/50 px-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                 autoFocus
@@ -214,58 +208,17 @@ export default function AdminPage() {
                 <p className="mb-3 text-xs font-medium text-destructive">{recoveryError}</p>
               )}
               <button
-                onClick={handleSendRecoveryCode}
+                onClick={handleRecoverPassword}
                 disabled={recoveryLoading || !recoveryEmail}
                 className="h-11 w-full rounded-xl bg-primary text-sm font-bold text-primary-foreground transition-all hover:bg-primary/90 disabled:opacity-50"
               >
-                {recoveryLoading ? "Envoi en cours..." : "Envoyer le code"}
+                {recoveryLoading ? "Verification..." : "Recuperer mon mot de passe"}
               </button>
               <button
                 onClick={() => { setRecoveryMode("off"); setRecoveryError("") }}
                 className="mt-4 w-full text-center text-xs text-muted-foreground hover:text-primary transition-colors"
               >
                 Retour a la connexion
-              </button>
-            </div>
-          )}
-
-          {/* Step 2: Enter code */}
-          {recoveryMode === "code" && (
-            <div className="rounded-2xl border border-border bg-card p-6">
-              <div className="mb-4 rounded-xl border border-primary/20 bg-primary/5 p-3">
-                <p className="text-xs text-primary">
-                  Un code a 6 chiffres a ete envoye a votre adresse email. Verifiez aussi les spams.
-                </p>
-              </div>
-              <label className="mb-2 block text-xs font-medium text-muted-foreground">
-                Code de verification
-              </label>
-              <input
-                type="text"
-                inputMode="numeric"
-                maxLength={6}
-                value={recoveryCode}
-                onChange={(e) => setRecoveryCode(e.target.value.replace(/\D/g, ""))}
-                onKeyDown={(e) => e.key === "Enter" && recoveryCode.length === 6 && handleVerifyCode()}
-                placeholder="000000"
-                className="mb-4 h-14 w-full rounded-xl border border-border bg-secondary/50 px-4 text-center text-2xl font-bold tracking-[0.5em] text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
-                autoFocus
-              />
-              {recoveryError && (
-                <p className="mb-3 text-xs font-medium text-destructive">{recoveryError}</p>
-              )}
-              <button
-                onClick={handleVerifyCode}
-                disabled={recoveryLoading || recoveryCode.length !== 6}
-                className="h-11 w-full rounded-xl bg-primary text-sm font-bold text-primary-foreground transition-all hover:bg-primary/90 disabled:opacity-50"
-              >
-                {recoveryLoading ? "Verification..." : "Verifier le code"}
-              </button>
-              <button
-                onClick={() => { setRecoveryMode("email"); setRecoveryCode(""); setRecoveryError("") }}
-                className="mt-4 w-full text-center text-xs text-muted-foreground hover:text-primary transition-colors"
-              >
-                Renvoyer un nouveau code
               </button>
             </div>
           )}
