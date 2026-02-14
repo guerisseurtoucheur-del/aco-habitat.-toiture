@@ -153,11 +153,11 @@ async function buildPDF(
   // Sub-scores
   const subStartX = margin + 65
   const subGap = 35
-  drawScoreCircle(subStartX, globalCy, 10, diagnostic.vegetal.score, "Vegetal")
-  drawScoreCircle(subStartX + subGap, globalCy, 10, diagnostic.structure.score, "Structure")
-  drawScoreCircle(subStartX + subGap * 2, globalCy, 10, diagnostic.etancheite.score, "Etancheite")
+  drawScoreCircle(subStartX, globalCy, 10, diagnostic.vegetal?.score ?? 0, "Vegetal")
+  drawScoreCircle(subStartX + subGap, globalCy, 10, diagnostic.structure?.score ?? 0, "Structure")
+  drawScoreCircle(subStartX + subGap * 2, globalCy, 10, diagnostic.etancheite?.score ?? 0, "Etancheite")
   if (diagnostic.thermique) {
-    drawScoreCircle(subStartX + subGap * 3, globalCy, 10, diagnostic.thermique.scoreIsolation, "Thermique")
+    drawScoreCircle(subStartX + subGap * 3, globalCy, 10, diagnostic.thermique?.scoreIsolation ?? 0, "Thermique")
   }
   y = globalCy + 26
 
@@ -229,16 +229,22 @@ async function buildPDF(
   }
 
   // ── VEGETATION ──
-  sectionTitle("VEGETATION & MOUSSE", [132, 204, 22], "LEAF")
-  sectionContent(diagnostic.vegetal.description, diagnostic.vegetal.zones, diagnostic.vegetal.score)
+  if (diagnostic.vegetal) {
+    sectionTitle("VEGETATION & MOUSSE", [132, 204, 22], "LEAF")
+    sectionContent(diagnostic.vegetal.description, diagnostic.vegetal.zones || [], diagnostic.vegetal.score ?? 0)
+  }
 
   // ── STRUCTURE ──
-  sectionTitle("STRUCTURE & CHARPENTE", [239, 68, 68], "TOOL")
-  sectionContent(diagnostic.structure.description, diagnostic.structure.zones, diagnostic.structure.score)
+  if (diagnostic.structure) {
+    sectionTitle("STRUCTURE & CHARPENTE", [239, 68, 68], "TOOL")
+    sectionContent(diagnostic.structure.description, diagnostic.structure.zones || [], diagnostic.structure.score ?? 0)
+  }
 
   // ── ETANCHEITE ──
-  sectionTitle("ETANCHEITE & HUMIDITE", [34, 197, 94], "DROP")
-  sectionContent(diagnostic.etancheite.description, diagnostic.etancheite.zones, diagnostic.etancheite.score)
+  if (diagnostic.etancheite) {
+    sectionTitle("ETANCHEITE & HUMIDITE", [34, 197, 94], "DROP")
+    sectionContent(diagnostic.etancheite.description, diagnostic.etancheite.zones || [], diagnostic.etancheite.score ?? 0)
+  }
 
   // ── THERMIQUE ──
   if (diagnostic.thermique) {
@@ -327,10 +333,10 @@ async function buildPDF(
 
   const scoreItems = [
     { label: "Score global", score: diagnostic.scoreGlobal },
-    { label: "Vegetal (mousse, lichen)", score: diagnostic.vegetal.score },
-    { label: "Structure (tuiles, faitage)", score: diagnostic.structure.score },
-    { label: "Etancheite (infiltrations)", score: diagnostic.etancheite.score },
-    ...(diagnostic.thermique ? [{ label: "Thermique (isolation)", score: diagnostic.thermique.scoreIsolation }] : []),
+    ...(diagnostic.vegetal ? [{ label: "Vegetal (mousse, lichen)", score: diagnostic.vegetal.score ?? 0 }] : []),
+    ...(diagnostic.structure ? [{ label: "Structure (tuiles, faitage)", score: diagnostic.structure.score ?? 0 }] : []),
+    ...(diagnostic.etancheite ? [{ label: "Etancheite (infiltrations)", score: diagnostic.etancheite.score ?? 0 }] : []),
+    ...(diagnostic.thermique ? [{ label: "Thermique (isolation)", score: diagnostic.thermique.scoreIsolation ?? 0 }] : []),
   ]
 
   scoreItems.forEach((item) => {
@@ -356,9 +362,9 @@ async function buildPDF(
   y += 7
 
   const allZones = [
-    ...diagnostic.vegetal.zones.map(z => ({ ...z, cat: "Vegetal" })),
-    ...diagnostic.structure.zones.map(z => ({ ...z, cat: "Structure" })),
-    ...diagnostic.etancheite.zones.map(z => ({ ...z, cat: "Etancheite" })),
+    ...(diagnostic.vegetal?.zones || []).map(z => ({ ...z, cat: "Vegetal" })),
+    ...(diagnostic.structure?.zones || []).map(z => ({ ...z, cat: "Structure" })),
+    ...(diagnostic.etancheite?.zones || []).map(z => ({ ...z, cat: "Etancheite" })),
   ]
 
   if (allZones.length > 0) {
