@@ -73,7 +73,33 @@ export function PricingSection() {
                 ))}
               </ul>
 
-              <div className="mt-8 rounded-xl border border-border bg-secondary/30 p-4">
+              <button
+                onClick={async () => {
+                  const { generateDiagnosticPDF } = await import("@/lib/generate-pdf")
+                  await generateDiagnosticPDF(
+                    {
+                      scores: { global: 68, structure: 72, vegetation: 55, thermal: 78, etancheite: 65 },
+                      layers: {
+                        vegetal: { zones: [{ location: "Versant nord", severity: "modere", details: "Mousse presente sur environ 30% de la surface, concentration au niveau des joints entre tuiles.", recommendation: "Nettoyage anti-mousse recommande dans les 6 mois." }] },
+                        structure: { zones: [{ location: "Faitage", severity: "leger", details: "Legere usure du mortier de faitage sur 2 metres lineaires.", recommendation: "Surveillance annuelle, refection a envisager sous 2-3 ans." }] },
+                        etancheite: { zones: [{ location: "Noue gauche", severity: "modere", details: "Traces d'humidite anciennes au niveau de la noue. Joint de raccord a verifier.", recommendation: "Inspection rapprochee recommandee par un couvreur." }] },
+                        thermal: { deperditions: [{ zone: "Combles", severity: "modere", details: "Deperdition thermique detectee au niveau de la jonction toiture-mur pignon.", recommendation: "Verifier l'isolation des combles et le raccord avec le mur pignon." }] },
+                      },
+                      summary: "Toiture en etat correct necessitant un entretien preventif. Mousse a traiter sur le versant nord, faitage a surveiller. Pas d'urgence mais des travaux d'entretien sont recommandes dans les 12 prochains mois.",
+                      disclaimer: "Ce rapport est un diagnostic automatise base sur l'imagerie aerienne. Il ne remplace pas l'expertise d'un professionnel sur site.",
+                    },
+                    "/images/hero-roof.jpg",
+                    "12 Rue des Lilas, 78000 Versailles",
+                    [{ type: "area", value: 85 }, { type: "perimeter", value: 42 }, { type: "ridge", value: 9 }]
+                  )
+                }}
+                className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl border border-border bg-secondary/50 px-6 py-3 text-sm font-medium text-secondary-foreground transition-all hover:bg-secondary"
+              >
+                <FileText size={16} />
+                Voir un exemple de rapport PDF
+              </button>
+
+              <div className="mt-4 rounded-xl border border-border bg-secondary/30 p-4">
                 <p className="text-xs leading-relaxed text-muted-foreground">
                   <span className="font-semibold text-foreground">Paiement securise par Stripe.</span>{" "}
                   Vous ne payez que lorsque vous lancez un diagnostic. Aucun abonnement, aucun engagement.

@@ -15,7 +15,7 @@ function severityLabel(score: number): string {
   return "Etat critique"
 }
 
-export async function generateDiagnosticPDF(
+async function buildPDF(
   diagnostic: DiagnosticResult,
   capturedImage: string,
   address: string,
@@ -464,7 +464,34 @@ export async function generateDiagnosticPDF(
     doc.text("Ce rapport est un diagnostic automatise base sur l'imagerie. Il ne remplace pas l'expertise d'un professionnel sur site.", margin, pageH - 3)
   }
 
-  // Save
+  return doc
+}
+
+/** Generate and download the PDF */
+export async function generateDiagnosticPDF(
+  diagnostic: DiagnosticResult,
+  capturedImage: string,
+  address: string,
+  measurements: { type: string; value: number }[]
+) {
+  const doc = await buildPDF(diagnostic, capturedImage, address, measurements)
   const fileName = `diagnostic-toiture-aco-habitat-${new Date().toISOString().slice(0, 10)}.pdf`
   doc.save(fileName)
+}
+
+/** Generate the PDF and return as base64 string (for email attachment) */
+export async function generateDiagnosticPDFBase64(
+  diagnostic: DiagnosticResult,
+  capturedImage: string,
+  address: string,
+  measurements: { type: string; value: number }[]
+): Promise<string> {
+  const doc = await buildPDF(diagnostic, capturedImage, address, measurements)
+  const arrayBuffer = doc.output("arraybuffer")
+  const uint8 = new Uint8Array(arrayBuffer)
+  let binary = ""
+  for (let i = 0; i < uint8.length; i++) {
+    binary += String.fromCharCode(uint8[i])
+  }
+  return btoa(binary)
 }

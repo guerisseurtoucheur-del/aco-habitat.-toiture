@@ -1,0 +1,79 @@
+import { NextResponse } from "next/server"
+import nodemailer from "nodemailer"
+
+export async function POST(req: Request) {
+  try {
+    const { email, address, globalScore, pdfBase64 } = await req.json()
+
+    if (!email || !pdfBase64) {
+      return NextResponse.json({ error: "Email et PDF requis" }, { status: 400 })
+    }
+
+    const transporter = nodemailer.createTransport({
+      host: process.env.SMTP_HOST || "smtp.gmail.com",
+      port: Number(process.env.SMTP_PORT) || 587,
+      secure: false,
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+    })
+
+    const scoreText = globalScore >= 75 ? "Bon etat" : globalScore >= 50 ? "A surveiller" : "Intervention recommandee"
+
+    await transporter.sendMail({
+      from: `"ACO-HABITAT Diagnostic" <${process.env.SMTP_USER || "noreply@aco-habitat.fr"}>`,
+      to: email,
+      subject: `Votre diagnostic toiture - ${address}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
+          <div style="text-align: center; padding: 20px; background: #0a0a0a; border-radius: 12px 12px 0 0;">
+            <h1 style="color: #22d3ee; margin: 0; font-size: 24px;">ACO-HABITAT</h1>
+            <p style="color: #888; margin: 5px 0 0; font-size: 14px;">Diagnostic Toiture par IA</p>
+          </div>
+          
+          <div style="padding: 30px; background: #111; border-radius: 0 0 12px 12px;">
+            <h2 style="color: #fff; margin: 0 0 10px;">Votre rapport est pret</h2>
+            <p style="color: #999; line-height: 1.6;">
+              Bonjour,<br><br>
+              Votre diagnostic toiture pour <strong style="color: #fff;">${address}</strong> est termine.
+            </p>
+            
+            <div style="background: #1a1a1a; border-radius: 8px; padding: 20px; margin: 20px 0; text-align: center;">
+              <p style="color: #888; margin: 0 0 5px; font-size: 12px;">SCORE GLOBAL</p>
+              <p style="color: ${globalScore >= 75 ? "#22c55e" : globalScore >= 50 ? "#f59e0b" : "#ef4444"}; font-size: 36px; font-weight: bold; margin: 0;">
+                ${globalScore}/100
+              </p>
+              <p style="color: #888; margin: 5px 0 0; font-size: 14px;">${scoreText}</p>
+            </div>
+
+            <p style="color: #999; line-height: 1.6;">
+              Vous trouverez votre rapport PDF complet en piece jointe de cet email. 
+              Ce document contient l'analyse detaillee avec les scores par categorie, 
+              les zones problematiques detectees et nos recommandations.
+            </p>
+
+            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
+              <p style="color: #666; font-size: 12px; margin: 0;">
+                ACO-HABITAT - Diagnostic Toiture par IA<br>
+                aco.habitat@orange.fr | diag.aco-habitat.fr
+              </p>
+            </div>
+          </div>
+        </div>
+      `,
+      attachments: [
+        {
+          filename: `diagnostic-toiture-${new Date().toISOString().slice(0, 10)}.pdf`,
+          content: Buffer.from(pdfBase64, "base64"),
+          contentType: "application/pdf",
+        },
+      ],
+    })
+
+    return NextResponse.json({ success: true })
+  } catch (error) {
+    console.error("Error sending report email:", error)
+    return NextResponse.json({ error: "Erreur envoi email" }, { status: 500 })
+  }
+}

@@ -32,7 +32,19 @@ function AnimatedCounter({ target, suffix = "" }: { target: number; suffix?: str
   )
 }
 
+function useDiagnosticCount() {
+  const [count, setCount] = useState(147) // fallback
+  useEffect(() => {
+    fetch("/api/diagnostics")
+      .then(r => r.json())
+      .then(d => { if (d.count > 0) setCount(d.count) })
+      .catch(() => {})
+  }, [])
+  return count
+}
+
 export function HeroSection() {
+  const diagCount = useDiagnosticCount()
   return (
     <section className="relative flex min-h-screen items-center overflow-hidden">
       {/* Background layers */}
@@ -117,7 +129,7 @@ export function HeroSection() {
           <div className="grid grid-cols-1 gap-px rounded-2xl border border-border bg-border overflow-hidden sm:grid-cols-3">
             <div className="flex flex-col items-center gap-2 bg-card px-6 py-8">
               <span className="text-3xl font-bold text-foreground" style={{ fontFamily: "var(--font-heading)" }}>
-                <AnimatedCounter target={500} suffix="+" />
+                <AnimatedCounter target={diagCount} suffix="+" />
               </span>
               <span className="text-sm text-muted-foreground">Diagnostics realises</span>
             </div>

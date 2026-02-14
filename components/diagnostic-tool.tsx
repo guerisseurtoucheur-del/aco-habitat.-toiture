@@ -380,6 +380,9 @@ export function DiagnosticTool() {
   const [diagnostic, setDiagnostic] = useState<DiagnosticResult | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [uploadMode, setUploadMode] = useState(false)
+  const [clientEmail, setClientEmail] = useState("")
+  const [emailSent, setEmailSent] = useState(false)
+  const [sendingEmail, setSendingEmail] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const resultsRef = useRef<HTMLDivElement>(null)
   const handleSearchRef = useRef<() => void>(() => {})
@@ -559,8 +562,26 @@ export function DiagnosticTool() {
         return
       }
 
-      setDiagnostic(ensureRealisticZones(diagData.diagnostic))
+      const finalDiag = ensureRealisticZones(diagData.diagnostic)
+      setDiagnostic(finalDiag)
       setStep("results")
+
+      // Save to database (fire and forget)
+      try {
+        fetch("/api/diagnostics", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: clientEmail,
+            address: formattedAddress,
+            globalScore: finalDiag.scores?.global || 0,
+            structureScore: finalDiag.scores?.structure || 0,
+            vegetalScore: finalDiag.scores?.vegetation || 0,
+            thermalScore: finalDiag.scores?.thermal || 0,
+            stripeSessionId: typeof window !== "undefined" ? window.__stripeSessionId || "" : "",
+          }),
+        })
+      } catch { /* silent */ }
 
       setTimeout(() => {
         resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
@@ -1003,6 +1024,24 @@ export function DiagnosticTool() {
                     </div>
                   ))}
                 </div>
+              </div>
+
+              {/* Email field */}
+              <div className="mb-4">
+                <label htmlFor="client-email" className="mb-2 block text-xs font-semibold text-muted-foreground">
+                  Votre email (pour recevoir le rapport PDF)
+                </label>
+                <input
+                  id="client-email"
+                  type="email"
+                  value={clientEmail}
+                  onChange={(e) => setClientEmail(e.target.value)}
+                  placeholder="votre@email.fr"
+                  className="h-11 w-full rounded-xl border border-border bg-background px-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                />
+                <p className="mt-1 text-[10px] text-muted-foreground">
+                  Le rapport PDF sera envoye a cette adresse apres l{"'"}analyse.
+                </p>
               </div>
 
               {/* Stripe Embedded Checkout */}
@@ -1520,13 +1559,37 @@ export function DiagnosticTool() {
                 </p>
                 <button
                   onClick={async () => {
-                    const { generateDiagnosticPDF } = await import("@/lib/generate-pdf")
+                    const { generateDiagnosticPDF, generateDiagnosticPDFBase64 } = await import("@/lib/generate-pdf")
                     await generateDiagnosticPDF(
                       diagnostic,
                       capturedImage || "",
                       formattedAddress,
                       mapMeasurements
                     )
+                    // Send PDF by email in background
+                    if (clientEmail && !emailSent) {
+                      setSendingEmail(true)
+                      try {
+                        const pdfBase64 = await generateDiagnosticPDFBase64(
+                          diagnostic,
+                          capturedImage || "",
+                          formattedAddress,
+                          mapMeasurements
+                        )
+                        await fetch("/api/send-report", {
+                          method: "POST",
+                          headers: { "Content-Type": "application/json" },
+                          body: JSON.stringify({
+                            email: clientEmail,
+                            address: formattedAddress,
+                            globalScore: diagnostic.scores?.global || 0,
+                            pdfBase64,
+                          }),
+                        })
+                        setEmailSent(true)
+                      } catch { /* silent */ }
+                      finally { setSendingEmail(false) }
+                    }
                   }}
                   className="group relative inline-flex items-center gap-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-8 py-4 text-base font-bold text-white shadow-lg shadow-cyan-500/25 transition-all hover:shadow-xl hover:shadow-cyan-500/30"
                 >
@@ -1534,9 +1597,21 @@ export function DiagnosticTool() {
                   Telecharger le rapport PDF
                   <span className="ml-1 rounded-md bg-white/20 px-2 py-0.5 text-[10px] font-semibold">INCLUS</span>
                 </button>
-                <p className="mt-3 text-[10px] text-muted-foreground">
-                  Telechargement instantane - Aucune inscription requise
-                </p>
+                {emailSent ? (
+                  <p className="mt-3 flex items-center justify-center gap-1.5 text-xs font-medium text-green-400">
+                    <CheckCircle2 size={12} />
+                    Rapport envoye a {clientEmail}
+                  </p>
+                ) : sendingEmail ? (
+                  <p className="mt-3 flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
+                    <Loader2 size={12} className="animate-spin" />
+                    Envoi du rapport par email...
+                  </p>
+                ) : (
+                  <p className="mt-3 text-[10px] text-muted-foreground">
+                    {clientEmail ? `Le rapport sera aussi envoye a ${clientEmail}` : "Telechargement instantane - Aucune inscription requise"}
+                  </p>
+                )}
               </div>
             </div>
 
