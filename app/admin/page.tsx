@@ -89,10 +89,9 @@ export default function AdminPage() {
       })
       const data = await res.json()
       if (!res.ok) {
-        setRecoveryError(data.error || "Email non reconnu.")
+        setRecoveryError(data.error || "Erreur lors de l'envoi.")
         return
       }
-      setRecoveredPassword(data.password)
       setRecoveryMode("success")
     } catch {
       setRecoveryError("Erreur de connexion.")
@@ -225,34 +224,28 @@ export default function AdminPage() {
             </div>
           )}
 
-          {/* Step 3: Password revealed */}
+          {/* Step 2: Email sent confirmation */}
           {recoveryMode === "success" && (
             <div className="rounded-2xl border border-border bg-card p-6">
               <div className="mb-5 flex items-center justify-center">
                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-500/10 border border-green-500/20">
-                  <ShieldCheck size={24} className="text-green-400" />
+                  <Mail size={24} className="text-green-400" />
                 </div>
               </div>
-              <p className="mb-4 text-center text-sm text-muted-foreground">
-                Identite verifiee. Voici votre mot de passe :
+              <p className="mb-2 text-center text-sm font-semibold text-foreground">
+                Email envoye
               </p>
-              <div className="mb-5 rounded-xl border border-primary/20 bg-primary/5 p-4 text-center">
-                <p className="font-mono text-lg font-bold text-primary select-all">{recoveredPassword}</p>
-              </div>
-              <p className="mb-5 text-center text-[11px] text-muted-foreground">
-                Notez-le dans un endroit sur. Vous pouvez le modifier dans les parametres Vercel (Variables d{"'"}environnement).
+              <p className="mb-5 text-center text-sm text-muted-foreground">
+                Si cette adresse correspond au compte admin, un email contenant votre mot de passe a ete envoye. Verifiez votre boite de reception et vos spams.
               </p>
               <button
                 onClick={() => {
-                  setPassword(recoveredPassword)
                   setRecoveryMode("off")
                   setRecoveryEmail("")
-                  setRecoveryCode("")
-                  setRecoveredPassword("")
                 }}
                 className="h-11 w-full rounded-xl bg-primary text-sm font-bold text-primary-foreground transition-all hover:bg-primary/90"
               >
-                Se connecter maintenant
+                Retour a la connexion
               </button>
             </div>
           )}
