@@ -7,7 +7,7 @@ export async function POST(req: NextRequest) {
   try {
     const { password } = await req.json()
     
-    if (password !== ADMIN_PASSWORD) {
+    if (!password || password.trim() !== ADMIN_PASSWORD.trim()) {
       return NextResponse.json({ error: "Mot de passe incorrect" }, { status: 401 })
     }
 
