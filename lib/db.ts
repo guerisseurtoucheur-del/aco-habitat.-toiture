@@ -29,6 +29,18 @@ export async function getDiagnosticCount(): Promise<number> {
   return result.length > 0 ? result[0].value : 0
 }
 
+export async function getAllDiagnostics() {
+  const result = await sql`
+    SELECT 
+      id, client_name, client_phone, email, address, 
+      global_score, structure_score, vegetal_score, thermal_score,
+      stripe_session_id, created_at
+    FROM diagnostics
+    ORDER BY created_at DESC
+  `
+  return result
+}
+
 export async function saveAbandonedCart(data: {
   email: string
   address: string
