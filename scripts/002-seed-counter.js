@@ -4,7 +4,7 @@ const sql = neon(process.env.DATABASE_URL)
 
 async function seed() {
   // Insert initial counter if not exists
-  await sql`INSERT INTO stats (key, value) VALUES ('total_diagnostics', 147) ON CONFLICT (key) DO NOTHING`
+  await sql`UPDATE stats SET value = 147 WHERE key = 'total_diagnostics'`
   console.log('Counter seeded to 147')
 
   // Verify
