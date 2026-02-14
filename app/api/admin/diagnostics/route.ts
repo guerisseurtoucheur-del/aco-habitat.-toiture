@@ -7,8 +7,6 @@ export async function POST(req: NextRequest) {
   try {
     const { password } = await req.json()
     
-    console.log("[v0] Login attempt - received length:", password?.length, "expected length:", ADMIN_PASSWORD?.length, "env defined:", !!process.env.ADMIN_PASSWORD)
-
     if (!password || password.trim() !== ADMIN_PASSWORD.trim()) {
       return NextResponse.json({ error: "Mot de passe incorrect" }, { status: 401 })
     }

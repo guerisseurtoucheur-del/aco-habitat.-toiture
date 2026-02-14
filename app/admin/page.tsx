@@ -10,10 +10,12 @@ interface DiagnosticRecord {
   client_phone: string
   email: string
   address: string
-  global_score: number
-  structure_score: number
-  vegetal_score: number
-  thermal_score: number
+  score_global: number
+  score_structure: number
+  score_vegetal: number
+  score_etancheite: number
+  score_thermique: number
+  toiture_type: string
   stripe_session_id: string
   created_at: string
 }
@@ -100,10 +102,10 @@ export default function AdminPage() {
   }
 
   function exportCSV() {
-    const headers = ["Date", "Nom", "Telephone", "Email", "Adresse", "Score Global", "Structure", "Vegetal", "Thermique"]
+    const headers = ["Date", "Nom", "Telephone", "Email", "Adresse", "Score Global", "Structure", "Vegetal", "Etancheite", "Thermique"]
     const rows = filteredDiags.map(d => [
       formatDate(d.created_at), d.client_name, d.client_phone, d.email, d.address,
-      d.global_score, d.structure_score, d.vegetal_score, d.thermal_score,
+      d.score_global, d.score_structure, d.score_vegetal, d.score_etancheite, d.score_thermique,
     ])
     const csv = [headers, ...rows].map(r => r.map(c => `"${c}"`).join(",")).join("\n")
     const blob = new Blob(["\ufeff" + csv], { type: "text/csv;charset=utf-8" })
@@ -314,10 +316,11 @@ export default function AdminPage() {
               <h3 className="mb-3 text-xs font-semibold text-muted-foreground uppercase tracking-wider">Scores du diagnostic</h3>
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                 {[
-                  { label: "Global", score: selectedDiag.global_score },
-                  { label: "Structure", score: selectedDiag.structure_score },
-                  { label: "Vegetal", score: selectedDiag.vegetal_score },
-                  { label: "Thermique", score: selectedDiag.thermal_score },
+                    { label: "Global", score: selectedDiag.score_global },
+                    { label: "Structure", score: selectedDiag.score_structure },
+                    { label: "Vegetal", score: selectedDiag.score_vegetal },
+                    { label: "Etancheite", score: selectedDiag.score_etancheite },
+                    { label: "Thermique", score: selectedDiag.score_thermique },
                 ].map(({ label, score }) => (
                   <div key={label} className="rounded-xl border border-border bg-secondary/30 p-3 text-center">
                     <p className="text-[10px] font-medium text-muted-foreground">{label}</p>
@@ -348,7 +351,7 @@ export default function AdminPage() {
 
   // Dashboard
   const avgScore = diagnostics.length > 0
-    ? Math.round(diagnostics.reduce((a, d) => a + (d.global_score || 0), 0) / diagnostics.length)
+    ? Math.round(diagnostics.reduce((a, d) => a + (d.score_global || 0), 0) / diagnostics.length)
     : 0
 
   return (
@@ -451,7 +454,7 @@ export default function AdminPage() {
                         {d.address || "-"}
                       </td>
                       <td className="px-4 py-3 text-center">
-                        <ScoreBadge score={d.global_score} />
+                        <ScoreBadge score={d.score_global} />
                       </td>
                       <td className="px-4 py-3 text-center">
                         <button

@@ -14,7 +14,7 @@ export async function saveDiagnostic(data: {
   stripeSessionId: string
 }) {
   await sql`
-    INSERT INTO diagnostics (client_name, client_phone, email, address, global_score, structure_score, vegetal_score, thermal_score, stripe_session_id)
+    INSERT INTO diagnostics (client_name, client_phone, email, address, score_global, score_structure, score_vegetal, score_thermique, stripe_session_id)
     VALUES (${data.name}, ${data.phone}, ${data.email}, ${data.address}, ${data.globalScore}, ${data.structureScore}, ${data.vegetalScore}, ${data.thermalScore}, ${data.stripeSessionId})
   `
   // Increment counter
@@ -33,8 +33,8 @@ export async function getAllDiagnostics() {
   const result = await sql`
     SELECT 
       id, client_name, client_phone, email, address, 
-      global_score, structure_score, vegetal_score, thermal_score,
-      stripe_session_id, created_at
+      score_global, score_structure, score_vegetal, score_etancheite, score_thermique,
+      toiture_type, stripe_session_id, created_at
     FROM diagnostics
     ORDER BY created_at DESC
   `
