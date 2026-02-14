@@ -46,13 +46,13 @@ export default function AdminPage() {
   const [totalCount, setTotalCount] = useState(0)
   const [searchTerm, setSearchTerm] = useState("")
   const [selectedDiag, setSelectedDiag] = useState<DiagnosticRecord | null>(null)
-  const [recoveryMode, setRecoveryMode] = useState<"off" | "email" | "code" | "success">("off")
-  const [recoveryEmail, setRecoveryEmail] = useState("")
-  const [recoveryCode, setRecoveryCode] = useState("")
+  const [recoveryMode, setRecoveryMode] = useState<"off" | "question" | "success">("off")
+  const [securityAnswer, setSecurityAnswer] = useState("")
   const [recoveryLoading, setRecoveryLoading] = useState(false)
   const [recoveryError, setRecoveryError] = useState("")
   const [recoveredPassword, setRecoveredPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
+  const [showRecoveredPassword, setShowRecoveredPassword] = useState(false)
 
   async function handleLogin() {
     setLoading(true)
@@ -85,13 +85,14 @@ export default function AdminPage() {
       const res = await fetch("/api/admin/recover", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: recoveryEmail }),
+        body: JSON.stringify({ answer: securityAnswer }),
       })
       const data = await res.json()
       if (!res.ok) {
-        setRecoveryError(data.error || "Erreur lors de l'envoi.")
+        setRecoveryError(data.error || "Reponse incorrecte.")
         return
       }
+      setRecoveredPassword(data.password)
       setRecoveryMode("success")
     } catch {
       setRecoveryError("Erreur de connexion.")
@@ -179,7 +180,7 @@ export default function AdminPage() {
                 {loading ? "Connexion..." : "Se connecter"}
               </button>
               <button
-                onClick={() => { setRecoveryMode("email"); setError("") }}
+                onClick={() => { setRecoveryMode("question"); setError("") }}
                 className="mt-4 w-full text-center text-xs text-muted-foreground hover:text-primary transition-colors"
               >
                 Mot de passe oublie ?
@@ -187,21 +188,21 @@ export default function AdminPage() {
             </div>
           )}
 
-          {/* Recovery: Enter email */}
-          {recoveryMode === "email" && (
+          {/* Recovery: Security question */}
+          {recoveryMode === "question" && (
             <div className="rounded-2xl border border-border bg-card p-6">
               <p className="mb-4 text-sm text-muted-foreground">
-                Entrez l{"'"}adresse email associee au compte admin pour recuperer votre mot de passe.
+                Repondez a la question secrete pour recuperer votre mot de passe.
               </p>
-              <label className="mb-2 block text-xs font-medium text-muted-foreground">
-                Adresse email admin
+              <label className="mb-2 block text-xs font-medium text-foreground">
+                Quel est le nom de votre premier animal de compagnie ?
               </label>
               <input
-                type="email"
-                value={recoveryEmail}
-                onChange={(e) => setRecoveryEmail(e.target.value)}
+                type="text"
+                value={securityAnswer}
+                onChange={(e) => setSecurityAnswer(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && handleRecoverPassword()}
-                placeholder="votre@email.fr"
+                placeholder="Votre reponse..."
                 className="mb-4 h-11 w-full rounded-xl border border-border bg-secondary/50 px-4 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
                 autoFocus
               />
@@ -210,13 +211,13 @@ export default function AdminPage() {
               )}
               <button
                 onClick={handleRecoverPassword}
-                disabled={recoveryLoading || !recoveryEmail}
+                disabled={recoveryLoading || !securityAnswer}
                 className="h-11 w-full rounded-xl bg-primary text-sm font-bold text-primary-foreground transition-all hover:bg-primary/90 disabled:opacity-50"
               >
-                {recoveryLoading ? "Verification..." : "Recuperer mon mot de passe"}
+                {recoveryLoading ? "Verification..." : "Verifier ma reponse"}
               </button>
               <button
-                onClick={() => { setRecoveryMode("off"); setRecoveryError("") }}
+                onClick={() => { setRecoveryMode("off"); setRecoveryError(""); setSecurityAnswer("") }}
                 className="mt-4 w-full text-center text-xs text-muted-foreground hover:text-primary transition-colors"
               >
                 Retour a la connexion
@@ -224,28 +225,47 @@ export default function AdminPage() {
             </div>
           )}
 
-          {/* Step 2: Email sent confirmation */}
+          {/* Recovery success: show password */}
           {recoveryMode === "success" && (
             <div className="rounded-2xl border border-border bg-card p-6">
               <div className="mb-5 flex items-center justify-center">
                 <div className="flex h-12 w-12 items-center justify-center rounded-full bg-green-500/10 border border-green-500/20">
-                  <Mail size={24} className="text-green-400" />
+                  <ShieldCheck size={24} className="text-green-400" />
                 </div>
               </div>
               <p className="mb-2 text-center text-sm font-semibold text-foreground">
-                Email envoye
+                Identite verifiee
               </p>
-              <p className="mb-5 text-center text-sm text-muted-foreground">
-                Si cette adresse correspond au compte admin, un email contenant votre mot de passe a ete envoye. Verifiez votre boite de reception et vos spams.
+              <p className="mb-4 text-center text-sm text-muted-foreground">
+                Voici votre mot de passe administrateur :
               </p>
+              <div className="relative mb-5 rounded-xl border border-primary/20 bg-primary/5 p-4 text-center">
+                <p className="font-mono text-lg font-bold text-primary select-all">
+                  {showRecoveredPassword ? recoveredPassword : "*".repeat(recoveredPassword.length)}
+                </p>
+                <button
+                  type="button"
+                  onClick={() => setShowRecoveredPassword(!showRecoveredPassword)}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  {showRecoveredPassword ? (
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94"/><path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><path d="m2 2 20 20"/><path d="M14.12 14.12a3 3 0 1 1-4.24-4.24"/></svg>
+                  ) : (
+                    <Eye size={18} />
+                  )}
+                </button>
+              </div>
               <button
                 onClick={() => {
+                  setPassword(recoveredPassword)
                   setRecoveryMode("off")
-                  setRecoveryEmail("")
+                  setSecurityAnswer("")
+                  setRecoveredPassword("")
+                  setShowRecoveredPassword(false)
                 }}
                 className="h-11 w-full rounded-xl bg-primary text-sm font-bold text-primary-foreground transition-all hover:bg-primary/90"
               >
-                Retour a la connexion
+                Se connecter maintenant
               </button>
             </div>
           )}
