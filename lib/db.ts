@@ -10,12 +10,13 @@ export async function saveDiagnostic(data: {
   globalScore: number
   structureScore: number
   vegetalScore: number
+  etancheiteScore: number
   thermalScore: number
   stripeSessionId: string
 }) {
   await sql`
-    INSERT INTO diagnostics (client_name, client_phone, email, address, score_global, score_structure, score_vegetal, score_thermique, stripe_session_id)
-    VALUES (${data.name}, ${data.phone}, ${data.email}, ${data.address}, ${data.globalScore}, ${data.structureScore}, ${data.vegetalScore}, ${data.thermalScore}, ${data.stripeSessionId})
+    INSERT INTO diagnostics (client_name, client_phone, email, address, score_global, score_structure, score_vegetal, score_etancheite, score_thermique, stripe_session_id)
+    VALUES (${data.name}, ${data.phone}, ${data.email}, ${data.address}, ${data.globalScore}, ${data.structureScore}, ${data.vegetalScore}, ${data.etancheiteScore}, ${data.thermalScore}, ${data.stripeSessionId})
   `
   // Increment counter
   await sql`

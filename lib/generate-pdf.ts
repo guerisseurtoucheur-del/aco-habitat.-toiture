@@ -25,7 +25,8 @@ async function buildPDF(
   diagnostic: DiagnosticResult,
   capturedImage: string,
   address: string,
-  measurements: { type: string; value: number }[]
+  measurements: { type: string; value: number }[],
+  clientInfo?: { name?: string; phone?: string; email?: string }
 ) {
   const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" })
   const pageW = doc.internal.pageSize.getWidth()
@@ -105,7 +106,36 @@ async function buildPDF(
   addText(`Diagnostic du ${dateStr}`, pageW - margin - 55, y, 9, "normal", [100, 100, 100])
   y += 4
   drawLine(y)
-  y += 8
+  y += 6
+
+  // Client info block
+  if (clientInfo && (clientInfo.name || clientInfo.phone || clientInfo.email)) {
+    doc.setFillColor(240, 249, 255)
+    doc.roundedRect(margin, y, contentW, 14, 2, 2, "F")
+    let clientX = margin + 4
+    if (clientInfo.name) {
+      addText("Client :", clientX, y + 5, 7, "bold", [50, 50, 50])
+      clientX += 14
+      addText(clientInfo.name, clientX, y + 5, 7, "normal", [80, 80, 80])
+      clientX += doc.getStringUnitWidth(clientInfo.name) * 7 * 0.35 + 8
+    }
+    if (clientInfo.phone) {
+      addText("Tel :", clientX, y + 5, 7, "bold", [50, 50, 50])
+      clientX += 9
+      addText(clientInfo.phone, clientX, y + 5, 7, "normal", [80, 80, 80])
+      clientX += doc.getStringUnitWidth(clientInfo.phone) * 7 * 0.35 + 8
+    }
+    if (clientInfo.email) {
+      addText("Email :", clientX, y + 5, 7, "bold", [50, 50, 50])
+      clientX += 13
+      addText(clientInfo.email, clientX, y + 5, 7, "normal", [80, 80, 80])
+    }
+    y += 10
+    addText("Coordonnees du demandeur", margin + 4, y, 5, "normal", [150, 150, 150])
+    y += 6
+  } else {
+    y += 2
+  }
 
   // Aerial image
   try {
@@ -488,9 +518,10 @@ export async function generateDiagnosticPDF(
   diagnostic: DiagnosticResult,
   capturedImage: string,
   address: string,
-  measurements: { type: string; value: number }[]
+  measurements: { type: string; value: number }[],
+  clientInfo?: { name?: string; phone?: string; email?: string }
 ) {
-  const doc = await buildPDF(diagnostic, capturedImage, address, measurements)
+  const doc = await buildPDF(diagnostic, capturedImage, address, measurements, clientInfo)
   const fileName = `diagnostic-toiture-aco-habitat-${new Date().toISOString().slice(0, 10)}.pdf`
   doc.save(fileName)
 }
@@ -500,9 +531,10 @@ export async function generateDiagnosticPDFBase64(
   diagnostic: DiagnosticResult,
   capturedImage: string,
   address: string,
-  measurements: { type: string; value: number }[]
+  measurements: { type: string; value: number }[],
+  clientInfo?: { name?: string; phone?: string; email?: string }
 ): Promise<string> {
-  const doc = await buildPDF(diagnostic, capturedImage, address, measurements)
+  const doc = await buildPDF(diagnostic, capturedImage, address, measurements, clientInfo)
   const arrayBuffer = doc.output("arraybuffer")
   const uint8 = new Uint8Array(arrayBuffer)
   let binary = ""

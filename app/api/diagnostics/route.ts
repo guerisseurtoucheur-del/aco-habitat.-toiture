@@ -12,6 +12,7 @@ export async function POST(req: Request) {
       globalScore: data.globalScore || 0,
       structureScore: data.structureScore || 0,
       vegetalScore: data.vegetalScore || 0,
+      etancheiteScore: data.etancheiteScore || 0,
       thermalScore: data.thermalScore || 0,
       stripeSessionId: data.stripeSessionId || "",
     })

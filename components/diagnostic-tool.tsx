@@ -581,6 +581,7 @@ export function DiagnosticTool() {
             globalScore: finalDiag.scoreGlobal || 0,
             structureScore: finalDiag.structure?.score || 0,
             vegetalScore: finalDiag.vegetal?.score || 0,
+            etancheiteScore: finalDiag.etancheite?.score || 0,
             thermalScore: finalDiag.thermique?.scoreIsolation || 0,
             stripeSessionId: typeof window !== "undefined" ? window.__stripeSessionId || "" : "",
           }),
@@ -590,13 +591,14 @@ export function DiagnosticTool() {
       // Auto-download PDF
       try {
         const { generateDiagnosticPDF, generateDiagnosticPDFBase64 } = await import("@/lib/generate-pdf")
-        await generateDiagnosticPDF(finalDiag, capturedImage || "", formattedAddress, mapMeasurements)
+        const clientInfo = { name: clientName, phone: clientPhone, email: clientEmail }
+        await generateDiagnosticPDF(finalDiag, capturedImage || "", formattedAddress, mapMeasurements, clientInfo)
 
         // Auto-send PDF by email
         if (clientEmail) {
           setSendingEmail(true)
           try {
-            const pdfBase64 = await generateDiagnosticPDFBase64(finalDiag, capturedImage || "", formattedAddress, mapMeasurements)
+            const pdfBase64 = await generateDiagnosticPDFBase64(finalDiag, capturedImage || "", formattedAddress, mapMeasurements, clientInfo)
             await fetch("/api/send-report", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
@@ -1629,7 +1631,8 @@ export function DiagnosticTool() {
                       diagnostic,
                       capturedImage || "",
                       formattedAddress,
-                      mapMeasurements
+                      mapMeasurements,
+                      { name: clientName, phone: clientPhone, email: clientEmail }
                     )
                   }}
                   className="group relative inline-flex items-center gap-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-8 py-4 text-base font-bold text-white shadow-lg shadow-cyan-500/25 transition-all hover:shadow-xl hover:shadow-cyan-500/30"
