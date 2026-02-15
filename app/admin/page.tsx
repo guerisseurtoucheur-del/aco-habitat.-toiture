@@ -1,8 +1,9 @@
 "use client"
 
 import { useState } from "react"
-import { Lock, Search, Download, Phone, Mail, MapPin, BarChart3, Users, ArrowLeft, Eye, KeyRound, ShieldCheck } from "lucide-react"
+import { Lock, Search, Download, Phone, Mail, MapPin, BarChart3, Users, ArrowLeft, Eye, KeyRound, ShieldCheck, FileText } from "lucide-react"
 import Link from "next/link"
+import jsPDF from "jspdf"
 
 interface DiagnosticRecord {
   id: number
@@ -35,6 +36,151 @@ function formatDate(dateStr: string) {
   return new Date(dateStr).toLocaleDateString("fr-FR", {
     day: "2-digit", month: "2-digit", year: "numeric", hour: "2-digit", minute: "2-digit",
   })
+}
+
+function generateAdminPDF(d: DiagnosticRecord) {
+  const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" })
+  const pageW = 210
+  const margin = 15
+  const contentW = pageW - margin * 2
+  let y = margin
+
+  // Header
+  doc.setFillColor(10, 10, 10)
+  doc.rect(0, 0, pageW, 42, "F")
+  doc.setFillColor(6, 182, 212)
+  doc.rect(0, 40, pageW, 2, "F")
+  doc.setFont("helvetica", "bold")
+  doc.setFontSize(18)
+  doc.setTextColor(255, 255, 255)
+  doc.text("ACO-HABITAT", margin, 18)
+  doc.setFontSize(9)
+  doc.setFont("helvetica", "normal")
+  doc.setTextColor(150, 150, 150)
+  doc.text("Diagnostic Toiture - Rapport complet", margin, 26)
+  doc.setFontSize(8)
+  doc.text(`Diagnostic #${d.id} - ${formatDate(d.created_at)}`, margin, 34)
+  y = 52
+
+  // Client info box
+  doc.setFillColor(240, 249, 255)
+  doc.roundedRect(margin, y, contentW, 32, 3, 3, "F")
+  doc.setDrawColor(6, 182, 212)
+  doc.setLineWidth(0.3)
+  doc.roundedRect(margin, y, contentW, 32, 3, 3, "S")
+  doc.setFont("helvetica", "bold")
+  doc.setFontSize(10)
+  doc.setTextColor(6, 182, 212)
+  doc.text("COORDONNEES CLIENT", margin + 5, y + 7)
+  doc.setFont("helvetica", "normal")
+  doc.setFontSize(9)
+  doc.setTextColor(50, 50, 50)
+  doc.text(`Nom : ${d.client_name || "Non renseigne"}`, margin + 5, y + 14)
+  doc.text(`Telephone : ${d.client_phone || "Non renseigne"}`, margin + 5, y + 20)
+  doc.text(`Email : ${d.email || "Non renseigne"}`, margin + 5, y + 26)
+  doc.text(`Adresse : ${d.address || "Non renseigne"}`, margin + contentW / 2, y + 14)
+  if (d.toiture_type) {
+    doc.text(`Type toiture : ${d.toiture_type}`, margin + contentW / 2, y + 20)
+  }
+  y += 40
+
+  // Score global
+  const scoreColor = (s: number): [number, number, number] =>
+    s >= 70 ? [34, 197, 94] : s >= 50 ? [245, 158, 11] : [239, 68, 68]
+  const [r, g, b] = scoreColor(d.score_global)
+
+  doc.setFillColor(20, 20, 20)
+  doc.roundedRect(margin, y, contentW, 35, 3, 3, "F")
+  doc.setFont("helvetica", "bold")
+  doc.setFontSize(11)
+  doc.setTextColor(150, 150, 150)
+  doc.text("SCORE GLOBAL", margin + 5, y + 9)
+  doc.setFontSize(32)
+  doc.setTextColor(r, g, b)
+  doc.text(`${d.score_global || 0}`, margin + 5, y + 28)
+  doc.setFontSize(14)
+  doc.setTextColor(100, 100, 100)
+  doc.text("/100", margin + 5 + doc.getStringUnitWidth(`${d.score_global || 0}`) * 32 * 0.35 + 2, y + 28)
+
+  // Etat general
+  const etat = d.score_global >= 70 ? "Bon etat general" : d.score_global >= 50 ? "Etat moyen - Surveillance conseillee" : "Etat preoccupant - Intervention recommandee"
+  doc.setFontSize(10)
+  doc.setTextColor(r, g, b)
+  doc.text(etat, margin + contentW / 2, y + 20)
+  y += 43
+
+  // Sub-scores
+  const scores = [
+    { label: "Structure", score: d.score_structure },
+    { label: "Vegetation", score: d.score_vegetal },
+    { label: "Etancheite", score: d.score_etancheite },
+    { label: "Thermique", score: d.score_thermique },
+  ]
+
+  const boxW = (contentW - 9) / 4
+  scores.forEach((s, i) => {
+    const bx = margin + i * (boxW + 3)
+    const [sr, sg, sb] = scoreColor(s.score || 0)
+    doc.setFillColor(30, 30, 30)
+    doc.roundedRect(bx, y, boxW, 25, 2, 2, "F")
+    doc.setFont("helvetica", "normal")
+    doc.setFontSize(7)
+    doc.setTextColor(150, 150, 150)
+    doc.text(s.label.toUpperCase(), bx + boxW / 2, y + 7, { align: "center" })
+    doc.setFont("helvetica", "bold")
+    doc.setFontSize(18)
+    doc.setTextColor(sr, sg, sb)
+    doc.text(`${s.score || 0}`, bx + boxW / 2, y + 20, { align: "center" })
+  })
+  y += 33
+
+  // Recommendations
+  doc.setFont("helvetica", "bold")
+  doc.setFontSize(11)
+  doc.setTextColor(255, 255, 255)
+  doc.setFillColor(20, 20, 20)
+  doc.roundedRect(margin, y, contentW, 10, 3, 3, "F")
+  doc.text("RECOMMANDATIONS", margin + 5, y + 7)
+  y += 14
+
+  const recos: string[] = []
+  if ((d.score_structure || 0) < 60) recos.push("Inspection structurelle recommandee - Verifier la charpente et les elements porteurs.")
+  if ((d.score_vegetal || 0) < 60) recos.push("Nettoyage vegetation necessaire - Elimination des mousses, lichens et debris vegetaux.")
+  if ((d.score_etancheite || 0) < 60) recos.push("Verification etancheite requise - Controle des joints, gouttiers et points de fuite.")
+  if ((d.score_thermique || 0) < 60) recos.push("Amelioration isolation recommandee - Bilan energetique et renforcement de l'isolation.")
+  if (recos.length === 0) recos.push("Toiture en bon etat general. Un entretien preventif annuel est recommande.")
+
+  doc.setFont("helvetica", "normal")
+  doc.setFontSize(9)
+  doc.setTextColor(80, 80, 80)
+  recos.forEach((rec) => {
+    doc.setFillColor(6, 182, 212)
+    doc.circle(margin + 3, y - 1, 1.2, "F")
+    const lines = doc.splitTextToSize(rec, contentW - 12)
+    doc.text(lines, margin + 8, y)
+    y += lines.length * 5 + 3
+  })
+  y += 5
+
+  // Paiement
+  if (d.stripe_session_id) {
+    doc.setFillColor(245, 245, 245)
+    doc.roundedRect(margin, y, contentW, 10, 2, 2, "F")
+    doc.setFontSize(7)
+    doc.setTextColor(150, 150, 150)
+    doc.text(`Ref. paiement : ${d.stripe_session_id}`, margin + 3, y + 6)
+    y += 14
+  }
+
+  // Footer
+  doc.setFillColor(10, 10, 10)
+  doc.rect(0, 282, pageW, 15, "F")
+  doc.setFontSize(7)
+  doc.setTextColor(100, 100, 100)
+  doc.text("ACO-HABITAT - Diagnostic Toiture | aco.habitat@orange.fr | 02 33 31 19 79", pageW / 2, 290, { align: "center" })
+
+  const fileName = `diagnostic-${d.id}-${d.client_name || "client"}-${new Date(d.created_at).toISOString().slice(0, 10)}.pdf`
+  doc.save(fileName.replace(/\s+/g, "-").toLowerCase())
 }
 
 export default function AdminPage() {
@@ -294,7 +440,16 @@ export default function AdminPage() {
           <div className="rounded-2xl border border-border bg-card p-6">
             <div className="mb-6 flex items-center justify-between">
               <h2 className="text-lg font-bold text-foreground">Diagnostic #{selectedDiag.id}</h2>
-              <span className="text-xs text-muted-foreground">{formatDate(selectedDiag.created_at)}</span>
+              <div className="flex items-center gap-3">
+                <button
+                  onClick={() => generateAdminPDF(selectedDiag)}
+                  className="inline-flex items-center gap-1.5 rounded-xl border border-primary/30 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary transition-all hover:bg-primary/20"
+                >
+                  <FileText size={14} />
+                  Telecharger PDF
+                </button>
+                <span className="text-xs text-muted-foreground">{formatDate(selectedDiag.created_at)}</span>
+              </div>
             </div>
             
             {/* Client info */}
@@ -470,13 +625,23 @@ export default function AdminPage() {
                         <ScoreBadge score={d.score_global} />
                       </td>
                       <td className="px-4 py-3 text-center">
-                        <button
-                          onClick={() => setSelectedDiag(d)}
-                          className="inline-flex items-center gap-1 rounded-lg border border-border px-2.5 py-1.5 text-[11px] font-medium text-muted-foreground transition-all hover:bg-secondary hover:text-foreground"
-                        >
-                          <Eye size={12} />
-                          Voir
-                        </button>
+                        <div className="flex items-center justify-center gap-1.5">
+                          <button
+                            onClick={() => setSelectedDiag(d)}
+                            className="inline-flex items-center gap-1 rounded-lg border border-border px-2.5 py-1.5 text-[11px] font-medium text-muted-foreground transition-all hover:bg-secondary hover:text-foreground"
+                          >
+                            <Eye size={12} />
+                            Voir
+                          </button>
+                          <button
+                            onClick={() => generateAdminPDF(d)}
+                            className="inline-flex items-center gap-1 rounded-lg border border-primary/30 bg-primary/10 px-2.5 py-1.5 text-[11px] font-medium text-primary transition-all hover:bg-primary/20"
+                            title="Telecharger le PDF"
+                          >
+                            <FileText size={12} />
+                            PDF
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))
