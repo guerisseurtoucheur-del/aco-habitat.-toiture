@@ -50,10 +50,10 @@ export function HeroSection() {
       {/* Background layers */}
       <div className="absolute inset-0 z-0">
         <Image
-          src="/images/hero-roof.jpg"
-          alt="Vue aerienne d'une toiture"
+          src="/images/toiture-aerienne.png"
+          alt="Vue aerienne d'une toiture en pierre analysee par drone"
           fill
-          className="object-cover opacity-15"
+          className="object-cover opacity-20"
           priority
         />
         <div className="absolute inset-0 bg-gradient-to-b from-background via-background/98 to-background" />
