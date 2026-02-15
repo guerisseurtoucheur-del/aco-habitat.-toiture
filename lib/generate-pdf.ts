@@ -470,6 +470,25 @@ async function buildPDF(
     })
   }
 
+  // Cross-selling charpente
+  if (diagnostic.structure && diagnostic.structure.score < 60) {
+    checkNewPage(25)
+    y += 4
+    doc.setFillColor(255, 251, 235)
+    doc.roundedRect(margin, y, contentW, 20, 2, 2, "F")
+    doc.setDrawColor(245, 158, 11)
+    doc.setLineWidth(0.4)
+    doc.roundedRect(margin, y, contentW, 20, 2, 2, "S")
+    addText("RECOMMANDATION : DIAGNOSTIC CHARPENTE", margin + 4, y + 6, 8, "bold", [180, 100, 0])
+    const charpenteText = "Le score structure de votre toiture est bas. Cela peut indiquer un probleme au niveau de la charpente. Completez votre diagnostic avec une analyse charpente par IA sur aco-habitat.fr pour avoir une vision complete."
+    doc.setFontSize(7)
+    doc.setFont("helvetica", "normal")
+    doc.setTextColor(120, 80, 20)
+    const charpenteLines = doc.splitTextToSize(charpenteText, contentW - 8)
+    doc.text(charpenteLines, margin + 4, y + 12)
+    y += 24
+  }
+
   // Legal disclaimer
   checkNewPage(35)
   y += 6
@@ -491,7 +510,7 @@ async function buildPDF(
   doc.text(legalLines, margin + 4, y + 12)
 
   addText("ACO-HABITAT - Plateforme independante non affiliee a des prestataires de travaux.", margin + 4, y + 28, 6, "bold", [120, 80, 20])
-  addText("Trouvez un couvreur pres de chez vous sur aco-habitat.fr - CGU completes sur aco-habitat.fr/mentions-legales", margin + 4, y + 34, 6, "normal", [120, 80, 20])
+  addText("Trouvez un couvreur pres de chez vous sur diag.aco-habitat.fr - CGU completes sur diag.aco-habitat.fr/mentions-legales", margin + 4, y + 34, 6, "normal", [120, 80, 20])
 
   // ═══════════════════════════════════════
   // Footer on every page
@@ -505,7 +524,7 @@ async function buildPDF(
     doc.setFontSize(6)
     doc.setFont("helvetica", "normal")
     doc.setTextColor(120, 120, 130)
-    doc.text("ACO-HABITAT - Diagnostic Toiture par IA | aco-habitat.fr | aco.habitat@orange.fr", margin, pageH - 7)
+    doc.text("ACO-HABITAT - Diagnostic Toiture par IA | diag.aco-habitat.fr | aco.habitat@orange.fr", margin, pageH - 7)
     doc.text(`Page ${p}/${totalPages}`, pageW - margin - 15, pageH - 7)
     doc.text("Ce rapport est un diagnostic automatise base sur l'imagerie. Il ne remplace pas l'expertise d'un professionnel sur site.", margin, pageH - 3)
   }

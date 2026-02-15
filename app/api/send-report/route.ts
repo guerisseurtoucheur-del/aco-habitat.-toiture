@@ -57,6 +57,18 @@ export async function POST(req: Request) {
               les zones problematiques detectees et nos recommandations.
             </p>
 
+            <div style="background: #1a1500; border: 1px solid #d97706; border-radius: 8px; padding: 16px; margin: 20px 0;">
+              <p style="color: #fbbf24; font-weight: bold; margin: 0 0 5px; font-size: 14px;">Diagnostic charpente par IA</p>
+              <p style="color: #ccc; margin: 0 0 12px; font-size: 13px; line-height: 1.5;">
+                Completez votre analyse avec un diagnostic charpente pour une vision complete 
+                de l'etat de votre couverture et de sa structure porteuse.
+              </p>
+              <a href="https://aco-habitat.fr" 
+                 style="display: inline-block; padding: 10px 24px; background: #d97706; color: #000; font-weight: bold; text-decoration: none; border-radius: 6px; font-size: 13px;">
+                Analyser ma charpente sur aco-habitat.fr
+              </a>
+            </div>
+
             <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
               <p style="color: #666; font-size: 12px; margin: 0;">
                 ACO-HABITAT - Diagnostic Toiture par IA<br>

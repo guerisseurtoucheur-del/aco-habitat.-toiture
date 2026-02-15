@@ -130,6 +130,18 @@ export async function GET(req: Request) {
                   <strong style="color: #ccc;">L'equipe ACO-HABITAT</strong>
                 </p>
 
+                <div style="background: #1a1500; border: 1px solid #d97706; border-radius: 8px; padding: 16px; margin: 25px 0 0;">
+                  <p style="color: #fbbf24; font-weight: bold; margin: 0 0 5px; font-size: 13px;">Probleme de charpente ?</p>
+                  <p style="color: #ccc; margin: 0 0 12px; font-size: 13px; line-height: 1.5;">
+                    Completez votre diagnostic toiture avec une <strong style="color: #fbbf24;">analyse charpente par IA</strong> 
+                    pour une vision complete de votre couverture.
+                  </p>
+                  <a href="https://aco-habitat.fr" 
+                     style="display: inline-block; padding: 10px 24px; background: #d97706; color: #000; font-weight: bold; text-decoration: none; border-radius: 6px; font-size: 13px;">
+                    Diagnostic charpente sur aco-habitat.fr
+                  </a>
+                </div>
+
                 <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
                   <p style="color: #555; font-size: 11px; margin: 0;">
                     ACO-HABITAT - Diagnostic Toiture par IA<br>
