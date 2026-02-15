@@ -393,6 +393,72 @@ export function DiagnosticTool() {
   const resultsRef = useRef<HTMLDivElement>(null)
   const handleSearchRef = useRef<() => void>(() => {})
 
+  // When diagnostic results are ready, save to DB + send email
+  useEffect(() => {
+    if (step !== "results" || !diagnostic) return
+
+    const saveAndEmail = async () => {
+      // 1. Save to database
+      try {
+        console.log("[v0] useEffect: Saving diagnostic to DB...")
+        const saveRes = await fetch("/api/diagnostics", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: clientName,
+            phone: clientPhone,
+            email: clientEmail,
+            address: formattedAddress,
+            globalScore: diagnostic.scoreGlobal || 0,
+            structureScore: diagnostic.structure?.score || 0,
+            vegetalScore: diagnostic.vegetal?.score || 0,
+            etancheiteScore: diagnostic.etancheite?.score || 0,
+            thermalScore: diagnostic.thermique?.scoreIsolation || 0,
+            stripeSessionId: typeof window !== "undefined" ? (window as unknown as { __stripeSessionId?: string }).__stripeSessionId || "" : "",
+          }),
+        })
+        const saveText = await saveRes.text()
+        console.log("[v0] useEffect: Save result:", saveRes.status, saveText)
+      } catch (e) {
+        console.log("[v0] useEffect: Save error:", e)
+      }
+
+      // 2. Send email with PDF
+      if (clientEmail) {
+        setSendingEmail(true)
+        try {
+          console.log("[v0] useEffect: Generating PDF for email to", clientEmail)
+          const { generateDiagnosticPDFBase64 } = await import("@/lib/generate-pdf")
+          const clientInfo = { name: clientName, phone: clientPhone, email: clientEmail }
+          const pdfBase64 = await generateDiagnosticPDFBase64(diagnostic, capturedImage || "", formattedAddress, mapMeasurements, clientInfo)
+          console.log("[v0] useEffect: PDF base64 length:", pdfBase64?.length || 0)
+
+          const emailRes = await fetch("/api/send-report", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              email: clientEmail,
+              name: clientName,
+              address: formattedAddress,
+              globalScore: diagnostic.scoreGlobal || 0,
+              pdfBase64,
+            }),
+          })
+          const emailData = await emailRes.json()
+          console.log("[v0] useEffect: Email result:", emailRes.status, JSON.stringify(emailData))
+          setEmailSent(true)
+        } catch (e) {
+          console.log("[v0] useEffect: Email error:", e)
+        } finally {
+          setSendingEmail(false)
+        }
+      }
+    }
+
+    saveAndEmail()
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [step, diagnostic])
+
   // Close dropdown on outside click
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
@@ -542,6 +608,7 @@ export function DiagnosticTool() {
 
   // Run the actual AI diagnostic (called after successful payment)
   const runDiagnostic = useCallback(async () => {
+    console.log("[v0] runDiagnostic called, capturedImage:", !!capturedImage, "address:", formattedAddress, "step:", step)
     setStep("scanning")
 
     try {
@@ -549,6 +616,7 @@ export function DiagnosticTool() {
       setStep("analyzing")
 
       const capture = pendingCaptureRef.current
+      console.log("[v0] Sending to /api/diagnostic, image length:", capturedImage?.length || 0, "address:", formattedAddress)
       const diagRes = await fetch("/api/diagnostic", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -561,8 +629,10 @@ export function DiagnosticTool() {
         }),
       })
       const diagData = await diagRes.json()
+      console.log("[v0] Diagnostic API response:", diagRes.ok, diagRes.status, JSON.stringify(diagData).substring(0, 200))
 
       if (!diagRes.ok) {
+        console.log("[v0] Diagnostic API error:", diagData.error)
         setError(diagData.error || "Erreur lors de l'analyse IA.")
         setStep("address")
         return
@@ -571,54 +641,14 @@ export function DiagnosticTool() {
       const finalDiag = ensureRealisticZones(diagData.diagnostic)
       setDiagnostic(finalDiag)
       setStep("results")
+      console.log("[v0] Diagnostic complete, score:", finalDiag.scoreGlobal)
 
-      // Save to database (fire and forget)
+      // Auto-download PDF (save to DB + email are handled by useEffect on step change)
       try {
-        fetch("/api/diagnostics", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            name: clientName,
-            phone: clientPhone,
-            email: clientEmail,
-            address: formattedAddress,
-            globalScore: finalDiag.scoreGlobal || 0,
-            structureScore: finalDiag.structure?.score || 0,
-            vegetalScore: finalDiag.vegetal?.score || 0,
-            etancheiteScore: finalDiag.etancheite?.score || 0,
-            thermalScore: finalDiag.thermique?.scoreIsolation || 0,
-            stripeSessionId: typeof window !== "undefined" ? window.__stripeSessionId || "" : "",
-          }),
-        })
-      } catch { /* silent */ }
-
-      // Auto-download PDF
-      try {
-        const { generateDiagnosticPDF, generateDiagnosticPDFBase64 } = await import("@/lib/generate-pdf")
+        const { generateDiagnosticPDF } = await import("@/lib/generate-pdf")
         const clientInfo = { name: clientName, phone: clientPhone, email: clientEmail }
         await generateDiagnosticPDF(finalDiag, capturedImage || "", formattedAddress, mapMeasurements, clientInfo)
-
-        // Auto-send PDF by email
-        if (clientEmail) {
-          setSendingEmail(true)
-          try {
-            const pdfBase64 = await generateDiagnosticPDFBase64(finalDiag, capturedImage || "", formattedAddress, mapMeasurements, clientInfo)
-            await fetch("/api/send-report", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                email: clientEmail,
-                name: clientName,
-                address: formattedAddress,
-                globalScore: finalDiag.scoreGlobal || 0,
-                pdfBase64,
-              }),
-            })
-            setEmailSent(true)
-          } catch { /* silent */ }
-          finally { setSendingEmail(false) }
-        }
-      } catch { /* silent - PDF generation failed */ }
+      } catch (e) { console.log("[v0] PDF download error:", e) }
 
       setTimeout(() => {
         resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
@@ -1142,7 +1172,10 @@ export function DiagnosticTool() {
                 <div className="rounded-xl border border-border bg-background p-1">
                   <StripeCheckout
                     productId="diagnostic-toiture"
-                    onComplete={() => runDiagnostic()}
+                    onComplete={() => {
+                      console.log("[v0] Stripe onComplete triggered, capturedImage:", !!capturedImage, "address:", formattedAddress)
+                      runDiagnostic()
+                    }}
                   />
                 </div>
               ) : (
