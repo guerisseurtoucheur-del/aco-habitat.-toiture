@@ -18,6 +18,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "quand-renover-toiture",
     "prix-renovation-toiture",
     "mousse-toiture-dangers",
+    "glossaire-toiture",
+    "degats-grele-toiture",
+    "duree-de-vie-toiture",
+    "signes-mauvaise-isolation-toiture",
+    "methodologie-diagnostic-ia",
   ]
 
   const servicePages = services.map((service) => ({

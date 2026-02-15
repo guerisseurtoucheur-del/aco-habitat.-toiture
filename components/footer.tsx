@@ -21,9 +21,11 @@ const footerLinks: { title: string; links: FooterLink[] }[] = [
     title: "Ressources",
     links: [
       { label: "FAQ", href: "#faq" },
-      { label: "Trouver un couvreur", href: "#couvreurs" },
-      { label: "Guide : quand renover sa toiture", href: "/guide/quand-renover-toiture" },
-      { label: "Guide : dangers de la mousse", href: "/guide/mousse-toiture-dangers" },
+      { label: "Glossaire toiture", href: "/guide/glossaire-toiture" },
+      { label: "Degats de grele", href: "/guide/degats-grele-toiture" },
+      { label: "Duree de vie d'une toiture", href: "/guide/duree-de-vie-toiture" },
+      { label: "Signes mauvaise isolation", href: "/guide/signes-mauvaise-isolation-toiture" },
+      { label: "Notre methodologie IA", href: "/guide/methodologie-diagnostic-ia" },
     ],
   },
   {
