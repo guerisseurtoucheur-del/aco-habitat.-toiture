@@ -53,10 +53,10 @@ export function HeroSection() {
           src="/images/toiture-aerienne.png"
           alt="Vue aerienne d'une toiture en pierre analysee par drone"
           fill
-          className="object-cover opacity-20"
+          className="object-cover opacity-30"
           priority
         />
-        <div className="absolute inset-0 bg-gradient-to-b from-background via-background/98 to-background" />
+        <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/90 to-background" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--color-glow-blue),_transparent_60%)]" />
       </div>
 
@@ -144,6 +144,23 @@ export function HeroSection() {
                 {"<"}30s
               </span>
               <span className="text-sm text-muted-foreground">Temps d{"'"}analyse</span>
+            </div>
+          </div>
+        </div>
+
+        {/* Photo toiture */}
+        <div className="mt-12 w-full max-w-4xl overflow-hidden rounded-2xl border border-border shadow-2xl shadow-primary/5">
+          <div className="relative aspect-[16/9] w-full">
+            <Image
+              src="/images/toiture-aerienne.png"
+              alt="Vue aerienne d'une toiture en pierre analysee par IA - diagnostic ACO-HABITAT"
+              fill
+              className="object-cover"
+            />
+            <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
+            <div className="absolute bottom-4 left-4 flex items-center gap-2 rounded-lg border border-border/50 bg-background/80 px-3 py-1.5 backdrop-blur-sm">
+              <Scan size={12} className="text-primary" />
+              <span className="text-[11px] font-medium text-foreground">Analyse aerienne par IA</span>
             </div>
           </div>
         </div>
