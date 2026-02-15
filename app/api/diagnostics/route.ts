@@ -4,6 +4,7 @@ import { saveDiagnostic, getDiagnosticCount } from "@/lib/db"
 export async function POST(req: Request) {
   try {
     const data = await req.json()
+    console.log("[v0] POST /api/diagnostics called, email:", data.email, "address:", data.address)
     await saveDiagnostic({
       name: data.name || "",
       phone: data.phone || "",
