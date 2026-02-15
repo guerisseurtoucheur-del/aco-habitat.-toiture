@@ -4,6 +4,7 @@ import {
   streamText,
   UIMessage,
 } from "ai"
+import { saveChatMessage } from "@/lib/db"
 
 export const maxDuration = 30
 
@@ -43,7 +44,22 @@ const SYSTEM_PROMPT = `Tu es l'assistant expert toiture d'ACO-HABITAT, une entre
 - Sois professionnel mais amical, comme un expert qui parle a un particulier`
 
 export async function POST(req: Request) {
-  const { messages }: { messages: UIMessage[] } = await req.json()
+  const { messages, sessionId }: { messages: UIMessage[]; sessionId?: string } = await req.json()
+
+  const chatSessionId = sessionId || crypto.randomUUID()
+
+  // Save the last user message
+  const lastMessage = messages[messages.length - 1]
+  if (lastMessage && lastMessage.role === "user") {
+    const userText = lastMessage.parts
+      ?.filter((p): p is { type: "text"; text: string } => p.type === "text")
+      .map((p) => p.text)
+      .join("") || ""
+    
+    if (userText) {
+      saveChatMessage({ sessionId: chatSessionId, role: "user", content: userText }).catch(() => {})
+    }
+  }
 
   const result = streamText({
     model: "openai/gpt-4o-mini",
@@ -51,6 +67,11 @@ export async function POST(req: Request) {
     messages: await convertToModelMessages(messages),
     abortSignal: req.signal,
     maxOutputTokens: 500,
+    onFinish: async ({ text }) => {
+      if (text) {
+        saveChatMessage({ sessionId: chatSessionId, role: "assistant", content: text }).catch(() => {})
+      }
+    },
   })
 
   return result.toUIMessageStreamResponse({

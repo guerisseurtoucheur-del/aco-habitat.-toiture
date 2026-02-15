@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Lock, Search, Download, Phone, Mail, MapPin, BarChart3, Users, ArrowLeft, Eye, KeyRound, ShieldCheck, FileText } from "lucide-react"
+import { Lock, Search, Download, Phone, Mail, MapPin, BarChart3, Users, ArrowLeft, Eye, KeyRound, ShieldCheck, FileText, MessageSquare, Bot, User as UserIcon } from "lucide-react"
 import Link from "next/link"
 import jsPDF from "jspdf"
 
@@ -199,6 +199,19 @@ export default function AdminPage() {
   const [recoveredPassword, setRecoveredPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [showRecoveredPassword, setShowRecoveredPassword] = useState(false)
+  const [activeTab, setActiveTab] = useState<"diagnostics" | "conversations">("diagnostics")
+  const [conversations, setConversations] = useState<Array<{
+    session_id: string
+    started_at: string
+    last_message_at: string
+    message_count: number
+    user_messages: number
+    first_question: string
+  }>>([])
+  const [chatStats, setChatStats] = useState({ total_sessions: 0, total_messages: 0, user_messages: 0, active_days: 0 })
+  const [selectedConvo, setSelectedConvo] = useState<string | null>(null)
+  const [convoMessages, setConvoMessages] = useState<Array<{ role: string; content: string; created_at: string }>>([])
+  const [convoLoading, setConvoLoading] = useState(false)
 
   async function handleLogin() {
     setLoading(true)
@@ -244,6 +257,31 @@ export default function AdminPage() {
       setRecoveryError("Erreur de connexion.")
     } finally {
       setRecoveryLoading(false)
+    }
+  }
+
+  async function loadConversations() {
+    setConvoLoading(true)
+    try {
+      const res = await fetch("/api/admin/conversations")
+      const data = await res.json()
+      setConversations(data.conversations || [])
+      setChatStats(data.stats || { total_sessions: 0, total_messages: 0, user_messages: 0, active_days: 0 })
+    } catch {
+      // ignore
+    } finally {
+      setConvoLoading(false)
+    }
+  }
+
+  async function loadConvoMessages(sessionId: string) {
+    setSelectedConvo(sessionId)
+    try {
+      const res = await fetch(`/api/admin/conversations/${sessionId}`)
+      const data = await res.json()
+      setConvoMessages(data.messages || [])
+    } catch {
+      setConvoMessages([])
     }
   }
 
@@ -567,6 +605,33 @@ export default function AdminPage() {
           ))}
         </div>
 
+        {/* Tabs */}
+        <div className="mb-6 flex gap-1 rounded-xl border border-border bg-card p-1">
+          <button
+            onClick={() => setActiveTab("diagnostics")}
+            className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-all ${
+              activeTab === "diagnostics"
+                ? "bg-primary text-primary-foreground shadow-sm"
+                : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+            }`}
+          >
+            <BarChart3 size={16} />
+            Diagnostics
+          </button>
+          <button
+            onClick={() => { setActiveTab("conversations"); loadConversations() }}
+            className={`flex flex-1 items-center justify-center gap-2 rounded-lg px-4 py-2.5 text-sm font-medium transition-all ${
+              activeTab === "conversations"
+                ? "bg-primary text-primary-foreground shadow-sm"
+                : "text-muted-foreground hover:bg-secondary hover:text-foreground"
+            }`}
+          >
+            <MessageSquare size={16} />
+            Conversations
+          </button>
+        </div>
+
+        {activeTab === "diagnostics" && (<>
         {/* Search */}
         <div className="mb-4 flex items-center gap-3 rounded-xl border border-border bg-card px-4 py-2">
           <Search size={16} className="text-muted-foreground" />
@@ -650,6 +715,124 @@ export default function AdminPage() {
             </table>
           </div>
         </div>
+        </>)}
+
+        {/* Conversations Tab */}
+        {activeTab === "conversations" && (
+          <>
+            {/* Chat Stats */}
+            <div className="mb-6 grid grid-cols-2 gap-4 lg:grid-cols-4">
+              {[
+                { label: "Conversations", value: chatStats.total_sessions?.toString() || "0", icon: MessageSquare, color: "text-primary" },
+                { label: "Messages total", value: chatStats.total_messages?.toString() || "0", icon: BarChart3, color: "text-accent" },
+                { label: "Questions posees", value: chatStats.user_messages?.toString() || "0", icon: UserIcon, color: "text-amber-400" },
+                { label: "Jours actifs", value: chatStats.active_days?.toString() || "0", icon: BarChart3, color: "text-green-400" },
+              ].map(({ label, value, icon: Icon, color }) => (
+                <div key={label} className="rounded-2xl border border-border bg-card p-4">
+                  <div className="mb-2 flex items-center gap-2">
+                    <Icon size={16} className={color} />
+                    <span className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">{label}</span>
+                  </div>
+                  <p className={`text-2xl font-bold ${color}`}>{value}</p>
+                </div>
+              ))}
+            </div>
+
+            {convoLoading ? (
+              <div className="py-20 text-center text-sm text-muted-foreground">Chargement des conversations...</div>
+            ) : selectedConvo ? (
+              /* Conversation detail */
+              <div className="overflow-hidden rounded-2xl border border-border bg-card">
+                <div className="flex items-center gap-3 border-b border-border bg-secondary/50 px-4 py-3">
+                  <button
+                    onClick={() => { setSelectedConvo(null); setConvoMessages([]) }}
+                    className="flex items-center gap-1 text-xs text-muted-foreground transition-colors hover:text-foreground"
+                  >
+                    <ArrowLeft size={14} />
+                    Retour
+                  </button>
+                  <span className="text-xs font-mono text-muted-foreground">Session : {selectedConvo.slice(0, 8)}...</span>
+                </div>
+                <div className="max-h-[500px] space-y-3 overflow-y-auto p-4">
+                  {convoMessages.length === 0 ? (
+                    <p className="py-8 text-center text-sm text-muted-foreground">Aucun message</p>
+                  ) : (
+                    convoMessages.map((msg, i) => (
+                      <div key={i} className={`flex gap-2.5 ${msg.role === "user" ? "flex-row-reverse" : ""}`}>
+                        <div className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${
+                          msg.role === "user" ? "bg-accent/15" : "bg-primary/15"
+                        }`}>
+                          {msg.role === "user" ? <UserIcon size={14} className="text-accent" /> : <Bot size={14} className="text-primary" />}
+                        </div>
+                        <div className={`max-w-[80%] rounded-2xl px-3.5 py-2.5 ${
+                          msg.role === "user"
+                            ? "rounded-tr-sm bg-primary/10 text-foreground"
+                            : "rounded-tl-sm bg-secondary text-foreground"
+                        }`}>
+                          <p className="whitespace-pre-wrap text-[13px] leading-relaxed">{msg.content}</p>
+                          <p className="mt-1 text-[10px] text-muted-foreground">
+                            {new Date(msg.created_at).toLocaleString("fr-FR")}
+                          </p>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+              </div>
+            ) : (
+              /* Conversations list */
+              <div className="overflow-hidden rounded-2xl border border-border bg-card">
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead>
+                      <tr className="border-b border-border bg-secondary/50">
+                        <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Date</th>
+                        <th className="px-4 py-3 text-left text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Premiere question</th>
+                        <th className="px-4 py-3 text-center text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Messages</th>
+                        <th className="px-4 py-3 text-center text-[11px] font-semibold uppercase tracking-wider text-muted-foreground">Action</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {conversations.length === 0 ? (
+                        <tr>
+                          <td colSpan={4} className="px-4 py-12 text-center text-sm text-muted-foreground">
+                            Aucune conversation pour le moment
+                          </td>
+                        </tr>
+                      ) : (
+                        conversations.map((c) => (
+                          <tr key={c.session_id} className="border-b border-border transition-colors hover:bg-secondary/30">
+                            <td className="px-4 py-3 text-xs text-muted-foreground">
+                              {formatDate(c.started_at)}
+                            </td>
+                            <td className="max-w-[300px] truncate px-4 py-3 text-sm text-foreground">
+                              {c.first_question || "..."}
+                            </td>
+                            <td className="px-4 py-3 text-center">
+                              <span className="inline-flex items-center gap-1 rounded-lg border border-border bg-secondary/50 px-2 py-0.5 text-xs font-medium text-foreground">
+                                <MessageSquare size={10} />
+                                {c.message_count}
+                              </span>
+                            </td>
+                            <td className="px-4 py-3 text-center">
+                              <button
+                                onClick={() => loadConvoMessages(c.session_id)}
+                                className="inline-flex items-center gap-1 rounded-lg border border-primary/30 bg-primary/10 px-2.5 py-1.5 text-[11px] font-medium text-primary transition-all hover:bg-primary/20"
+                              >
+                                <Eye size={12} />
+                                Voir
+                              </button>
+                            </td>
+                          </tr>
+                        ))
+                      )}
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            )}
+          </>
+        )}
       </div>
     </div>
   )

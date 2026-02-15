@@ -15,11 +15,17 @@ const SUGGESTED_QUESTIONS = [
 export function Chatbot() {
   const [isOpen, setIsOpen] = useState(false)
   const [input, setInput] = useState("")
+  const [sessionId] = useState(() => crypto.randomUUID())
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const inputRef = useRef<HTMLInputElement>(null)
 
   const { messages, sendMessage, status } = useChat({
-    transport: new DefaultChatTransport({ api: "/api/chat" }),
+    transport: new DefaultChatTransport({
+      api: "/api/chat",
+      prepareSendMessagesRequest: ({ id, messages }) => ({
+        body: { messages, sessionId, id },
+      }),
+    }),
   })
 
   const isLoading = status === "streaming" || status === "submitted"
