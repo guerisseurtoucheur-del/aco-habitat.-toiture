@@ -577,9 +577,9 @@ export function DiagnosticTool() {
       setStep("results")
       console.log("[v0] Diagnostic complete, score:", finalDiag.scoreGlobal)
 
-      // Save to database (fire and forget)
+      // Save to database
       try {
-        fetch("/api/diagnostics", {
+        const saveRes = await fetch("/api/diagnostics", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -595,7 +595,8 @@ export function DiagnosticTool() {
             stripeSessionId: typeof window !== "undefined" ? window.__stripeSessionId || "" : "",
           }),
         })
-      } catch { /* silent */ }
+        console.log("[v0] Save diagnostic result:", saveRes.status, await saveRes.text())
+      } catch (e) { console.log("[v0] Save diagnostic error:", e) }
 
       // Auto-download PDF
       try {
@@ -607,8 +608,10 @@ export function DiagnosticTool() {
         if (clientEmail) {
           setSendingEmail(true)
           try {
+            console.log("[v0] Generating PDF base64 for email...")
             const pdfBase64 = await generateDiagnosticPDFBase64(finalDiag, capturedImage || "", formattedAddress, mapMeasurements, clientInfo)
-            await fetch("/api/send-report", {
+            console.log("[v0] PDF base64 generated, length:", pdfBase64?.length || 0, "Sending to:", clientEmail)
+            const emailRes = await fetch("/api/send-report", {
               method: "POST",
               headers: { "Content-Type": "application/json" },
               body: JSON.stringify({
@@ -619,11 +622,13 @@ export function DiagnosticTool() {
                 pdfBase64,
               }),
             })
+            const emailData = await emailRes.json()
+            console.log("[v0] Email send result:", emailRes.status, JSON.stringify(emailData))
             setEmailSent(true)
-          } catch { /* silent */ }
+          } catch (e) { console.log("[v0] Email send error:", e) }
           finally { setSendingEmail(false) }
         }
-      } catch { /* silent - PDF generation failed */ }
+      } catch (e) { console.log("[v0] PDF generation error:", e) }
 
       setTimeout(() => {
         resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
