@@ -608,58 +608,50 @@ export function DiagnosticTool() {
           console.log("[v0] DB save:", r.status, t)
         }).catch((e) => console.log("[v0] DB save error:", e))
 
-        // 2. Auto-download PDF
-        import("@/lib/generate-pdf").then(async ({ generateDiagnosticPDF, generateDiagnosticPDFBase64 }) => {
+        // 2. Auto-download PDF (separate, non-blocking)
+        import("@/lib/generate-pdf").then(async ({ generateDiagnosticPDF }) => {
           const clientInfo = { name: clientName, phone: clientPhone, email: clientEmail }
-          try {
-            await generateDiagnosticPDF(finalDiag, capturedImage || "", formattedAddress, mapMeasurements, clientInfo)
-            console.log("[v0] PDF downloaded")
-          } catch (e) { console.log("[v0] PDF download error:", e) }
-          
-          // 3. Send email with PDF
-          if (clientEmail) {
-            setSendingEmail(true)
+          await generateDiagnosticPDF(finalDiag, capturedImage || "", formattedAddress, mapMeasurements, clientInfo)
+          console.log("[v0] PDF downloaded")
+        }).catch((e) => console.log("[v0] PDF download error:", String(e)))
+
+        // 3. Send email with PDF (separate, independent from PDF download)
+        if (clientEmail) {
+          setSendingEmail(true)
+          import("@/lib/generate-pdf").then(async ({ generateDiagnosticPDFBase64 }) => {
             try {
-              console.log("[v0] Generating PDF base64 for email...")
+              const clientInfo = { name: clientName, phone: clientPhone, email: clientEmail }
+              console.log("[v0] Generating PDF base64 for email to:", clientEmail)
               const pdfBase64 = await generateDiagnosticPDFBase64(finalDiag, capturedImage || "", formattedAddress, mapMeasurements, clientInfo)
               const pdfLength = pdfBase64?.length || 0
-              console.log("[v0] PDF base64 ready, length:", pdfLength, "chars (~" + Math.round(pdfLength / 1024) + "KB), sending to:", clientEmail)
+              console.log("[v0] PDF base64 ready, length:", pdfLength, "sending email...")
               
-              // If PDF is too large (>4MB), skip email attachment
-              if (pdfLength > 4 * 1024 * 1024) {
-                console.log("[v0] PDF too large for email, sending without attachment")
-                const emailRes = await fetch("/api/send-report", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({
-                    email: clientEmail,
-                    name: clientName,
-                    address: formattedAddress,
-                    globalScore: finalDiag.scoreGlobal || 0,
-                    pdfBase64: "",
-                  }),
-                })
-                console.log("[v0] Email (no attachment) result:", emailRes.status)
-              } else {
-                const emailRes = await fetch("/api/send-report", {
-                  method: "POST",
-                  headers: { "Content-Type": "application/json" },
-                  body: JSON.stringify({
-                    email: clientEmail,
-                    name: clientName,
-                    address: formattedAddress,
-                    globalScore: finalDiag.scoreGlobal || 0,
-                    pdfBase64,
-                  }),
-                })
-                const emailData = await emailRes.json()
-                console.log("[v0] Email result:", emailRes.status, JSON.stringify(emailData))
+              const bodyPayload: Record<string, unknown> = {
+                email: clientEmail,
+                name: clientName,
+                address: formattedAddress,
+                globalScore: finalDiag.scoreGlobal || 0,
+                pdfBase64: pdfLength > 4 * 1024 * 1024 ? "" : pdfBase64,
               }
+              
+              const emailRes = await fetch("/api/send-report", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(bodyPayload),
+              })
+              const emailText = await emailRes.text()
+              console.log("[v0] Email API response:", emailRes.status, emailText)
               setEmailSent(true)
-            } catch (e) { console.log("[v0] Email error:", String(e)) }
-            finally { setSendingEmail(false) }
-          }
-        }).catch((e) => console.log("[v0] PDF import error:", String(e)))
+            } catch (e) {
+              console.log("[v0] Email error:", String(e))
+            } finally {
+              setSendingEmail(false)
+            }
+          }).catch((e) => {
+            console.log("[v0] Email PDF import error:", String(e))
+            setSendingEmail(false)
+          })
+        }
       }
     } catch {
       setError("Une erreur est survenue. Verifiez votre connexion et reessayez.")

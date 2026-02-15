@@ -14,14 +14,25 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Email requis" }, { status: 400 })
     }
 
+    const smtpHost = process.env.SMTP_HOST || "smtp.gmail.com"
     const smtpPort = Number(process.env.SMTP_PORT) || 587
+    const smtpUser = process.env.SMTP_USER
+    const smtpPass = process.env.SMTP_PASS
+
+    console.log("[v0] SMTP config - host:", smtpHost, "port:", smtpPort, "user:", smtpUser, "pass set:", !!smtpPass)
+
+    if (!smtpUser || !smtpPass) {
+      console.log("[v0] SMTP credentials missing!")
+      return NextResponse.json({ error: "Configuration SMTP manquante", details: { host: smtpHost, user: !!smtpUser, pass: !!smtpPass } }, { status: 500 })
+    }
+
     const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST || "smtp.gmail.com",
+      host: smtpHost,
       port: smtpPort,
       secure: smtpPort === 465,
       auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
+        user: smtpUser,
+        pass: smtpPass,
       },
       tls: {
         rejectUnauthorized: false,
@@ -30,6 +41,7 @@ export async function POST(req: Request) {
 
     const scoreText = globalScore >= 75 ? "Bon etat" : globalScore >= 50 ? "A surveiller" : "Intervention recommandee"
 
+    console.log("[v0] Sending email to:", email, "from:", smtpUser)
     await transporter.sendMail({
       from: `"ACO-HABITAT Diagnostic" <${process.env.SMTP_USER || "noreply@aco-habitat.fr"}>`,
       to: email,
@@ -92,9 +104,11 @@ export async function POST(req: Request) {
       ] : [],
     })
 
+    console.log("[v0] Email sent successfully to:", email)
     return NextResponse.json({ success: true })
   } catch (error) {
-    console.error("Error sending report email:", error)
-    return NextResponse.json({ error: "Erreur envoi email" }, { status: 500 })
+    const errMsg = error instanceof Error ? error.message : String(error)
+    console.error("[v0] SMTP Error:", errMsg)
+    return NextResponse.json({ error: "Erreur envoi email", details: errMsg }, { status: 500 })
   }
 }
