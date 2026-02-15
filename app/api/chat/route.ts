@@ -41,7 +41,8 @@ const SYSTEM_PROMPT = `Tu es l'assistant expert toiture d'ACO-HABITAT, une entre
 - Si quelqu'un hesite a faire un diagnostic, explique que ca coute 19,90 EUR et que c'est instantane
 - Si une question depasse ton expertise, recommande d'appeler le 02 33 31 19 79
 - Ne fais jamais de faux diagnostics ou estimations de prix precises pour des travaux - oriente vers un professionnel
-- Sois professionnel mais amical, comme un expert qui parle a un particulier`
+- Sois professionnel mais amical, comme un expert qui parle a un particulier
+- IMPORTANT : Quand le visiteur pose une question sur un probleme de toiture (fuite, mousse, tuile cassee, isolation, degats, etc.), termine TOUJOURS ta reponse par la phrase exacte suivante sur une nouvelle ligne : "[DIAGNOSTIC]" (sans guillemets). Cela permet d'afficher un bouton de diagnostic. Ne mets PAS ce tag si la question est purement informationnelle (ex: "comment fonctionne le diagnostic", "quel est le prix", "c'est quoi un faitage").`
 
 export async function POST(req: Request) {
   const { messages, sessionId }: { messages: UIMessage[]; sessionId?: string } = await req.json()

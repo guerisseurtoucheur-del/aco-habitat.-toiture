@@ -3,7 +3,7 @@
 import { useState, useRef, useEffect } from "react"
 import { useChat } from "@ai-sdk/react"
 import { DefaultChatTransport } from "ai"
-import { MessageSquare, X, Send, Bot, User, ChevronDown } from "lucide-react"
+import { MessageSquare, X, Send, Bot, User, ChevronDown, ScanLine } from "lucide-react"
 
 const SUGGESTED_QUESTIONS = [
   "Comment fonctionne le diagnostic IA ?",
@@ -163,10 +163,29 @@ export function Chatbot() {
               >
                 {message.parts.map((part, index) => {
                   if (part.type === "text") {
+                    const hasDiagnosticTag = part.text.includes("[DIAGNOSTIC]")
+                    const cleanText = part.text.replace("[DIAGNOSTIC]", "").trim()
                     return (
-                      <p key={index} className="whitespace-pre-wrap text-[13px] leading-relaxed">
-                        {part.text}
-                      </p>
+                      <div key={index}>
+                        <p className="whitespace-pre-wrap text-[13px] leading-relaxed">
+                          {cleanText}
+                        </p>
+                        {hasDiagnosticTag && (
+                          <button
+                            onClick={() => {
+                              setIsOpen(false)
+                              const el = document.getElementById("diagnostic")
+                              if (el) {
+                                el.scrollIntoView({ behavior: "smooth" })
+                              }
+                            }}
+                            className="mt-2.5 flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-[12px] font-semibold text-primary-foreground transition-all hover:bg-primary/90 hover:shadow-md"
+                          >
+                            <ScanLine size={14} />
+                            Lancer mon diagnostic toiture
+                          </button>
+                        )}
+                      </div>
                     )
                   }
                   return null
