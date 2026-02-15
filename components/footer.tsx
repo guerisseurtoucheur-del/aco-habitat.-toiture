@@ -14,7 +14,7 @@ const footerLinks: { title: string; links: FooterLink[] }[] = [
       { label: "Diagnostic Toiture IA", href: "#diagnostic" },
       { label: "Comment ca marche", href: "#methode" },
       { label: "Tarifs", href: "#tarifs" },
-      { label: "Exemple de rapport PDF", href: "#diagnostic" },
+      { label: "Exemple de rapport PDF", href: "#tarifs" },
     ],
   },
   {
