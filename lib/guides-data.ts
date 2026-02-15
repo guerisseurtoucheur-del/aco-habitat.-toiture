@@ -928,6 +928,126 @@ export const guidesData: GuideData[] = [
     relatedServices: ["diagnostic-ia", "couverture", "renovation-toiture"],
     relatedGuides: ["diagnostic-toiture-satellite", "glossaire-toiture"],
   },
+  {
+    slug: "diagnostic-toiture-achat-vente-immobilier",
+    title: "Diagnostic toiture et transaction immobiliere",
+    metaTitle:
+      "Diagnostic toiture avant achat ou vente de maison | ACO-HABITAT",
+    metaDescription:
+      "Pourquoi faire un diagnostic toiture avant d'acheter ou vendre une maison ? Decouvrez comment proteger votre transaction immobiliere et negocier le juste prix grace a l'analyse IA.",
+    heroTitle:
+      "Diagnostic toiture : l'atout indispensable pour votre transaction immobiliere",
+    heroDescription:
+      "Que vous soyez acheteur, vendeur, agent immobilier, mandataire ou notaire, l'etat de la toiture est un enjeu majeur dans toute transaction. Un diagnostic IA objectif protege toutes les parties et securise la vente.",
+    datePublished: "2026-02-15",
+    dateModified: "2026-02-15",
+    readTime: "8 min",
+    sections: [
+      {
+        title: "Acheteur : pourquoi verifier la toiture avant d'acheter",
+        content: `La toiture represente 15 a 30% de la valeur d'un bien immobilier. Une toiture en mauvais etat peut couter entre 15 000 et 40 000 EUR de travaux. Pourtant, le diagnostic toiture n'est pas obligatoire lors d'une vente, contrairement au DPE ou a l'amiante.
+
+Faire un diagnostic toiture avant achat vous permet de :
+- **Connaitre l'etat reel** de la couverture avant de signer le compromis
+- **Negocier le prix** en vous appuyant sur un rapport objectif (score de 0 a 100)
+- **Anticiper les travaux** et les integrer dans votre plan de financement
+- **Eviter les mauvaises surprises** : fuites, infiltrations, isolation defaillante
+
+Un diagnostic IA ACO-HABITAT coute 19,90 EUR. C'est 0,01% du prix d'une maison a 200 000 EUR. L'investissement le plus rentable de votre achat immobilier.`,
+      },
+      {
+        title: "Vendeur : comment la toiture impacte votre prix de vente",
+        content: `En tant que vendeur, la toiture est souvent le premier element que les acheteurs et leurs experts examinent. Une toiture en bon etat rassure et justifie votre prix.
+
+Les avantages d'un diagnostic toiture pour le vendeur :
+- **Transparence** : montrez que vous n'avez rien a cacher
+- **Confiance** : un rapport IA objectif rassure les acheteurs plus qu'un simple "elle est en bon etat"
+- **Rapidite** : les acheteurs hesitent moins quand la toiture est documentee
+- **Prix** : une toiture scoree a 80/100 peut justifier un prix plus eleve
+
+Les acheteurs utilisent de plus en plus internet pour se renseigner. Un rapport PDF professionnel integre au dossier de vente fait la difference face a une annonce sans documentation technique.`,
+      },
+      {
+        title: "Agent immobilier et mandataire : un service differenciant",
+        content: `Le marche immobilier est de plus en plus concurrentiel. Proposer un diagnostic toiture IA a vos clients est un service supplementaire qui vous demarque.
+
+Pour l'agent immobilier et le mandataire :
+- **Outil de prospection** : proposez un diagnostic gratuit pour decrocher un mandat de vente
+- **Service premium** : integrez le rapport au dossier de vente comme valeur ajoutee
+- **Securite juridique** : un diagnostic toiture limite les litiges post-vente
+- **Rapidite** : 30 secondes pour un resultat, directement sur le terrain avec une photo
+
+Vous pouvez realiser le diagnostic lors de la visite d'estimation, directement depuis votre smartphone. Le rapport PDF est immediatement disponible pour etre integre au dossier.
+
+A seulement 19,90 EUR par diagnostic, c'est un investissement negligeable par rapport a la valeur du mandat que vous pouvez decrocher.`,
+      },
+      {
+        title: "Notaire : securiser l'acte et le devoir de conseil",
+        content: `Le notaire joue un role central dans la transaction immobiliere. Le diagnostic toiture, bien que non obligatoire, est une piece complementaire precieuse.
+
+Interets pour le notaire :
+- **Devoir de conseil** : informer les parties de l'etat de la toiture renforce votre mission
+- **Prevention des litiges** : un vice cache lie a la toiture est l'une des causes les plus frequentes de contentieux post-vente
+- **Documentation** : le rapport PDF IA constitue une piece objective a annexer
+- **Protection** : en cas de litige, vous pouvez demontrer que l'information etait disponible
+
+Le rapport ACO-HABITAT mentionne explicitement qu'il s'agit d'une estimation indicative basee sur l'IA et ne remplace pas un diagnostic physique. Cette transparence protege toutes les parties.`,
+      },
+      {
+        title: "Comment fonctionne le diagnostic toiture immobilier",
+        content: `Le processus est simple et rapide :
+
+1. **Uploadez une photo** : photo aerienne (drone, satellite, Google Maps) ou photo prise depuis le sol
+2. **Renseignez l'adresse** du bien immobilier
+3. **L'IA analyse** : notre algorithme detecte les problemes (mousse, tuiles cassees, infiltrations, usure)
+4. **Recevez votre rapport** : score de 0 a 100, details par zone, recommandations, meteo locale
+
+Le rapport PDF peut etre :
+- Annexe au compromis de vente
+- Transmis a l'acquereur ou au vendeur
+- Utilise pour negocier le prix
+- Archive dans le dossier de la transaction
+
+L'analyse prend moins de 30 secondes et le rapport est envoye par email immediatement.`,
+      },
+      {
+        title: "Aspects juridiques : ce que dit la loi",
+        content: `Contrairement au DPE, au diagnostic amiante ou au diagnostic plomb, le diagnostic toiture n'est **pas obligatoire** lors d'une vente immobiliere en France. Cependant :
+
+- L'article 1641 du Code civil prevoit la **garantie des vices caches** : si la toiture presente un defaut grave non signale, l'acheteur peut demander l'annulation de la vente ou une reduction du prix
+- Le vendeur a une **obligation d'information** sur les defauts connus du bien
+- Le notaire a un **devoir de conseil** envers les deux parties
+
+Un diagnostic toiture IA, meme indicatif, constitue un element de transparence qui protege le vendeur contre une accusation de dissimulation et informe l'acheteur des risques potentiels.
+
+**Important** : Le diagnostic ACO-HABITAT est une estimation indicative generee par intelligence artificielle. Il ne remplace pas l'inspection physique d'un couvreur professionnel et ne constitue pas un diagnostic technique officiel au sens de la loi.`,
+      },
+    ],
+    faq: [
+      {
+        question: "Le diagnostic toiture est-il obligatoire pour vendre une maison ?",
+        answer:
+          "Non, le diagnostic toiture n'est pas obligatoire en France. Cependant, il est fortement recommande pour securiser la transaction et eviter les litiges post-vente lies aux vices caches.",
+      },
+      {
+        question: "Puis-je utiliser le rapport pour negocier le prix d'achat ?",
+        answer:
+          "Oui, le rapport PDF avec le score de 0 a 100 et les problemes detectes constitue un argument factuel pour negocier. Un score bas justifie une baisse de prix proportionnelle aux travaux a prevoir.",
+      },
+      {
+        question: "Le rapport a-t-il une valeur juridique ?",
+        answer:
+          "Le rapport ACO-HABITAT est un document informatif base sur l'analyse IA. Il ne remplace pas un diagnostic technique officiel mais constitue un element de preuve de bonne foi dans une transaction.",
+      },
+      {
+        question: "Un agent immobilier peut-il proposer ce service a ses clients ?",
+        answer:
+          "Absolument. A 19,90 EUR par diagnostic, c'est un service premium a proposer aux vendeurs pour valoriser leur bien ou aux acheteurs pour les rassurer. Le rapport professionnel renforce votre credibilite.",
+      },
+    ],
+    relatedServices: ["diagnostic-ia", "couverture"],
+    relatedGuides: ["duree-vie-toiture", "mousse-toiture-dangers"],
+  },
 ]
 
 export function getGuideBySlug(slug: string): GuideData | undefined {
