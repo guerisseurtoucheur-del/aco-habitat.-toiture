@@ -414,7 +414,7 @@ export function DiagnosticTool() {
             vegetalScore: diagnostic.vegetal?.score || 0,
             etancheiteScore: diagnostic.etancheite?.score || 0,
             thermalScore: diagnostic.thermique?.scoreIsolation || 0,
-            stripeSessionId: typeof window !== "undefined" ? window.__stripeSessionId || "" : "",
+            stripeSessionId: typeof window !== "undefined" ? (window as unknown as { __stripeSessionId?: string }).__stripeSessionId || "" : "",
           }),
         })
         const saveText = await saveRes.text()
