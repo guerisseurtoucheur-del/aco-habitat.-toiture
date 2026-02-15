@@ -1,6 +1,5 @@
 "use client"
 
-import Image from "next/image"
 import { Scan, Shield, Droplets, ArrowRight, Zap } from "lucide-react"
 import { useEffect, useState } from "react"
 import { WeatherAlertBanner } from "@/components/weather-alert-banner"
@@ -50,12 +49,13 @@ export function HeroSection() {
     <section className="relative flex min-h-screen items-center overflow-hidden">
       {/* Background layers */}
       <div className="absolute inset-0 z-0">
-        <Image
-          src="/images/toiture-aerienne.png"
-          alt="Vue aerienne d'une toiture en pierre analysee par drone"
-          fill
-          className="object-cover opacity-30"
-          priority
+        <video
+          src="/videos/hero-satellite.mp4"
+          autoPlay
+          muted
+          loop
+          playsInline
+          className="h-full w-full object-cover opacity-25"
         />
         <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/90 to-background" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--color-glow-blue),_transparent_60%)]" />
@@ -154,21 +154,21 @@ export function HeroSection() {
           </div>
         </div>
 
-        {/* Photo toiture */}
+        {/* Video toiture */}
         <div className="mt-8 w-full max-w-4xl overflow-hidden rounded-xl border border-border shadow-2xl shadow-primary/5 sm:mt-12 sm:rounded-2xl">
           <div className="relative aspect-[4/3] w-full sm:aspect-[16/9]">
-            <Image
-              src="/images/toiture-aerienne.png"
-              alt="Vue aerienne d'une toiture en pierre analysee par IA - diagnostic ACO-HABITAT"
-              fill
-              className="object-cover"
-              priority
-              loading="eager"
+            <video
+              src="/videos/hero-satellite.mp4"
+              autoPlay
+              muted
+              loop
+              playsInline
+              className="h-full w-full object-cover"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
             <div className="absolute bottom-4 left-4 flex items-center gap-2 rounded-lg border border-border/50 bg-background/80 px-3 py-1.5 backdrop-blur-sm">
               <Scan size={12} className="text-primary" />
-              <span className="text-[11px] font-medium text-foreground">Analyse aerienne par IA</span>
+              <span className="text-[11px] font-medium text-foreground">Analyse satellite par IA</span>
             </div>
           </div>
         </div>
