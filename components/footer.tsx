@@ -75,6 +75,39 @@ export function Footer() {
         </div>
       </div>
 
+      {/* Cross-selling charpente banner */}
+      <div className="border-t border-amber-500/20 bg-amber-500/5">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-amber-500/15">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-amber-400">
+                <path d="M3 21h18" />
+                <path d="M12 2L2 7h20L12 2z" />
+                <path d="M6 12v7" />
+                <path d="M18 12v7" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-foreground">
+                Diagnostic charpente par IA
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Analysez aussi votre charpente sur notre site dedie
+              </p>
+            </div>
+          </div>
+          <a
+            href="https://aco.habitat.fr"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex shrink-0 items-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-2 text-xs font-semibold text-amber-400 transition-all hover:bg-amber-500/20"
+          >
+            aco.habitat.fr
+            <ExternalLink size={12} />
+          </a>
+        </div>
+      </div>
+
       {/* Footer links */}
       <div className="border-t border-border">
         <div className="mx-auto max-w-7xl px-6 py-14">

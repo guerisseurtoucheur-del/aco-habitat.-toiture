@@ -22,6 +22,7 @@ import {
   Send,
   Download,
   ScanLine,
+  ExternalLink,
   Crosshair,
   Thermometer,
   Flame,
@@ -1658,6 +1659,49 @@ export function DiagnosticTool() {
                 )}
               </div>
             </div>
+
+            {/* Cross-selling charpente - si score structure bas */}
+            {diagnostic.structure && diagnostic.structure.score < 60 && (
+              <div className="relative overflow-hidden rounded-2xl border-2 border-amber-500/40 bg-gradient-to-br from-amber-500/10 via-orange-500/5 to-transparent p-8">
+                <div className="absolute right-4 top-4 flex h-12 w-12 items-center justify-center rounded-full bg-amber-500/15">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-amber-400">
+                    <path d="M3 21h18" />
+                    <path d="M3 7v1a3 3 0 0 0 6 0V7" />
+                    <path d="M9 7v1a3 3 0 0 0 6 0V7" />
+                    <path d="M15 7v1a3 3 0 0 0 6 0V7" />
+                    <path d="M12 2L2 7h20L12 2z" />
+                    <path d="M6 12v7" />
+                    <path d="M10 12v7" />
+                    <path d="M14 12v7" />
+                    <path d="M18 12v7" />
+                  </svg>
+                </div>
+                <div className="inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-amber-400">
+                  Recommandation
+                </div>
+                <h3 className="mt-4 text-xl font-bold text-foreground" style={{ fontFamily: "var(--font-heading)" }}>
+                  Votre charpente semble fragilisee
+                </h3>
+                <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted-foreground">
+                  Notre analyse detecte un <strong className="text-amber-400">score structure de {diagnostic.structure.score}/100</strong>. 
+                  Cela peut indiquer des problemes au niveau de la charpente (bois affaibli, deformation, humidite).
+                  Completez votre diagnostic avec une <strong className="text-foreground">analyse charpente par IA</strong> pour 
+                  avoir une vision complete de votre toiture.
+                </p>
+                <div className="mt-5 flex flex-wrap items-center gap-3">
+                  <a
+                    href="https://aco.habitat.fr"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group flex items-center gap-2 rounded-xl bg-amber-500 px-6 py-3 text-sm font-bold text-black transition-all hover:bg-amber-400 hover:shadow-lg hover:shadow-amber-500/25"
+                  >
+                    Diagnostic charpente par IA
+                    <ExternalLink size={14} className="transition-transform group-hover:translate-x-0.5" />
+                  </a>
+                  <span className="text-xs text-muted-foreground">sur aco.habitat.fr</span>
+                </div>
+              </div>
+            )}
 
             {/* CTA */}
             <div className="rounded-2xl border border-primary/30 bg-gradient-to-r from-primary/10 to-transparent p-8 text-center">
