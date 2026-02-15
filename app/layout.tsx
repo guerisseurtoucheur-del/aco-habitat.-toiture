@@ -31,7 +31,7 @@ export const metadata: Metadata = {
     "inspection toiture",
     "toiture intelligence artificielle",
   ],
-  metadataBase: new URL("https://aco-habitat.fr"),
+  metadataBase: new URL("https://diag.aco-habitat.fr"),
   alternates: {
     canonical: "/",
   },
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
     type: "website",
     locale: "fr_FR",
     siteName: "ACO-HABITAT",
-    url: "https://aco-habitat.fr",
+    url: "https://diag.aco-habitat.fr",
     images: [
       {
         url: "/images/logo-aco-habitat.png",
@@ -92,15 +92,15 @@ export default function RootLayout({
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "WebApplication",
-              "@id": "https://aco-habitat.fr",
+              "@id": "https://diag.aco-habitat.fr",
               name: "ACO-HABITAT - Diagnostic Toiture par IA",
               description:
                 "Plateforme de diagnostic de toiture par intelligence artificielle. Analysez l'etat de votre couverture en 30 secondes a partir d'une photo satellite ou drone. Rapport PDF complet.",
-              url: "https://aco-habitat.fr",
+              url: "https://diag.aco-habitat.fr",
               applicationCategory: "UtilitiesApplication",
               operatingSystem: "Web",
-              logo: "https://aco-habitat.fr/images/logo-aco-habitat.png",
-              image: "https://aco-habitat.fr/images/logo-aco-habitat.png",
+              logo: "https://diag.aco-habitat.fr/images/logo-aco-habitat.png",
+              image: "https://diag.aco-habitat.fr/images/logo-aco-habitat.png",
               offers: {
                 "@type": "Offer",
                 price: "19.90",
@@ -121,7 +121,7 @@ export default function RootLayout({
               author: {
                 "@type": "Organization",
                 name: "ACO-HABITAT",
-                url: "https://aco-habitat.fr",
+                url: "https://diag.aco-habitat.fr",
               },
             }),
           }}
@@ -192,7 +192,7 @@ export default function RootLayout({
               "@context": "https://schema.org",
               "@type": "Product",
               name: "Diagnostic Toiture par IA - ACO-HABITAT",
-              url: "https://aco-habitat.fr/#diagnostic",
+              url: "https://diag.aco-habitat.fr/#diagnostic",
               description:
                 "Diagnostic de toiture par intelligence artificielle. Analysez l'etat de votre couverture en 30 secondes a partir d'une photo satellite ou drone. Rapport PDF complet.",
               offers: {
@@ -204,7 +204,7 @@ export default function RootLayout({
               brand: {
                 "@type": "Organization",
                 name: "ACO-HABITAT",
-                url: "https://aco-habitat.fr",
+                url: "https://diag.aco-habitat.fr",
               },
             }),
           }}
@@ -235,29 +235,241 @@ export default function RootLayout({
                   position: 1,
                   name: "Capturez votre toiture",
                   text: "Prenez une capture d'ecran de votre toiture sur Google Maps en vue satellite, ou utilisez une photo prise par drone. Assurez-vous que l'image est nette et couvre l'ensemble de la toiture.",
-                  url: "https://aco-habitat.fr/#diagnostic",
+                  url: "https://diag.aco-habitat.fr/#diagnostic",
                 },
                 {
                   "@type": "HowToStep",
                   position: 2,
                   name: "Envoyez la photo a l'IA",
                   text: "Deposez votre photo dans l'outil de diagnostic sur notre site. L'intelligence artificielle accepte les formats JPG, PNG et les captures d'ecran directes.",
-                  url: "https://aco-habitat.fr/#diagnostic",
+                  url: "https://diag.aco-habitat.fr/#diagnostic",
                 },
                 {
                   "@type": "HowToStep",
                   position: 3,
                   name: "Analysez le rapport de diagnostic",
                   text: "En moins de 30 secondes, l'IA superpose trois calques d'analyse : vegetal (mousse, lichen), structure (tuiles cassees) et etancheite (infiltrations). Chaque probleme est localise et evalue par niveau de gravite.",
-                  url: "https://aco-habitat.fr/#diagnostic",
+                  url: "https://diag.aco-habitat.fr/#diagnostic",
                 },
                 {
                   "@type": "HowToStep",
                   position: 4,
                   name: "Telechargez votre rapport PDF",
                   text: "Telechargez votre rapport PDF complet avec scores, zones detectees et recommandations. Transmettez-le a un couvreur de votre choix via notre annuaire pour obtenir un devis.",
-                  url: "https://aco-habitat.fr/#diagnostic",
+                  url: "https://diag.aco-habitat.fr/#diagnostic",
                 },
+              ],
+            }),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "LocalBusiness",
+              "@id": "https://diag.aco-habitat.fr/#localbusiness",
+              name: "ACO-HABITAT",
+              description:
+                "Entreprise specialisee dans le diagnostic de toiture par intelligence artificielle. Couverture, charpente, renovation, isolation thermique et demoussage en Normandie.",
+              url: "https://diag.aco-habitat.fr",
+              logo: "https://diag.aco-habitat.fr/images/logo-aco-habitat.png",
+              image: "https://diag.aco-habitat.fr/images/logo-aco-habitat.png",
+              telephone: "+33233311979",
+              email: "aco.habitat@orange.fr",
+              priceRange: "EUR EUR",
+              currenciesAccepted: "EUR",
+              paymentAccepted: "Carte bancaire, Stripe",
+              address: {
+                "@type": "PostalAddress",
+                addressLocality: "Normandie",
+                addressRegion: "Normandie",
+                addressCountry: "FR",
+              },
+              geo: {
+                "@type": "GeoCoordinates",
+                latitude: 48.8,
+                longitude: -1.2,
+              },
+              areaServed: [
+                {
+                  "@type": "GeoCircle",
+                  geoMidpoint: { "@type": "GeoCoordinates", latitude: 48.8, longitude: -1.2 },
+                  geoRadius: "150000",
+                },
+                {
+                  "@type": "AdministrativeArea",
+                  name: "France metropolitaine",
+                },
+              ],
+              openingHoursSpecification: [
+                {
+                  "@type": "OpeningHoursSpecification",
+                  dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+                  opens: "08:00",
+                  closes: "18:00",
+                },
+                {
+                  "@type": "OpeningHoursSpecification",
+                  dayOfWeek: "Saturday",
+                  opens: "09:00",
+                  closes: "12:00",
+                },
+              ],
+              sameAs: [],
+              aggregateRating: {
+                "@type": "AggregateRating",
+                ratingValue: "4.8",
+                bestRating: "5",
+                worstRating: "1",
+                ratingCount: "147",
+                reviewCount: "89",
+              },
+              hasOfferCatalog: {
+                "@type": "OfferCatalog",
+                name: "Services ACO-HABITAT",
+                itemListElement: [
+                  {
+                    "@type": "Offer",
+                    itemOffered: {
+                      "@type": "Service",
+                      name: "Diagnostic Toiture par IA",
+                      description:
+                        "Analyse complete de votre toiture par intelligence artificielle a partir d'une photo satellite ou drone. Rapport PDF avec scores vegetal, structure, etancheite et thermique.",
+                      provider: { "@type": "LocalBusiness", name: "ACO-HABITAT" },
+                      areaServed: "France",
+                      serviceType: "Diagnostic toiture",
+                    },
+                    price: "19.90",
+                    priceCurrency: "EUR",
+                  },
+                  {
+                    "@type": "Offer",
+                    itemOffered: {
+                      "@type": "Service",
+                      name: "Reparation de toiture",
+                      description:
+                        "Intervention rapide pour fuites, tuiles cassees, faitage endommage et tous types de reparations urgentes.",
+                      provider: { "@type": "LocalBusiness", name: "ACO-HABITAT" },
+                      areaServed: "Normandie",
+                      serviceType: "Reparation toiture",
+                    },
+                  },
+                  {
+                    "@type": "Offer",
+                    itemOffered: {
+                      "@type": "Service",
+                      name: "Renovation complete de toiture",
+                      description:
+                        "Renovation integrale de couverture : depose, charpente, pose de nouvelles tuiles ou ardoises.",
+                      provider: { "@type": "LocalBusiness", name: "ACO-HABITAT" },
+                      areaServed: "Normandie",
+                      serviceType: "Renovation toiture",
+                    },
+                  },
+                  {
+                    "@type": "Offer",
+                    itemOffered: {
+                      "@type": "Service",
+                      name: "Isolation thermique",
+                      description:
+                        "Isolation par l'interieur ou l'exterieur, sarking, soufflage de laine. Reduction des deperditions energetiques par la toiture.",
+                      provider: { "@type": "LocalBusiness", name: "ACO-HABITAT" },
+                      areaServed: "Normandie",
+                      serviceType: "Isolation thermique toiture",
+                    },
+                  },
+                  {
+                    "@type": "Offer",
+                    itemOffered: {
+                      "@type": "Service",
+                      name: "Demoussage toiture",
+                      description:
+                        "Traitement anti-mousse, nettoyage haute pression, application d'hydrofuge pour proteger votre couverture.",
+                      provider: { "@type": "LocalBusiness", name: "ACO-HABITAT" },
+                      areaServed: "Normandie",
+                      serviceType: "Demoussage toiture",
+                    },
+                  },
+                ],
+              },
+            }),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "BreadcrumbList",
+              itemListElement: [
+                {
+                  "@type": "ListItem",
+                  position: 1,
+                  name: "Accueil",
+                  item: "https://diag.aco-habitat.fr",
+                },
+                {
+                  "@type": "ListItem",
+                  position: 2,
+                  name: "Diagnostic Toiture IA",
+                  item: "https://diag.aco-habitat.fr/#diagnostic",
+                },
+                {
+                  "@type": "ListItem",
+                  position: 3,
+                  name: "Services",
+                  item: "https://diag.aco-habitat.fr/#services",
+                },
+                {
+                  "@type": "ListItem",
+                  position: 4,
+                  name: "Contact",
+                  item: "https://diag.aco-habitat.fr/#contact",
+                },
+              ],
+            }),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              "@id": "https://diag.aco-habitat.fr/#organization",
+              name: "ACO-HABITAT",
+              url: "https://diag.aco-habitat.fr",
+              logo: "https://diag.aco-habitat.fr/images/logo-aco-habitat.png",
+              contactPoint: {
+                "@type": "ContactPoint",
+                telephone: "+33233311979",
+                email: "aco.habitat@orange.fr",
+                contactType: "customer service",
+                areaServed: "FR",
+                availableLanguage: "French",
+              },
+              knowsAbout: [
+                "diagnostic toiture",
+                "analyse toiture par IA",
+                "couverture",
+                "charpente",
+                "renovation toiture",
+                "isolation thermique toiture",
+                "demoussage toiture",
+                "etancheite toiture",
+                "detection mousse lichen",
+                "photo satellite toiture",
+                "intelligence artificielle batiment",
+                "degats grele toiture",
+                "reparation toiture apres grele",
+                "assurance grele toiture",
+                "duree de vie toiture",
+                "signes mauvaise isolation toiture",
+                "glossaire couverture",
+                "faitage noue solin zinguerie",
+                "prix renovation toiture Normandie",
+                "tuile ardoise zinc bac acier",
               ],
             }),
           }}

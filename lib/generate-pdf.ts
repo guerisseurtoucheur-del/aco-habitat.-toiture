@@ -1,5 +1,11 @@
+// PDF generation module v2 - safe property access
 import jsPDF from "jspdf"
 import type { DiagnosticResult } from "./diagnostic-types"
+
+function safeScore(obj: { score?: number } | undefined | null): number {
+  if (!obj) return 0
+  return typeof obj.score === "number" ? obj.score : 0
+}
 
 function scoreColor(score: number): [number, number, number] {
   if (score >= 75) return [34, 197, 94]   // green
@@ -15,11 +21,12 @@ function severityLabel(score: number): string {
   return "Etat critique"
 }
 
-export async function generateDiagnosticPDF(
+async function buildPDF(
   diagnostic: DiagnosticResult,
   capturedImage: string,
   address: string,
-  measurements: { type: string; value: number }[]
+  measurements: { type: string; value: number }[],
+  clientInfo?: { name?: string; phone?: string; email?: string }
 ) {
   const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" })
   const pageW = doc.internal.pageSize.getWidth()
@@ -99,7 +106,36 @@ export async function generateDiagnosticPDF(
   addText(`Diagnostic du ${dateStr}`, pageW - margin - 55, y, 9, "normal", [100, 100, 100])
   y += 4
   drawLine(y)
-  y += 8
+  y += 6
+
+  // Client info block
+  if (clientInfo && (clientInfo.name || clientInfo.phone || clientInfo.email)) {
+    doc.setFillColor(240, 249, 255)
+    doc.roundedRect(margin, y, contentW, 14, 2, 2, "F")
+    let clientX = margin + 4
+    if (clientInfo.name) {
+      addText("Client :", clientX, y + 5, 7, "bold", [50, 50, 50])
+      clientX += 14
+      addText(clientInfo.name, clientX, y + 5, 7, "normal", [80, 80, 80])
+      clientX += doc.getStringUnitWidth(clientInfo.name) * 7 * 0.35 + 8
+    }
+    if (clientInfo.phone) {
+      addText("Tel :", clientX, y + 5, 7, "bold", [50, 50, 50])
+      clientX += 9
+      addText(clientInfo.phone, clientX, y + 5, 7, "normal", [80, 80, 80])
+      clientX += doc.getStringUnitWidth(clientInfo.phone) * 7 * 0.35 + 8
+    }
+    if (clientInfo.email) {
+      addText("Email :", clientX, y + 5, 7, "bold", [50, 50, 50])
+      clientX += 13
+      addText(clientInfo.email, clientX, y + 5, 7, "normal", [80, 80, 80])
+    }
+    y += 10
+    addText("Coordonnees du demandeur", margin + 4, y, 5, "normal", [150, 150, 150])
+    y += 6
+  } else {
+    y += 2
+  }
 
   // Aerial image
   try {
@@ -150,14 +186,18 @@ export async function generateDiagnosticPDF(
   const globalCy = y + 18
   drawScoreCircle(globalCx, globalCy, 14, diagnostic.scoreGlobal, severityLabel(diagnostic.scoreGlobal))
 
-  // Sub-scores
+  // Sub-scores v2
   const subStartX = margin + 65
   const subGap = 35
-  drawScoreCircle(subStartX, globalCy, 10, diagnostic.vegetal.score, "Vegetal")
-  drawScoreCircle(subStartX + subGap, globalCy, 10, diagnostic.structure.score, "Structure")
-  drawScoreCircle(subStartX + subGap * 2, globalCy, 10, diagnostic.etancheite.score, "Etancheite")
+  const _vScore = safeScore(diagnostic.vegetal)
+  const _sScore = safeScore(diagnostic.structure)
+  const _eScore = safeScore(diagnostic.etancheite)
+  const _tScore = diagnostic.thermique && typeof diagnostic.thermique.scoreIsolation === "number" ? diagnostic.thermique.scoreIsolation : 0
+  drawScoreCircle(subStartX, globalCy, 10, _vScore, "Vegetal")
+  drawScoreCircle(subStartX + subGap, globalCy, 10, _sScore, "Structure")
+  drawScoreCircle(subStartX + subGap * 2, globalCy, 10, _eScore, "Etancheite")
   if (diagnostic.thermique) {
-    drawScoreCircle(subStartX + subGap * 3, globalCy, 10, diagnostic.thermique.scoreIsolation, "Thermique")
+    drawScoreCircle(subStartX + subGap * 3, globalCy, 10, _tScore, "Thermique")
   }
   y = globalCy + 26
 
@@ -229,16 +269,22 @@ export async function generateDiagnosticPDF(
   }
 
   // ── VEGETATION ──
-  sectionTitle("VEGETATION & MOUSSE", [132, 204, 22], "LEAF")
-  sectionContent(diagnostic.vegetal.description, diagnostic.vegetal.zones, diagnostic.vegetal.score)
+  if (diagnostic.vegetal) {
+    sectionTitle("VEGETATION & MOUSSE", [132, 204, 22], "LEAF")
+    sectionContent(diagnostic.vegetal.description, diagnostic.vegetal.zones || [], diagnostic.vegetal.score ?? 0)
+  }
 
   // ── STRUCTURE ──
-  sectionTitle("STRUCTURE & CHARPENTE", [239, 68, 68], "TOOL")
-  sectionContent(diagnostic.structure.description, diagnostic.structure.zones, diagnostic.structure.score)
+  if (diagnostic.structure) {
+    sectionTitle("STRUCTURE & CHARPENTE", [239, 68, 68], "TOOL")
+    sectionContent(diagnostic.structure.description, diagnostic.structure.zones || [], diagnostic.structure.score ?? 0)
+  }
 
   // ── ETANCHEITE ──
-  sectionTitle("ETANCHEITE & HUMIDITE", [34, 197, 94], "DROP")
-  sectionContent(diagnostic.etancheite.description, diagnostic.etancheite.zones, diagnostic.etancheite.score)
+  if (diagnostic.etancheite) {
+    sectionTitle("ETANCHEITE & HUMIDITE", [34, 197, 94], "DROP")
+    sectionContent(diagnostic.etancheite.description, diagnostic.etancheite.zones || [], diagnostic.etancheite.score ?? 0)
+  }
 
   // ── THERMIQUE ──
   if (diagnostic.thermique) {
@@ -327,10 +373,10 @@ export async function generateDiagnosticPDF(
 
   const scoreItems = [
     { label: "Score global", score: diagnostic.scoreGlobal },
-    { label: "Vegetal (mousse, lichen)", score: diagnostic.vegetal.score },
-    { label: "Structure (tuiles, faitage)", score: diagnostic.structure.score },
-    { label: "Etancheite (infiltrations)", score: diagnostic.etancheite.score },
-    ...(diagnostic.thermique ? [{ label: "Thermique (isolation)", score: diagnostic.thermique.scoreIsolation }] : []),
+    ...(diagnostic.vegetal ? [{ label: "Vegetal (mousse, lichen)", score: diagnostic.vegetal.score ?? 0 }] : []),
+    ...(diagnostic.structure ? [{ label: "Structure (tuiles, faitage)", score: diagnostic.structure.score ?? 0 }] : []),
+    ...(diagnostic.etancheite ? [{ label: "Etancheite (infiltrations)", score: diagnostic.etancheite.score ?? 0 }] : []),
+    ...(diagnostic.thermique ? [{ label: "Thermique (isolation)", score: diagnostic.thermique.scoreIsolation ?? 0 }] : []),
   ]
 
   scoreItems.forEach((item) => {
@@ -356,9 +402,9 @@ export async function generateDiagnosticPDF(
   y += 7
 
   const allZones = [
-    ...diagnostic.vegetal.zones.map(z => ({ ...z, cat: "Vegetal" })),
-    ...diagnostic.structure.zones.map(z => ({ ...z, cat: "Structure" })),
-    ...diagnostic.etancheite.zones.map(z => ({ ...z, cat: "Etancheite" })),
+    ...(diagnostic.vegetal?.zones || []).map(z => ({ ...z, cat: "Vegetal" })),
+    ...(diagnostic.structure?.zones || []).map(z => ({ ...z, cat: "Structure" })),
+    ...(diagnostic.etancheite?.zones || []).map(z => ({ ...z, cat: "Etancheite" })),
   ]
 
   if (allZones.length > 0) {
@@ -424,6 +470,25 @@ export async function generateDiagnosticPDF(
     })
   }
 
+  // Cross-selling charpente
+  if (diagnostic.structure && diagnostic.structure.score < 60) {
+    checkNewPage(25)
+    y += 4
+    doc.setFillColor(255, 251, 235)
+    doc.roundedRect(margin, y, contentW, 20, 2, 2, "F")
+    doc.setDrawColor(245, 158, 11)
+    doc.setLineWidth(0.4)
+    doc.roundedRect(margin, y, contentW, 20, 2, 2, "S")
+    addText("RECOMMANDATION : DIAGNOSTIC CHARPENTE", margin + 4, y + 6, 8, "bold", [180, 100, 0])
+    const charpenteText = "Le score structure de votre toiture est bas. Cela peut indiquer un probleme au niveau de la charpente. Completez votre diagnostic avec une analyse charpente par IA sur aco-habitat.fr pour avoir une vision complete."
+    doc.setFontSize(7)
+    doc.setFont("helvetica", "normal")
+    doc.setTextColor(120, 80, 20)
+    const charpenteLines = doc.splitTextToSize(charpenteText, contentW - 8)
+    doc.text(charpenteLines, margin + 4, y + 12)
+    y += 24
+  }
+
   // Legal disclaimer
   checkNewPage(35)
   y += 6
@@ -445,7 +510,7 @@ export async function generateDiagnosticPDF(
   doc.text(legalLines, margin + 4, y + 12)
 
   addText("ACO-HABITAT - Plateforme independante non affiliee a des prestataires de travaux.", margin + 4, y + 28, 6, "bold", [120, 80, 20])
-  addText("Trouvez un couvreur pres de chez vous sur aco-habitat.fr - CGU completes sur aco-habitat.fr/mentions-legales", margin + 4, y + 34, 6, "normal", [120, 80, 20])
+  addText("Trouvez un couvreur pres de chez vous sur diag.aco-habitat.fr - CGU completes sur diag.aco-habitat.fr/mentions-legales", margin + 4, y + 34, 6, "normal", [120, 80, 20])
 
   // ═══════════════════════════════════════
   // Footer on every page
@@ -459,12 +524,41 @@ export async function generateDiagnosticPDF(
     doc.setFontSize(6)
     doc.setFont("helvetica", "normal")
     doc.setTextColor(120, 120, 130)
-    doc.text("ACO-HABITAT - Diagnostic Toiture par IA | aco-habitat.fr | aco.habitat@orange.fr", margin, pageH - 7)
+    doc.text("ACO-HABITAT - Diagnostic Toiture par IA | diag.aco-habitat.fr | aco.habitat@orange.fr", margin, pageH - 7)
     doc.text(`Page ${p}/${totalPages}`, pageW - margin - 15, pageH - 7)
     doc.text("Ce rapport est un diagnostic automatise base sur l'imagerie. Il ne remplace pas l'expertise d'un professionnel sur site.", margin, pageH - 3)
   }
 
-  // Save
+  return doc
+}
+
+/** Generate and download the PDF */
+export async function generateDiagnosticPDF(
+  diagnostic: DiagnosticResult,
+  capturedImage: string,
+  address: string,
+  measurements: { type: string; value: number }[],
+  clientInfo?: { name?: string; phone?: string; email?: string }
+) {
+  const doc = await buildPDF(diagnostic, capturedImage, address, measurements, clientInfo)
   const fileName = `diagnostic-toiture-aco-habitat-${new Date().toISOString().slice(0, 10)}.pdf`
   doc.save(fileName)
+}
+
+/** Generate the PDF and return as base64 string (for email attachment) */
+export async function generateDiagnosticPDFBase64(
+  diagnostic: DiagnosticResult,
+  capturedImage: string,
+  address: string,
+  measurements: { type: string; value: number }[],
+  clientInfo?: { name?: string; phone?: string; email?: string }
+): Promise<string> {
+  const doc = await buildPDF(diagnostic, capturedImage, address, measurements, clientInfo)
+  const arrayBuffer = doc.output("arraybuffer")
+  const uint8 = new Uint8Array(arrayBuffer)
+  let binary = ""
+  for (let i = 0; i < uint8.length; i++) {
+    binary += String.fromCharCode(uint8[i])
+  }
+  return btoa(binary)
 }

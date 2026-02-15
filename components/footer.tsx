@@ -21,9 +21,11 @@ const footerLinks: { title: string; links: FooterLink[] }[] = [
     title: "Ressources",
     links: [
       { label: "FAQ", href: "#faq" },
-      { label: "Trouver un couvreur", href: "#couvreurs" },
-      { label: "Guide : quand renover sa toiture", href: "/guide/quand-renover-toiture" },
-      { label: "Guide : dangers de la mousse", href: "/guide/mousse-toiture-dangers" },
+      { label: "Glossaire toiture", href: "/guide/glossaire-toiture" },
+      { label: "Degats de grele", href: "/guide/degats-grele-toiture" },
+      { label: "Duree de vie d'une toiture", href: "/guide/duree-de-vie-toiture" },
+      { label: "Signes mauvaise isolation", href: "/guide/signes-mauvaise-isolation-toiture" },
+      { label: "Notre methodologie IA", href: "/guide/methodologie-diagnostic-ia" },
     ],
   },
   {
@@ -32,6 +34,7 @@ const footerLinks: { title: string; links: FooterLink[] }[] = [
       { label: "A propos", href: "#methode" },
       { label: "Contact / Support", href: "mailto:aco.habitat@orange.fr" },
       { label: "Mentions legales & CGV", href: "/mentions-legales" },
+      { label: "Espace pro", href: "/admin" },
     ],
   },
 ]
@@ -69,6 +72,39 @@ export function Footer() {
               </a>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Cross-selling charpente banner */}
+      <div className="border-t border-amber-500/20 bg-amber-500/5">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
+          <div className="flex items-center gap-3">
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-amber-500/15">
+              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-amber-400">
+                <path d="M3 21h18" />
+                <path d="M12 2L2 7h20L12 2z" />
+                <path d="M6 12v7" />
+                <path d="M18 12v7" />
+              </svg>
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-foreground">
+                Diagnostic charpente par IA
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Analysez aussi votre charpente sur notre site dedie
+              </p>
+            </div>
+          </div>
+          <a
+            href="https://aco-habitat.fr"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex shrink-0 items-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-2 text-xs font-semibold text-amber-400 transition-all hover:bg-amber-500/20"
+          >
+            aco-habitat.fr
+            <ExternalLink size={12} />
+          </a>
         </div>
       </div>
 

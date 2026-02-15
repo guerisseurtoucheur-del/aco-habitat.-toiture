@@ -22,6 +22,7 @@ import {
   Send,
   Download,
   ScanLine,
+  ExternalLink,
   Crosshair,
   Thermometer,
   Flame,
@@ -380,6 +381,11 @@ export function DiagnosticTool() {
   const [diagnostic, setDiagnostic] = useState<DiagnosticResult | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [uploadMode, setUploadMode] = useState(false)
+  const [clientName, setClientName] = useState("")
+  const [clientPhone, setClientPhone] = useState("")
+  const [clientEmail, setClientEmail] = useState("")
+  const [emailSent, setEmailSent] = useState(false)
+  const [sendingEmail, setSendingEmail] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const resultsRef = useRef<HTMLDivElement>(null)
   const handleSearchRef = useRef<() => void>(() => {})
@@ -559,8 +565,57 @@ export function DiagnosticTool() {
         return
       }
 
-      setDiagnostic(ensureRealisticZones(diagData.diagnostic))
+      const finalDiag = ensureRealisticZones(diagData.diagnostic)
+      setDiagnostic(finalDiag)
       setStep("results")
+
+      // Save to database (fire and forget)
+      try {
+        fetch("/api/diagnostics", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: clientName,
+            phone: clientPhone,
+            email: clientEmail,
+            address: formattedAddress,
+            globalScore: finalDiag.scoreGlobal || 0,
+            structureScore: finalDiag.structure?.score || 0,
+            vegetalScore: finalDiag.vegetal?.score || 0,
+            etancheiteScore: finalDiag.etancheite?.score || 0,
+            thermalScore: finalDiag.thermique?.scoreIsolation || 0,
+            stripeSessionId: typeof window !== "undefined" ? window.__stripeSessionId || "" : "",
+          }),
+        })
+      } catch { /* silent */ }
+
+      // Auto-download PDF
+      try {
+        const { generateDiagnosticPDF, generateDiagnosticPDFBase64 } = await import("@/lib/generate-pdf")
+        const clientInfo = { name: clientName, phone: clientPhone, email: clientEmail }
+        await generateDiagnosticPDF(finalDiag, capturedImage || "", formattedAddress, mapMeasurements, clientInfo)
+
+        // Auto-send PDF by email
+        if (clientEmail) {
+          setSendingEmail(true)
+          try {
+            const pdfBase64 = await generateDiagnosticPDFBase64(finalDiag, capturedImage || "", formattedAddress, mapMeasurements, clientInfo)
+            await fetch("/api/send-report", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                email: clientEmail,
+                name: clientName,
+                address: formattedAddress,
+                globalScore: finalDiag.scoreGlobal || 0,
+                pdfBase64,
+              }),
+            })
+            setEmailSent(true)
+          } catch { /* silent */ }
+          finally { setSendingEmail(false) }
+        }
+      } catch { /* silent - PDF generation failed */ }
 
       setTimeout(() => {
         resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
@@ -569,7 +624,7 @@ export function DiagnosticTool() {
       setError("Une erreur est survenue. Verifiez votre connexion et reessayez.")
       setStep("address")
     }
-  }, [capturedImage, formattedAddress, mapMeasurements])
+  }, [capturedImage, formattedAddress, mapMeasurements, clientName, clientPhone, clientEmail])
 
   // Compress image to max 1600px and JPEG quality 0.85 to stay under API body limits
   const compressImage = useCallback((file: File): Promise<string> => {
@@ -1003,6 +1058,58 @@ export function DiagnosticTool() {
                     </div>
                   ))}
                 </div>
+              </div>
+
+              {/* Client info form */}
+              <div className="mb-5 space-y-3 rounded-xl border border-border bg-secondary/30 p-4">
+                <p className="text-xs font-semibold text-foreground">Vos coordonnees</p>
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <div>
+                    <label htmlFor="client-name" className="mb-1 block text-[11px] font-medium text-muted-foreground">
+                      Nom complet *
+                    </label>
+                    <input
+                      id="client-name"
+                      type="text"
+                      value={clientName}
+                      onChange={(e) => setClientName(e.target.value)}
+                      placeholder="Jean Dupont"
+                      className="h-10 w-full rounded-lg border border-border bg-background px-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                      required
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="client-phone" className="mb-1 block text-[11px] font-medium text-muted-foreground">
+                      Telephone *
+                    </label>
+                    <input
+                      id="client-phone"
+                      type="tel"
+                      value={clientPhone}
+                      onChange={(e) => setClientPhone(e.target.value)}
+                      placeholder="06 12 34 56 78"
+                      className="h-10 w-full rounded-lg border border-border bg-background px-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                      required
+                    />
+                  </div>
+                </div>
+                <div>
+                  <label htmlFor="client-email" className="mb-1 block text-[11px] font-medium text-muted-foreground">
+                    Adresse email *
+                  </label>
+                  <input
+                    id="client-email"
+                    type="email"
+                    value={clientEmail}
+                    onChange={(e) => setClientEmail(e.target.value)}
+                    placeholder="votre@email.fr"
+                    className="h-10 w-full rounded-lg border border-border bg-background px-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                    required
+                  />
+                </div>
+                <p className="text-[10px] text-muted-foreground">
+                  Le rapport PDF sera envoye a cette adresse. Vos coordonnees restent confidentielles.
+                </p>
               </div>
 
               {/* Stripe Embedded Checkout */}
@@ -1525,20 +1632,76 @@ export function DiagnosticTool() {
                       diagnostic,
                       capturedImage || "",
                       formattedAddress,
-                      mapMeasurements
+                      mapMeasurements,
+                      { name: clientName, phone: clientPhone, email: clientEmail }
                     )
                   }}
                   className="group relative inline-flex items-center gap-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-8 py-4 text-base font-bold text-white shadow-lg shadow-cyan-500/25 transition-all hover:shadow-xl hover:shadow-cyan-500/30"
                 >
                   <Download size={20} />
-                  Telecharger le rapport PDF
+                  Re-telecharger le rapport PDF
                   <span className="ml-1 rounded-md bg-white/20 px-2 py-0.5 text-[10px] font-semibold">INCLUS</span>
                 </button>
-                <p className="mt-3 text-[10px] text-muted-foreground">
-                  Telechargement instantane - Aucune inscription requise
-                </p>
+                {emailSent ? (
+                  <p className="mt-3 flex items-center justify-center gap-1.5 text-xs font-medium text-green-400">
+                    <CheckCircle2 size={12} />
+                    Rapport PDF telecharge et envoye a {clientEmail}
+                  </p>
+                ) : sendingEmail ? (
+                  <p className="mt-3 flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
+                    <Loader2 size={12} className="animate-spin" />
+                    Envoi du rapport par email en cours...
+                  </p>
+                ) : (
+                  <p className="mt-3 text-[10px] text-muted-foreground">
+                    Le rapport PDF a ete telecharge automatiquement.
+                  </p>
+                )}
               </div>
             </div>
+
+            {/* Cross-selling charpente - si score structure bas */}
+            {diagnostic.structure && diagnostic.structure.score < 60 && (
+              <div className="relative overflow-hidden rounded-2xl border-2 border-amber-500/40 bg-gradient-to-br from-amber-500/10 via-orange-500/5 to-transparent p-8">
+                <div className="absolute right-4 top-4 flex h-12 w-12 items-center justify-center rounded-full bg-amber-500/15">
+                  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-amber-400">
+                    <path d="M3 21h18" />
+                    <path d="M3 7v1a3 3 0 0 0 6 0V7" />
+                    <path d="M9 7v1a3 3 0 0 0 6 0V7" />
+                    <path d="M15 7v1a3 3 0 0 0 6 0V7" />
+                    <path d="M12 2L2 7h20L12 2z" />
+                    <path d="M6 12v7" />
+                    <path d="M10 12v7" />
+                    <path d="M14 12v7" />
+                    <path d="M18 12v7" />
+                  </svg>
+                </div>
+                <div className="inline-flex items-center gap-2 rounded-full border border-amber-500/30 bg-amber-500/10 px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-amber-400">
+                  Recommandation
+                </div>
+                <h3 className="mt-4 text-xl font-bold text-foreground" style={{ fontFamily: "var(--font-heading)" }}>
+                  Votre charpente semble fragilisee
+                </h3>
+                <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted-foreground">
+                  Notre analyse detecte un <strong className="text-amber-400">score structure de {diagnostic.structure.score}/100</strong>. 
+                  Cela peut indiquer des problemes au niveau de la charpente (bois affaibli, deformation, humidite).
+                  Completez votre diagnostic avec une <strong className="text-foreground">analyse charpente par IA</strong> pour 
+                  avoir une vision complete de votre toiture.
+                </p>
+                <div className="mt-5 flex flex-wrap items-center gap-3">
+                  <a
+                    href="https://aco-habitat.fr"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="group flex items-center gap-2 rounded-xl bg-amber-500 px-6 py-3 text-sm font-bold text-black transition-all hover:bg-amber-400 hover:shadow-lg hover:shadow-amber-500/25"
+                  >
+                    Diagnostic charpente par IA
+                    <ExternalLink size={14} className="transition-transform group-hover:translate-x-0.5" />
+                  </a>
+                  <span className="text-xs text-muted-foreground">sur aco-habitat.fr</span>
+                </div>
+              </div>
+            )}
 
             {/* CTA */}
             <div className="rounded-2xl border border-primary/30 bg-gradient-to-r from-primary/10 to-transparent p-8 text-center">

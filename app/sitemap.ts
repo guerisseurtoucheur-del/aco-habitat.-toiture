@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next"
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://aco-habitat.fr"
+  const baseUrl = "https://diag.aco-habitat.fr"
 
   const services = [
     "couverture",
@@ -18,6 +18,11 @@ export default function sitemap(): MetadataRoute.Sitemap {
     "quand-renover-toiture",
     "prix-renovation-toiture",
     "mousse-toiture-dangers",
+    "glossaire-toiture",
+    "degats-grele-toiture",
+    "duree-de-vie-toiture",
+    "signes-mauvaise-isolation-toiture",
+    "methodologie-diagnostic-ia",
   ]
 
   const servicePages = services.map((service) => ({
@@ -40,6 +45,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: new Date(),
       changeFrequency: "weekly",
       priority: 1,
+    },
+    {
+      url: `${baseUrl}/mentions-legales`,
+      lastModified: new Date(),
+      changeFrequency: "yearly",
+      priority: 0.3,
     },
     ...servicePages,
     ...guidePages,
