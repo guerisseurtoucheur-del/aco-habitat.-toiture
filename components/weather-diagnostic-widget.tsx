@@ -99,23 +99,30 @@ export function WeatherDiagnosticWidget({ address, score }: { address: string; s
     (a) => a.event.includes("Orage") || a.event.includes("Vent fort")
   )
 
-  // Generate weather-aware recommendation based on score
-  function getWeatherRecommendation(): string | null {
-    if (score >= 70 && !hasAlerts) return null
-    
+  // Generate weather-aware recommendation based on score - always show one
+  function getWeatherRecommendation(): { text: string; level: "urgent" | "warning" | "info" } {
     if (hasDangerousWeather && score < 50) {
-      return "URGENT : Votre toiture est fragilisee et des conditions meteorologiques severes sont prevues. Faites intervenir un couvreur rapidement pour eviter des degats supplementaires."
+      return { text: "URGENT : Votre toiture est fragilisee et des conditions meteorologiques severes sont prevues. Faites intervenir un couvreur rapidement pour eviter des degats supplementaires.", level: "urgent" }
     }
     if (hasDangerousWeather && score < 70) {
-      return "Attention : des intemperies sont prevues dans votre zone et votre toiture presente des faiblesses. Surveillez les infiltrations apres le passage de la perturbation."
+      return { text: "Attention : des intemperies sont prevues dans votre zone et votre toiture presente des faiblesses. Surveillez les infiltrations apres le passage de la perturbation.", level: "warning" }
     }
     if (hasAlerts && score < 50) {
-      return "Votre toiture est en mauvais etat. Les conditions meteo a venir pourraient aggraver les problemes existants. Contactez un couvreur pour un devis."
+      return { text: "Votre toiture est en mauvais etat. Les conditions meteo a venir pourraient aggraver les problemes existants. Contactez un couvreur pour un devis.", level: "warning" }
     }
     if (weather.current.wind_speed > 40 && score < 60) {
-      return "Vent soutenu detecte dans votre zone. Sur une toiture fragilisee, le vent peut soulever des tuiles et endommager le faitage."
+      return { text: "Vent soutenu detecte dans votre zone. Sur une toiture fragilisee, le vent peut soulever des tuiles et endommager le faitage.", level: "warning" }
     }
-    return null
+    if (hasDangerousWeather) {
+      return { text: "Des intemperies sont prevues dans votre zone. Meme si votre toiture est en bon etat, restez vigilant et verifiez apres le passage de la perturbation.", level: "warning" }
+    }
+    if (score < 50) {
+      return { text: `Conditions meteo actuelles : ${weather.current.description} avec un vent de ${weather.current.wind_speed} km/h. Votre toiture fragilisee (score ${score}/100) est plus vulnerable aux intemperies. Planifiez des reparations.`, level: "warning" }
+    }
+    if (score < 70) {
+      return { text: `Conditions meteo actuelles : ${weather.current.description}. Votre toiture presente quelques faiblesses (score ${score}/100). Surveillez l'apparition de mousses et verifiez l'etancheite apres chaque episode pluvieux.`, level: "info" }
+    }
+    return { text: `Conditions meteo actuelles : ${weather.current.description} a ${weather.current.temp}°C. Votre toiture est en bon etat (score ${score}/100). Continuez a surveiller regulierement, surtout apres les periodes de gel ou de forte chaleur.`, level: "info" }
   }
 
   const recommendation = getWeatherRecommendation()
@@ -130,8 +137,8 @@ export function WeatherDiagnosticWidget({ address, score }: { address: string; s
             Meteo {weather.current.city_name}
           </span>
         </div>
-        <span className="text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
-          Impact toiture
+        <span className="text-[10px] font-medium text-muted-foreground">
+          {new Date().toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long", year: "numeric" })}
         </span>
       </div>
 
@@ -187,13 +194,34 @@ export function WeatherDiagnosticWidget({ address, score }: { address: string; s
           </div>
         )}
 
-        {/* Recommendation */}
-        {recommendation && (
-          <div className="mt-4 flex items-start gap-2.5 rounded-xl border border-primary/30 bg-primary/5 px-3.5 py-2.5">
-            <Thermometer size={14} className="mt-0.5 shrink-0 text-primary" />
-            <p className="text-xs leading-relaxed text-foreground">{recommendation}</p>
+        {/* Recommendation - toujours affichee */}
+        <div className={`mt-4 flex items-start gap-2.5 rounded-xl border px-3.5 py-2.5 ${
+          recommendation.level === "urgent"
+            ? "border-red-500/30 bg-red-500/10"
+            : recommendation.level === "warning"
+            ? "border-orange-500/30 bg-orange-500/10"
+            : "border-primary/30 bg-primary/5"
+        }`}>
+          <Thermometer size={14} className={`mt-0.5 shrink-0 ${
+            recommendation.level === "urgent"
+              ? "text-red-400"
+              : recommendation.level === "warning"
+              ? "text-orange-400"
+              : "text-primary"
+          }`} />
+          <div>
+            <p className={`text-[10px] font-bold uppercase tracking-wider ${
+              recommendation.level === "urgent"
+                ? "text-red-400"
+                : recommendation.level === "warning"
+                ? "text-orange-400"
+                : "text-primary"
+            }`}>
+              {recommendation.level === "urgent" ? "Alerte toiture" : recommendation.level === "warning" ? "Surveillance recommandee" : "Impact meteo sur votre toiture"}
+            </p>
+            <p className="mt-1 text-xs leading-relaxed text-foreground">{recommendation.text}</p>
           </div>
-        )}
+        </div>
 
         {/* 4-day forecast */}
         {weather.forecast.length > 0 && (
