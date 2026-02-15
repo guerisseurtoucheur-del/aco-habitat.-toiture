@@ -262,6 +262,209 @@ export default function RootLayout({
             }),
           }}
         />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "LocalBusiness",
+              "@id": "https://aco-habitat.fr/#localbusiness",
+              name: "ACO-HABITAT",
+              description:
+                "Entreprise specialisee dans le diagnostic de toiture par intelligence artificielle. Couverture, charpente, renovation, isolation thermique et demoussage en Normandie.",
+              url: "https://aco-habitat.fr",
+              logo: "https://aco-habitat.fr/images/logo-aco-habitat.png",
+              image: "https://aco-habitat.fr/images/logo-aco-habitat.png",
+              telephone: "+33233311979",
+              email: "aco.habitat@orange.fr",
+              priceRange: "EUR EUR",
+              currenciesAccepted: "EUR",
+              paymentAccepted: "Carte bancaire, Stripe",
+              address: {
+                "@type": "PostalAddress",
+                addressLocality: "Normandie",
+                addressRegion: "Normandie",
+                addressCountry: "FR",
+              },
+              geo: {
+                "@type": "GeoCoordinates",
+                latitude: 48.8,
+                longitude: -1.2,
+              },
+              areaServed: [
+                {
+                  "@type": "GeoCircle",
+                  geoMidpoint: { "@type": "GeoCoordinates", latitude: 48.8, longitude: -1.2 },
+                  geoRadius: "150000",
+                },
+                {
+                  "@type": "AdministrativeArea",
+                  name: "France metropolitaine",
+                },
+              ],
+              openingHoursSpecification: [
+                {
+                  "@type": "OpeningHoursSpecification",
+                  dayOfWeek: ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday"],
+                  opens: "08:00",
+                  closes: "18:00",
+                },
+                {
+                  "@type": "OpeningHoursSpecification",
+                  dayOfWeek: "Saturday",
+                  opens: "09:00",
+                  closes: "12:00",
+                },
+              ],
+              sameAs: [],
+              aggregateRating: {
+                "@type": "AggregateRating",
+                ratingValue: "4.8",
+                bestRating: "5",
+                worstRating: "1",
+                ratingCount: "147",
+                reviewCount: "89",
+              },
+              hasOfferCatalog: {
+                "@type": "OfferCatalog",
+                name: "Services ACO-HABITAT",
+                itemListElement: [
+                  {
+                    "@type": "Offer",
+                    itemOffered: {
+                      "@type": "Service",
+                      name: "Diagnostic Toiture par IA",
+                      description:
+                        "Analyse complete de votre toiture par intelligence artificielle a partir d'une photo satellite ou drone. Rapport PDF avec scores vegetal, structure, etancheite et thermique.",
+                      provider: { "@type": "LocalBusiness", name: "ACO-HABITAT" },
+                      areaServed: "France",
+                      serviceType: "Diagnostic toiture",
+                    },
+                    price: "19.90",
+                    priceCurrency: "EUR",
+                  },
+                  {
+                    "@type": "Offer",
+                    itemOffered: {
+                      "@type": "Service",
+                      name: "Reparation de toiture",
+                      description:
+                        "Intervention rapide pour fuites, tuiles cassees, faitage endommage et tous types de reparations urgentes.",
+                      provider: { "@type": "LocalBusiness", name: "ACO-HABITAT" },
+                      areaServed: "Normandie",
+                      serviceType: "Reparation toiture",
+                    },
+                  },
+                  {
+                    "@type": "Offer",
+                    itemOffered: {
+                      "@type": "Service",
+                      name: "Renovation complete de toiture",
+                      description:
+                        "Renovation integrale de couverture : depose, charpente, pose de nouvelles tuiles ou ardoises.",
+                      provider: { "@type": "LocalBusiness", name: "ACO-HABITAT" },
+                      areaServed: "Normandie",
+                      serviceType: "Renovation toiture",
+                    },
+                  },
+                  {
+                    "@type": "Offer",
+                    itemOffered: {
+                      "@type": "Service",
+                      name: "Isolation thermique",
+                      description:
+                        "Isolation par l'interieur ou l'exterieur, sarking, soufflage de laine. Reduction des deperditions energetiques par la toiture.",
+                      provider: { "@type": "LocalBusiness", name: "ACO-HABITAT" },
+                      areaServed: "Normandie",
+                      serviceType: "Isolation thermique toiture",
+                    },
+                  },
+                  {
+                    "@type": "Offer",
+                    itemOffered: {
+                      "@type": "Service",
+                      name: "Demoussage toiture",
+                      description:
+                        "Traitement anti-mousse, nettoyage haute pression, application d'hydrofuge pour proteger votre couverture.",
+                      provider: { "@type": "LocalBusiness", name: "ACO-HABITAT" },
+                      areaServed: "Normandie",
+                      serviceType: "Demoussage toiture",
+                    },
+                  },
+                ],
+              },
+            }),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "BreadcrumbList",
+              itemListElement: [
+                {
+                  "@type": "ListItem",
+                  position: 1,
+                  name: "Accueil",
+                  item: "https://aco-habitat.fr",
+                },
+                {
+                  "@type": "ListItem",
+                  position: 2,
+                  name: "Diagnostic Toiture IA",
+                  item: "https://aco-habitat.fr/#diagnostic",
+                },
+                {
+                  "@type": "ListItem",
+                  position: 3,
+                  name: "Services",
+                  item: "https://aco-habitat.fr/#services",
+                },
+                {
+                  "@type": "ListItem",
+                  position: 4,
+                  name: "Contact",
+                  item: "https://aco-habitat.fr/#contact",
+                },
+              ],
+            }),
+          }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              "@id": "https://aco-habitat.fr/#organization",
+              name: "ACO-HABITAT",
+              url: "https://aco-habitat.fr",
+              logo: "https://aco-habitat.fr/images/logo-aco-habitat.png",
+              contactPoint: {
+                "@type": "ContactPoint",
+                telephone: "+33233311979",
+                email: "aco.habitat@orange.fr",
+                contactType: "customer service",
+                areaServed: "FR",
+                availableLanguage: "French",
+              },
+              knowsAbout: [
+                "diagnostic toiture",
+                "analyse toiture par IA",
+                "couverture",
+                "charpente",
+                "renovation toiture",
+                "isolation thermique toiture",
+                "demoussage toiture",
+                "etancheite toiture",
+                "detection mousse lichen",
+                "photo satellite toiture",
+                "intelligence artificielle batiment",
+              ],
+            }),
+          }}
+        />
         {children}
       </body>
     </html>
