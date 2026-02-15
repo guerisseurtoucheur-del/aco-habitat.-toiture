@@ -248,6 +248,26 @@ export default async function GuidePage({
               {guide.heroDescription}
             </p>
 
+            {/* Guide image */}
+            {guide.image && (
+              <div className="mt-8 overflow-hidden rounded-2xl border border-border shadow-lg">
+                <div className="relative aspect-[16/9] w-full">
+                  <Image
+                    src={guide.image}
+                    alt={guide.imageAlt || guide.title}
+                    fill
+                    className="object-cover"
+                    priority
+                  />
+                </div>
+                {guide.imageAlt && (
+                  <p className="bg-card/60 px-4 py-2 text-xs text-muted-foreground">
+                    {guide.imageAlt}
+                  </p>
+                )}
+              </div>
+            )}
+
             {/* Author box */}
             <div className="mt-8 flex items-center gap-4 rounded-2xl border border-border bg-card/40 p-5">
               <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full">

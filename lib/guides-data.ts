@@ -19,6 +19,8 @@ export interface GuideData {
   datePublished: string
   dateModified: string
   readTime: string
+  image?: string
+  imageAlt?: string
   sections: GuideSection[]
   faq: GuideFAQ[]
   relatedServices: string[]
@@ -296,6 +298,8 @@ export const guidesData: GuideData[] = [
     datePublished: "2026-01-25",
     dateModified: "2026-02-10",
     readTime: "7 min",
+    image: "/images/toiture-mousse.png",
+    imageAlt: "Toiture en ardoise recouverte de mousse et lichen - exemple de degradation vegetale necessitant un traitement",
     sections: [
       {
         title: "Comment la mousse s'installe-t-elle sur votre toit ?",
