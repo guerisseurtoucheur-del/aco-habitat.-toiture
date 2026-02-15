@@ -122,7 +122,7 @@ export async function GET(req: Request) {
 
                 <p style="line-height: 1.6;">
                   Vous pouvez aussi nous contacter directement par telephone au 
-                  <strong style="color: #fff;">06 XX XX XX XX</strong>.
+                  <strong style="color: #fff;">02 33 31 19 79</strong>.
                 </p>
 
                 <p style="color: #888; line-height: 1.6;">
