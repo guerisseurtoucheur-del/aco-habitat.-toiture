@@ -542,6 +542,7 @@ export function DiagnosticTool() {
 
   // Run the actual AI diagnostic (called after successful payment)
   const runDiagnostic = useCallback(async () => {
+    console.log("[v0] runDiagnostic called, capturedImage:", !!capturedImage, "address:", formattedAddress, "step:", step)
     setStep("scanning")
 
     try {
@@ -549,6 +550,7 @@ export function DiagnosticTool() {
       setStep("analyzing")
 
       const capture = pendingCaptureRef.current
+      console.log("[v0] Sending to /api/diagnostic, image length:", capturedImage?.length || 0, "address:", formattedAddress)
       const diagRes = await fetch("/api/diagnostic", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -561,8 +563,10 @@ export function DiagnosticTool() {
         }),
       })
       const diagData = await diagRes.json()
+      console.log("[v0] Diagnostic API response:", diagRes.ok, diagRes.status, JSON.stringify(diagData).substring(0, 200))
 
       if (!diagRes.ok) {
+        console.log("[v0] Diagnostic API error:", diagData.error)
         setError(diagData.error || "Erreur lors de l'analyse IA.")
         setStep("address")
         return
@@ -571,6 +575,7 @@ export function DiagnosticTool() {
       const finalDiag = ensureRealisticZones(diagData.diagnostic)
       setDiagnostic(finalDiag)
       setStep("results")
+      console.log("[v0] Diagnostic complete, score:", finalDiag.scoreGlobal)
 
       // Save to database (fire and forget)
       try {
@@ -1142,7 +1147,10 @@ export function DiagnosticTool() {
                 <div className="rounded-xl border border-border bg-background p-1">
                   <StripeCheckout
                     productId="diagnostic-toiture"
-                    onComplete={() => runDiagnostic()}
+                    onComplete={() => {
+                      console.log("[v0] Stripe onComplete triggered, capturedImage:", !!capturedImage, "address:", formattedAddress)
+                      runDiagnostic()
+                    }}
                   />
                 </div>
               ) : (
