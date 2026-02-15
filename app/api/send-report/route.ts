@@ -4,8 +4,10 @@ import nodemailer from "nodemailer"
 export async function POST(req: Request) {
   try {
     const { email, address, globalScore, pdfBase64 } = await req.json()
+    console.log("[v0] POST /api/send-report called, email:", email, "address:", address, "pdfBase64 length:", pdfBase64?.length || 0)
 
     if (!email || !pdfBase64) {
+      console.log("[v0] send-report missing data, email:", !!email, "pdfBase64:", !!pdfBase64)
       return NextResponse.json({ error: "Email et PDF requis" }, { status: 400 })
     }
 
