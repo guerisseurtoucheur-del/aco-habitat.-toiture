@@ -43,11 +43,28 @@
   * {
     @apply border-border;
   }
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
   body {
     @apply bg-background text-foreground antialiased;
+    -webkit-tap-highlight-color: transparent;
+    overflow-x: hidden;
   }
   ::selection {
     @apply bg-primary/30 text-foreground;
+  }
+  /* Minimum touch target size */
+  button, a, input, select, textarea {
+    touch-action: manipulation;
+  }
+  /* Safe area for notch phones */
+  @supports (padding: env(safe-area-inset-bottom)) {
+    body {
+      padding-left: env(safe-area-inset-left);
+      padding-right: env(safe-area-inset-right);
+    }
   }
 }
 

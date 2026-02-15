@@ -43,8 +43,8 @@ export function Footer() {
   return (
     <footer className="border-t border-border bg-card/30">
       {/* CTA Banner */}
-      <div className="mx-auto max-w-7xl px-6 py-16">
-        <div className="relative overflow-hidden rounded-2xl border border-primary/20 bg-primary/5 p-10 text-center">
+      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-16">
+        <div className="relative overflow-hidden rounded-xl border border-primary/20 bg-primary/5 p-6 text-center sm:rounded-2xl sm:p-10">
           <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--color-glow-blue),_transparent_60%)]" />
           <div className="relative">
             <h3
@@ -77,7 +77,7 @@ export function Footer() {
 
       {/* Cross-selling charpente banner */}
       <div className="border-t border-amber-500/20 bg-amber-500/5">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-6 py-4">
+        <div className="mx-auto flex max-w-7xl flex-col items-start gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:px-6">
           <div className="flex items-center gap-3">
             <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-amber-500/15">
               <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-amber-400">
@@ -110,10 +110,10 @@ export function Footer() {
 
       {/* Footer links */}
       <div className="border-t border-border">
-        <div className="mx-auto max-w-7xl px-6 py-14">
-          <div className="grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
+        <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14">
+          <div className="grid grid-cols-2 gap-8 sm:grid-cols-2 lg:grid-cols-4">
             {/* Brand */}
-            <div className="flex flex-col gap-4">
+            <div className="col-span-2 flex flex-col gap-4 sm:col-span-1">
               <div className="flex items-center gap-3">
                 <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full">
                   <Image
@@ -180,7 +180,7 @@ export function Footer() {
 
       {/* Bottom bar */}
       <div className="border-t border-border">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-6 py-6 sm:flex-row">
+          <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 py-6 sm:flex-row sm:px-6">
           <p className="text-xs text-muted-foreground">
             {"2026 ACO-HABITAT. Tous droits reserves."}
           </p>

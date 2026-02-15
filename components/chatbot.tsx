@@ -70,11 +70,11 @@ export function Chatbot() {
 
       {/* Chat window */}
       <div
-        className={`fixed bottom-5 right-5 z-50 flex w-[370px] flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-2xl shadow-black/40 transition-all duration-300 ${
+        className={`fixed z-50 flex flex-col overflow-hidden border border-border bg-card shadow-2xl shadow-black/40 transition-all duration-300 ${
           isOpen
-            ? "h-[520px] scale-100 opacity-100"
+            ? "scale-100 opacity-100"
             : "pointer-events-none h-0 scale-95 opacity-0"
-        }`}
+        } bottom-0 right-0 h-[100dvh] w-full rounded-none sm:bottom-5 sm:right-5 sm:h-[520px] sm:w-[370px] sm:rounded-2xl`}
       >
         {/* Header */}
         <div className="flex items-center justify-between border-b border-border bg-secondary/50 px-4 py-3">

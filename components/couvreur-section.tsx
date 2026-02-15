@@ -18,8 +18,8 @@ export function CouvreurSection() {
   const mapsExternalUrl = `https://www.google.com/maps/search/couvreur+toiture+${encodeURIComponent(city || "France")}`
 
   return (
-    <section id="couvreurs" className="relative py-24 bg-secondary/30">
-      <div className="mx-auto max-w-6xl px-6">
+    <section id="couvreurs" className="relative bg-secondary/30 py-16 sm:py-24">
+      <div className="mx-auto max-w-6xl px-4 sm:px-6">
         {/* Header */}
         <div className="mx-auto max-w-3xl text-center">
           <div className="mb-4 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5">
@@ -41,7 +41,7 @@ export function CouvreurSection() {
         {/* Search bar */}
         <form
           onSubmit={handleSearch}
-          className="mx-auto mt-10 flex max-w-lg gap-3"
+          className="mx-auto mt-10 flex max-w-lg flex-col gap-3 sm:flex-row"
         >
           <div className="relative flex-1">
             <MapPin size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" />
@@ -74,7 +74,7 @@ export function CouvreurSection() {
               allowFullScreen
               loading="lazy"
               referrerPolicy="no-referrer-when-downgrade"
-              className="w-full"
+              className="h-[320px] w-full sm:h-[480px]"
             />
           </div>
 

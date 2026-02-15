@@ -47,12 +47,12 @@ export function MethodSection() {
   return (
     <section
       id="methode"
-      className="relative border-y border-border bg-card/30 py-28"
+      className="relative border-y border-border bg-card/30 py-16 sm:py-28"
       aria-label="Comment diagnostiquer votre toiture avec notre IA en 4 etapes"
     >
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--color-glow-accent),_transparent_60%)]" />
 
-      <div className="relative mx-auto max-w-7xl px-6">
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
         <div className="mx-auto max-w-2xl text-center">
           <span className="inline-block rounded-full border border-accent/20 bg-accent/5 px-4 py-1.5 text-xs font-medium text-accent tracking-wide">
             Comment ca marche
@@ -70,7 +70,7 @@ export function MethodSection() {
           </p>
         </div>
 
-        <ol className="mt-16 grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4 list-none p-0 m-0">
+        <ol className="mt-10 grid grid-cols-1 gap-4 list-none p-0 m-0 sm:mt-16 sm:grid-cols-2 sm:gap-6 lg:grid-cols-4">
           {steps.map((step, index) => (
             <li key={step.number} className="relative flex flex-col">
               {/* Connector line */}

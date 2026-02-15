@@ -13,10 +13,10 @@ const features = [
 
 export function PricingSection() {
   return (
-    <section id="tarifs" className="relative py-28">
+    <section id="tarifs" className="relative py-16 sm:py-28">
       <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_bottom_left,_var(--color-glow-blue),_transparent_50%)]" />
 
-      <div className="relative mx-auto max-w-7xl px-6">
+      <div className="relative mx-auto max-w-7xl px-4 sm:px-6">
         <div className="mx-auto max-w-2xl text-center">
           <span className="inline-block rounded-full border border-primary/20 bg-primary/5 px-4 py-1.5 text-xs font-medium text-primary tracking-wide">
             Tarif simple
@@ -34,19 +34,19 @@ export function PricingSection() {
         </div>
 
         {/* Pricing card */}
-        <div className="mx-auto mt-14 max-w-lg">
-          <div className="relative overflow-hidden rounded-3xl border border-primary/30 bg-card/80 p-10 backdrop-blur-sm">
+        <div className="mx-auto mt-10 max-w-lg sm:mt-14">
+          <div className="relative overflow-hidden rounded-2xl border border-primary/30 bg-card/80 p-6 backdrop-blur-sm sm:rounded-3xl sm:p-10">
             <div className="absolute top-0 right-0 -mt-8 -mr-8 h-40 w-40 rounded-full bg-primary/5 blur-3xl" />
             <div className="relative">
               <div className="flex items-baseline gap-2">
                 <span
-                  className="text-6xl font-bold text-foreground"
+                  className="text-4xl font-bold text-foreground sm:text-6xl"
                   style={{ fontFamily: "var(--font-heading)" }}
                 >
                   19,90
                 </span>
-                <span className="text-xl text-muted-foreground">EUR</span>
-                <span className="ml-2 text-sm text-muted-foreground">/ diagnostic</span>
+                <span className="text-lg text-muted-foreground sm:text-xl">EUR</span>
+                <span className="ml-2 text-xs text-muted-foreground sm:text-sm">/ diagnostic</span>
               </div>
 
               <p className="mt-4 text-sm leading-relaxed text-muted-foreground">

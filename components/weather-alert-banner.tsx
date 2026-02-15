@@ -76,8 +76,8 @@ export function WeatherAlertBanner() {
   const iconColor = alertIconColors[mainAlert.event] || "text-amber-400"
 
   return (
-    <div className={`relative border-b ${borderColor}`}>
-      <div className="mx-auto flex max-w-7xl items-center gap-3 px-4 py-2.5 sm:px-6">
+    <div className={`relative rounded-xl ${borderColor}`}>
+      <div className="flex items-center gap-2.5 px-3 py-2.5 sm:gap-3 sm:px-4">
         <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-background/50 ${iconColor}`}>
           <Icon size={16} />
         </div>
