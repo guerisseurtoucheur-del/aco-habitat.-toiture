@@ -7,5 +7,19 @@
       "path": "/api/cron/followup",
       "schedule": "0 9 * * *"
     }
+  ],
+  "redirects": [
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "diag.aco-habitat.fr" }],
+      "destination": "https://aco-habitat.fr/:path*",
+      "permanent": true
+    },
+    {
+      "source": "/:path*",
+      "has": [{ "type": "host", "value": "www.aco-habitat.fr" }],
+      "destination": "https://aco-habitat.fr/:path*",
+      "permanent": true
+    }
   ]
 }
