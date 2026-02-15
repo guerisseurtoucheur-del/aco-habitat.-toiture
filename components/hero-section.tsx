@@ -3,6 +3,7 @@
 import Image from "next/image"
 import { Scan, Shield, Droplets, ArrowRight, Zap } from "lucide-react"
 import { useEffect, useState } from "react"
+import { WeatherAlertBanner } from "@/components/weather-alert-banner"
 
 function AnimatedCounter({ target, suffix = "" }: { target: number; suffix?: string }) {
   const [count, setCount] = useState(0)
@@ -70,6 +71,11 @@ export function HeroSection() {
       />
 
       <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col items-center px-6 pt-32 pb-20">
+        {/* Weather Alert Banner */}
+        <div className="mb-6 w-full max-w-3xl">
+          <WeatherAlertBanner />
+        </div>
+
         {/* Badge */}
         <div className="animate-fade-up mb-8 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-5 py-2">
           <div className="flex h-5 w-5 items-center justify-center rounded-full bg-primary/20">

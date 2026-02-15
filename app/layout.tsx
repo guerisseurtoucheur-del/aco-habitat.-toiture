@@ -2,7 +2,6 @@ import type { Metadata, Viewport } from "next"
 import { Inter, Space_Grotesk } from "next/font/google"
 import "./globals.css"
 import { Chatbot } from "@/components/chatbot"
-import { WeatherAlertBanner } from "@/components/weather-alert-banner"
 
 const _inter = Inter({
   subsets: ["latin"],
@@ -476,7 +475,6 @@ export default function RootLayout({
             }),
           }}
         />
-        <WeatherAlertBanner />
         {children}
         <Chatbot />
       </body>
