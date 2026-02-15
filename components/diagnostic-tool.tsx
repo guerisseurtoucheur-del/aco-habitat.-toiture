@@ -33,6 +33,7 @@ import {
   Upload,
   Camera,
   ImageIcon,
+  Mail,
 } from "lucide-react"
 import type { DiagnosticResult, DiagnosticZone } from "@/lib/diagnostic-types"
 import type { MapCaptureData, MapMeasurement } from "./leaflet-map"
@@ -543,7 +544,6 @@ export function DiagnosticTool() {
 
   // Run the actual AI diagnostic (called after successful payment)
   const runDiagnostic = useCallback(async () => {
-    console.log("[v0] runDiagnostic called, capturedImage:", !!capturedImage, "address:", formattedAddress, "step:", step)
     setStep("scanning")
 
     try {
@@ -551,7 +551,6 @@ export function DiagnosticTool() {
       setStep("analyzing")
 
       const capture = pendingCaptureRef.current
-      console.log("[v0] Sending to /api/diagnostic, image length:", capturedImage?.length || 0, "address:", formattedAddress)
       const diagRes = await fetch("/api/diagnostic", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -564,10 +563,7 @@ export function DiagnosticTool() {
         }),
       })
       const diagData = await diagRes.json()
-      console.log("[v0] Diagnostic API response:", diagRes.ok, diagRes.status, JSON.stringify(diagData).substring(0, 200))
-
       if (!diagRes.ok) {
-        console.log("[v0] Diagnostic API error:", diagData.error)
         setError(diagData.error || "Erreur lors de l'analyse IA.")
         setStep("address")
         return
@@ -576,7 +572,6 @@ export function DiagnosticTool() {
       const finalDiag = ensureRealisticZones(diagData.diagnostic)
       setDiagnostic(finalDiag)
       setStep("results")
-      console.log("[v0] Diagnostic complete, score:", finalDiag.scoreGlobal)
 
       // Scroll to results
       setTimeout(() => {
@@ -612,46 +607,9 @@ export function DiagnosticTool() {
         import("@/lib/generate-pdf").then(async ({ generateDiagnosticPDF }) => {
           const clientInfo = { name: clientName, phone: clientPhone, email: clientEmail }
           await generateDiagnosticPDF(finalDiag, capturedImage || "", formattedAddress, mapMeasurements, clientInfo)
-          console.log("[v0] PDF downloaded")
-        }).catch((e) => console.log("[v0] PDF download error:", String(e)))
+        }).catch(() => {})
 
-        // 3. Send email with PDF (separate, independent from PDF download)
-        if (clientEmail) {
-          setSendingEmail(true)
-          import("@/lib/generate-pdf").then(async ({ generateDiagnosticPDFBase64 }) => {
-            try {
-              const clientInfo = { name: clientName, phone: clientPhone, email: clientEmail }
-              console.log("[v0] Generating PDF base64 for email to:", clientEmail)
-              const pdfBase64 = await generateDiagnosticPDFBase64(finalDiag, capturedImage || "", formattedAddress, mapMeasurements, clientInfo)
-              const pdfLength = pdfBase64?.length || 0
-              console.log("[v0] PDF base64 ready, length:", pdfLength, "sending email...")
-              
-              const bodyPayload: Record<string, unknown> = {
-                email: clientEmail,
-                name: clientName,
-                address: formattedAddress,
-                globalScore: finalDiag.scoreGlobal || 0,
-                pdfBase64: pdfLength > 4 * 1024 * 1024 ? "" : pdfBase64,
-              }
-              
-              const emailRes = await fetch("/api/send-report", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(bodyPayload),
-              })
-              const emailText = await emailRes.text()
-              console.log("[v0] Email API response:", emailRes.status, emailText)
-              setEmailSent(true)
-            } catch (e) {
-              console.log("[v0] Email error:", String(e))
-            } finally {
-              setSendingEmail(false)
-            }
-          }).catch((e) => {
-            console.log("[v0] Email PDF import error:", String(e))
-            setSendingEmail(false)
-          })
-        }
+        // Email is now sent manually via button in results section
       }
     } catch {
       setError("Une erreur est survenue. Verifiez votre connexion et reessayez.")
@@ -1710,19 +1668,76 @@ export function DiagnosticTool() {
                   <span className="ml-1 rounded-md bg-white/20 px-2 py-0.5 text-[10px] font-semibold">INCLUS</span>
                 </button>
                 {emailSent ? (
-                  <p className="mt-3 flex items-center justify-center gap-1.5 text-xs font-medium text-green-400">
-                    <CheckCircle2 size={12} />
-                    Rapport PDF telecharge et envoye a {clientEmail}
-                  </p>
-                ) : sendingEmail ? (
-                  <p className="mt-3 flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
-                    <Loader2 size={12} className="animate-spin" />
-                    Envoi du rapport par email en cours...
+                  <p className="mt-4 flex items-center justify-center gap-1.5 text-xs font-medium text-green-400">
+                    <CheckCircle2 size={14} />
+                    Rapport envoye a {clientEmail}
                   </p>
                 ) : (
-                  <p className="mt-3 text-[10px] text-muted-foreground">
-                    Le rapport PDF a ete telecharge automatiquement.
-                  </p>
+                  <div className="mt-4 flex flex-col items-center gap-2">
+                    <div className="flex w-full max-w-md items-center gap-2">
+                      <input
+                        type="email"
+                        value={clientEmail}
+                        onChange={(e) => setClientEmail(e.target.value)}
+                        placeholder="Votre adresse email"
+                        className="flex-1 rounded-lg border border-border bg-card px-3 py-2.5 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                      />
+                      <button
+                        disabled={sendingEmail || !clientEmail}
+                        onClick={async () => {
+                          if (!clientEmail || !diagnostic) return
+                          setSendingEmail(true)
+                          try {
+                            const { generateDiagnosticPDFBase64 } = await import("@/lib/generate-pdf")
+                            const pdfBase64 = await generateDiagnosticPDFBase64(
+                              diagnostic,
+                              capturedImage || "",
+                              formattedAddress,
+                              mapMeasurements,
+                              { name: clientName, phone: clientPhone, email: clientEmail }
+                            )
+                            const res = await fetch("/api/send-report", {
+                              method: "POST",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({
+                                email: clientEmail,
+                                name: clientName,
+                                address: formattedAddress,
+                                globalScore: diagnostic.scoreGlobal || 0,
+                                pdfBase64: (pdfBase64?.length || 0) > 4 * 1024 * 1024 ? "" : pdfBase64,
+                              }),
+                            })
+                            if (res.ok) {
+                              setEmailSent(true)
+                            } else {
+                              const data = await res.json()
+                              alert("Erreur : " + (data.details || data.error || "Impossible d'envoyer l'email"))
+                            }
+                          } catch (e) {
+                            alert("Erreur : " + String(e))
+                          } finally {
+                            setSendingEmail(false)
+                          }
+                        }}
+                        className="inline-flex items-center gap-2 whitespace-nowrap rounded-lg bg-primary px-4 py-2.5 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90 disabled:opacity-50"
+                      >
+                        {sendingEmail ? (
+                          <>
+                            <Loader2 size={14} className="animate-spin" />
+                            Envoi...
+                          </>
+                        ) : (
+                          <>
+                            <Mail size={14} />
+                            Recevoir par email
+                          </>
+                        )}
+                      </button>
+                    </div>
+                    <p className="text-[10px] text-muted-foreground">
+                      Recevez votre rapport PDF directement dans votre boite mail
+                    </p>
+                  </div>
                 )}
               </div>
             </div>
