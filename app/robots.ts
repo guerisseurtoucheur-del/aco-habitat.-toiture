@@ -29,6 +29,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ["/api/", "/admin"],
       },
     ],
-    sitemap: "https://aco-habitat.fr/sitemap.xml",
+    sitemap: "https://diag.aco-habitat.fr/sitemap.xml",
   }
 }

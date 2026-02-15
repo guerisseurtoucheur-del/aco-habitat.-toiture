@@ -97,12 +97,12 @@ export function Footer() {
             </div>
           </div>
           <a
-            href="https://aco.habitat.fr"
+            href="https://aco-habitat.fr"
             target="_blank"
             rel="noopener noreferrer"
             className="flex shrink-0 items-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-2 text-xs font-semibold text-amber-400 transition-all hover:bg-amber-500/20"
           >
-            aco.habitat.fr
+            aco-habitat.fr
             <ExternalLink size={12} />
           </a>
         </div>
