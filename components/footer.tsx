@@ -15,12 +15,14 @@ const footerLinks: { title: string; links: FooterLink[] }[] = [
       { label: "Comment ca marche", href: "#methode" },
       { label: "Tarifs", href: "#tarifs" },
       { label: "Exemple de rapport PDF", href: "#tarifs" },
+      { label: "Immobilier", href: "#immobilier" },
     ],
   },
   {
     title: "Ressources",
     links: [
       { label: "FAQ", href: "#faq" },
+      { label: "Diagnostic immobilier", href: "/guide/diagnostic-toiture-achat-vente-immobilier" },
       { label: "Glossaire toiture", href: "/guide/glossaire-toiture" },
       { label: "Degats de grele", href: "/guide/degats-grele-toiture" },
       { label: "Duree de vie d'une toiture", href: "/guide/duree-de-vie-toiture" },

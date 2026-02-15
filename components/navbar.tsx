@@ -9,6 +9,7 @@ const navLinks = [
   { href: "#diagnostic", label: "Diagnostic IA" },
   { href: "#methode", label: "Comment ca marche" },
   { href: "#tarifs", label: "Tarifs" },
+  { href: "#immobilier", label: "Immobilier" },
   { href: "#faq", label: "FAQ" },
   { href: "#couvreurs", label: "Trouver un couvreur" },
 ]
