@@ -52,3 +52,53 @@ export async function saveAbandonedCart(data: {
     ON CONFLICT DO NOTHING
   `
 }
+
+export async function saveChatMessage(data: {
+  sessionId: string
+  role: string
+  content: string
+}) {
+  await sql`
+    INSERT INTO chat_conversations (session_id, role, content)
+    VALUES (${data.sessionId}, ${data.role}, ${data.content})
+  `
+}
+
+export async function getChatConversations() {
+  const result = await sql`
+    SELECT 
+      session_id,
+      MIN(created_at) as started_at,
+      MAX(created_at) as last_message_at,
+      COUNT(*) as message_count,
+      COUNT(*) FILTER (WHERE role = 'user') as user_messages,
+      (SELECT content FROM chat_conversations c2 WHERE c2.session_id = c1.session_id AND role = 'user' ORDER BY created_at ASC LIMIT 1) as first_question
+    FROM chat_conversations c1
+    GROUP BY session_id
+    ORDER BY MAX(created_at) DESC
+    LIMIT 100
+  `
+  return result
+}
+
+export async function getChatMessages(sessionId: string) {
+  const result = await sql`
+    SELECT role, content, created_at
+    FROM chat_conversations
+    WHERE session_id = ${sessionId}
+    ORDER BY created_at ASC
+  `
+  return result
+}
+
+export async function getChatStats() {
+  const result = await sql`
+    SELECT 
+      COUNT(DISTINCT session_id) as total_sessions,
+      COUNT(*) as total_messages,
+      COUNT(*) FILTER (WHERE role = 'user') as user_messages,
+      COUNT(DISTINCT DATE(created_at)) as active_days
+    FROM chat_conversations
+  `
+  return result[0] || { total_sessions: 0, total_messages: 0, user_messages: 0, active_days: 0 }
+}

@@ -2,6 +2,7 @@
 
 import { useState, useRef, useCallback, useEffect } from "react"
 import dynamic from "next/dynamic"
+import { WeatherDiagnosticWidget } from "@/components/weather-diagnostic-widget"
 import {
   MapPin,
   Search,
@@ -23,6 +24,7 @@ import {
   Download,
   ScanLine,
   ExternalLink,
+  Cloud,
   Crosshair,
   Thermometer,
   Flame,
@@ -1659,6 +1661,9 @@ export function DiagnosticTool() {
                 )}
               </div>
             </div>
+
+            {/* Weather widget */}
+            <WeatherDiagnosticWidget address={formattedAddress} score={diagnostic.scoreGlobal} />
 
             {/* Cross-selling charpente - si score structure bas */}
             {diagnostic.structure && diagnostic.structure.score < 60 && (
