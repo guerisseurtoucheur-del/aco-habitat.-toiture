@@ -162,6 +162,8 @@ export function HeroSection() {
               alt="Vue aerienne d'une toiture en pierre analysee par IA - diagnostic ACO-HABITAT"
               fill
               className="object-cover"
+              priority
+              loading="eager"
             />
             <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
             <div className="absolute bottom-4 left-4 flex items-center gap-2 rounded-lg border border-border/50 bg-background/80 px-3 py-1.5 backdrop-blur-sm">
