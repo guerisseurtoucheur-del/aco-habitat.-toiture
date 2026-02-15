@@ -97,7 +97,6 @@ export default function LeafletMap({
   const drawnItemsRef = useRef<L.FeatureGroup | null>(null)
   const drawControlRef = useRef<any>(null)
   const markerRef = useRef<L.Marker | null>(null)
-  const selectionBoxRef = useRef<L.Rectangle | null>(null)
 
   const [activeLayer, setActiveLayer] = useState<LayerMode>("satellite")
   const [showCadastre, setShowCadastre] = useState(false)
@@ -166,82 +165,7 @@ export default function LeafletMap({
     }).addTo(map)
     markerRef.current = addressMarker
 
-    // Auto-draw a ~20x20m selection rectangle centered exactly on the address
-    const selectionBounds: L.LatLngBoundsExpression = [
-      [center.lat - BOX_HALF_DEG, center.lng - BOX_HALF_DEG],
-      [center.lat + BOX_HALF_DEG, center.lng + BOX_HALF_DEG],
-    ]
-    const selectionBox = L.rectangle(selectionBounds, {
-      color: "#3b82f6",
-      weight: 2,
-      fillColor: "#3b82f6",
-      fillOpacity: 0.12,
-      dashArray: "6, 4",
-      interactive: true,
-      bubblingMouseEvents: false,
-    }).addTo(map)
-
-    // Make the selection box editable (resizable handles)
-    const editableBox: any = selectionBox
-    if (editableBox.editing) {
-      editableBox.editing.enable()
-    }
-
-    // Make selection box draggable: disable map drag while moving the box
-    let isDraggingBox = false
-    let dragStartLatLng: L.LatLng | null = null
-
-    // Set grab cursor on the selection box
-    const boxElement = (selectionBox as any)._path
-    if (boxElement) {
-      boxElement.style.cursor = "grab"
-    }
-
-    selectionBox.on("mousedown", (e: any) => {
-      isDraggingBox = true
-      dragStartLatLng = e.latlng
-      map.dragging.disable()
-      if (boxElement) boxElement.style.cursor = "grabbing"
-      L.DomEvent.stopPropagation(e)
-    })
-
-    map.on("mousemove", (e: L.LeafletMouseEvent) => {
-      if (!isDraggingBox || !dragStartLatLng) return
-      const currentBounds = selectionBox.getBounds()
-      const dlat = e.latlng.lat - dragStartLatLng.lat
-      const dlng = e.latlng.lng - dragStartLatLng.lng
-      const newBounds = L.latLngBounds(
-        [currentBounds.getSouth() + dlat, currentBounds.getWest() + dlng],
-        [currentBounds.getNorth() + dlat, currentBounds.getEast() + dlng]
-      )
-      selectionBox.setBounds(newBounds)
-      // Re-enable editing handles after bounds change
-      if (editableBox.editing) {
-        editableBox.editing.disable()
-        editableBox.editing.enable()
-      }
-      dragStartLatLng = e.latlng
-    })
-
-    map.on("mouseup", () => {
-      if (isDraggingBox) {
-        isDraggingBox = false
-        dragStartLatLng = null
-        map.dragging.enable()
-        if (boxElement) boxElement.style.cursor = "grab"
-      }
-    })
-
-    selectionBoxRef.current = selectionBox
-
-    // Tooltip on hover
-    selectionBox.bindTooltip("Deplacez ce rectangle sur la toiture", {
-      permanent: false,
-      direction: "top",
-      className: "leaflet-measurement-label",
-      sticky: false,
-    })
-
+    // Selection box is now a fixed CSS overlay - no Leaflet rectangle needed
     tileLayerRef.current = tileLayer
 
     // Drawn items layer for measurements
@@ -308,7 +232,6 @@ export default function LeafletMap({
       map.remove()
       mapRef.current = null
       markerRef.current = null
-      selectionBoxRef.current = null
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
@@ -333,14 +256,6 @@ export default function LeafletMap({
     // Update marker to the exact geocoded position
     if (markerRef.current) {
       markerRef.current.setLatLng([center.lat, center.lng])
-    }
-
-    // Reposition selection box centered exactly on the address coordinates
-    if (selectionBoxRef.current) {
-      selectionBoxRef.current.setBounds([
-        [center.lat - BOX_HALF_DEG, center.lng - BOX_HALF_DEG],
-        [center.lat + BOX_HALF_DEG, center.lng + BOX_HALF_DEG],
-      ])
     }
 
   }, [center.lat, center.lng, zoom])
@@ -440,6 +355,19 @@ export default function LeafletMap({
     setDrawMode("none")
   }, [onMeasurementsChange])
 
+  // Helper: get bounds of the fixed CSS selection box (center 70% of map)
+  const getSelectionBounds = useCallback(() => {
+    const map = mapRef.current
+    if (!map) return null
+    const container = map.getContainer()
+    const mapSize = { x: container.clientWidth, y: container.clientHeight }
+    const boxSize = Math.min(mapSize.x, mapSize.y) * 0.7
+    const centerPoint = { x: mapSize.x / 2, y: mapSize.y / 2 }
+    const topLeft = map.containerPointToLatLng(L.point(centerPoint.x - boxSize / 2, centerPoint.y - boxSize / 2))
+    const bottomRight = map.containerPointToLatLng(L.point(centerPoint.x + boxSize / 2, centerPoint.y + boxSize / 2))
+    return L.latLngBounds(topLeft, bottomRight)
+  }, [])
+
   // Capture map via server-side IGN WMS (avoids CORS issues with canvas)
   const captureMap = useCallback(async () => {
     const map = mapRef.current
@@ -447,9 +375,7 @@ export default function LeafletMap({
     setIsCapturing(true)
 
     try {
-      const captureBounds = selectionBoxRef.current
-        ? selectionBoxRef.current.getBounds()
-        : map.getBounds()
+      const captureBounds = getSelectionBounds() || map.getBounds()
 
       const south = captureBounds.getSouth()
       const west = captureBounds.getWest()
@@ -491,14 +417,48 @@ export default function LeafletMap({
   return (
     <div className={`relative flex flex-col ${className}`}>
       {/* Map container */}
-      <div
-        ref={mapContainerRef}
-        className="relative z-0 w-full flex-1"
-        style={{ background: "var(--color-card)", minHeight: "400px" }}
-      />
+      <div className="relative z-0 w-full flex-1" style={{ minHeight: "400px" }}>
+        <div
+          ref={mapContainerRef}
+          className="absolute inset-0"
+          style={{ background: "var(--color-card)" }}
+        />
+
+        {/* Fixed selection box overlay - user moves/zooms map underneath */}
+        <div className="pointer-events-none absolute inset-0 z-[500] flex items-center justify-center">
+          <div
+            className="relative border-2 border-primary border-dashed"
+            style={{ width: "70%", height: "0", paddingBottom: "70%", maxWidth: "70%", maxHeight: "70%" }}
+          >
+            {/* Corner markers */}
+            <div className="absolute -top-1.5 -left-1.5 h-3 w-3 rounded-sm bg-primary" />
+            <div className="absolute -top-1.5 -right-1.5 h-3 w-3 rounded-sm bg-primary" />
+            <div className="absolute -bottom-1.5 -left-1.5 h-3 w-3 rounded-sm bg-primary" />
+            <div className="absolute -bottom-1.5 -right-1.5 h-3 w-3 rounded-sm bg-primary" />
+            {/* Center crosshair */}
+            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
+              <div className="h-4 w-px bg-primary/60" />
+              <div className="absolute top-1/2 left-1/2 h-px w-4 -translate-x-1/2 -translate-y-1/2 bg-primary/60" />
+            </div>
+          </div>
+          {/* Dark overlay outside the box */}
+          <div className="absolute inset-0" style={{
+            background: "linear-gradient(to right, rgba(0,0,0,0.4) 15%, transparent 15%, transparent 85%, rgba(0,0,0,0.4) 85%)",
+          }} />
+        </div>
+
+        {/* Instruction tooltip */}
+        <div className="absolute top-3 left-1/2 z-[1000] -translate-x-1/2">
+          <div className="rounded-lg border border-primary/30 bg-card/90 px-3 py-1.5 text-center shadow-lg backdrop-blur-sm">
+            <p className="text-[11px] font-medium text-foreground">
+              Deplacez et zoomez la carte pour cadrer la toiture dans le carre
+            </p>
+          </div>
+        </div>
+      </div>
 
       {/* Custom toolbar overlay */}
-      <div className="absolute top-3 left-3 z-[1000] flex items-start gap-2">
+      <div className="absolute top-14 left-3 z-[1000] flex flex-wrap items-start gap-2">
         {/* Layer switcher */}
         <div className="relative">
           <button
