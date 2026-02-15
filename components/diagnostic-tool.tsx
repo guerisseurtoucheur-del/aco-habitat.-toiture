@@ -386,6 +386,7 @@ export function DiagnosticTool() {
   const [clientName, setClientName] = useState("")
   const [clientPhone, setClientPhone] = useState("")
   const [clientEmail, setClientEmail] = useState("")
+  const [acceptedDisclaimer, setAcceptedDisclaimer] = useState(false)
   const [emailSent, setEmailSent] = useState(false)
   const [sendingEmail, setSendingEmail] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
@@ -1114,13 +1115,44 @@ export function DiagnosticTool() {
                 </p>
               </div>
 
-              {/* Stripe Embedded Checkout */}
-              <div className="rounded-xl border border-border bg-background p-1">
-                <StripeCheckout
-                  productId="diagnostic-toiture"
-                  onComplete={() => runDiagnostic()}
-                />
+              {/* Disclaimer checkbox */}
+              <div className="mb-5 rounded-xl border border-amber-500/20 bg-amber-500/5 p-4">
+                <label className="flex cursor-pointer items-start gap-3">
+                  <input
+                    type="checkbox"
+                    checked={acceptedDisclaimer}
+                    onChange={(e) => setAcceptedDisclaimer(e.target.checked)}
+                    className="mt-1 h-4 w-4 shrink-0 cursor-pointer rounded border-border accent-primary"
+                  />
+                  <span className="text-xs leading-relaxed text-foreground">
+                    {"J'accepte que ce diagnostic est une "}
+                    <strong>estimation indicative generee par intelligence artificielle</strong>
+                    {" a partir d'une photo. Il "}
+                    <strong>ne remplace en aucun cas</strong>
+                    {" l'inspection physique d'un couvreur ou d'un expert qualifie. ACO-HABITAT decline toute responsabilite en cas de decisions prises sur la seule base de ce rapport. "}
+                    <a href="/mentions-legales" target="_blank" className="text-primary underline">
+                      Mentions legales
+                    </a>
+                  </span>
+                </label>
               </div>
+
+              {/* Stripe Embedded Checkout */}
+              {acceptedDisclaimer ? (
+                <div className="rounded-xl border border-border bg-background p-1">
+                  <StripeCheckout
+                    productId="diagnostic-toiture"
+                    onComplete={() => runDiagnostic()}
+                  />
+                </div>
+              ) : (
+                <div className="rounded-xl border border-border bg-secondary/50 p-6 text-center">
+                  <Shield size={20} className="mx-auto mb-2 text-muted-foreground" />
+                  <p className="text-sm text-muted-foreground">
+                    Veuillez accepter les conditions ci-dessus pour acceder au paiement
+                  </p>
+                </div>
+              )}
 
               <p className="mt-4 text-center text-[10px] text-muted-foreground">
                 Paiement securise 256-bit SSL. Vos donnees bancaires ne transitent jamais par nos serveurs.
