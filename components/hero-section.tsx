@@ -50,7 +50,7 @@ export function HeroSection() {
       {/* Background layers */}
       <div className="absolute inset-0 z-0">
         <video
-          src="/videos/hero-satellite.mp4"
+          src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/diag.aco-habitat.satelitte.video-udYSb78QcWnfnkDh3V4kfBnzQAtNyk.MP4"
           autoPlay
           muted
           loop
@@ -158,7 +158,7 @@ export function HeroSection() {
         <div className="mt-8 w-full max-w-4xl overflow-hidden rounded-xl border border-border shadow-2xl shadow-primary/5 sm:mt-12 sm:rounded-2xl">
           <div className="relative aspect-[4/3] w-full sm:aspect-[16/9]">
             <video
-              src="/videos/hero-satellite.mp4"
+              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/diag.aco-habitat.satelitte.video-udYSb78QcWnfnkDh3V4kfBnzQAtNyk.MP4"
               autoPlay
               muted
               loop
