@@ -100,6 +100,7 @@ export function WeatherDiagnosticWidget({ address, score }: { address: string; s
   )
 
   // Generate weather-aware recommendation based on score - always show one
+  const w = weather // local reference for TypeScript narrowing
   function getWeatherRecommendation(): { text: string; level: "urgent" | "warning" | "info" } {
     if (hasDangerousWeather && score < 50) {
       return { text: "URGENT : Votre toiture est fragilisee et des conditions meteorologiques severes sont prevues. Faites intervenir un couvreur rapidement pour eviter des degats supplementaires.", level: "urgent" }
@@ -110,19 +111,19 @@ export function WeatherDiagnosticWidget({ address, score }: { address: string; s
     if (hasAlerts && score < 50) {
       return { text: "Votre toiture est en mauvais etat. Les conditions meteo a venir pourraient aggraver les problemes existants. Contactez un couvreur pour un devis.", level: "warning" }
     }
-    if (weather.current.wind_speed > 40 && score < 60) {
+    if (w.current.wind_speed > 40 && score < 60) {
       return { text: "Vent soutenu detecte dans votre zone. Sur une toiture fragilisee, le vent peut soulever des tuiles et endommager le faitage.", level: "warning" }
     }
     if (hasDangerousWeather) {
       return { text: "Des intemperies sont prevues dans votre zone. Meme si votre toiture est en bon etat, restez vigilant et verifiez apres le passage de la perturbation.", level: "warning" }
     }
     if (score < 50) {
-      return { text: `Conditions meteo actuelles : ${weather.current.description} avec un vent de ${weather.current.wind_speed} km/h. Votre toiture fragilisee (score ${score}/100) est plus vulnerable aux intemperies. Planifiez des reparations.`, level: "warning" }
+      return { text: `Conditions meteo actuelles : ${w.current.description} avec un vent de ${w.current.wind_speed} km/h. Votre toiture fragilisee (score ${score}/100) est plus vulnerable aux intemperies. Planifiez des reparations.`, level: "warning" }
     }
     if (score < 70) {
-      return { text: `Conditions meteo actuelles : ${weather.current.description}. Votre toiture presente quelques faiblesses (score ${score}/100). Surveillez l'apparition de mousses et verifiez l'etancheite apres chaque episode pluvieux.`, level: "info" }
+      return { text: `Conditions meteo actuelles : ${w.current.description}. Votre toiture presente quelques faiblesses (score ${score}/100). Surveillez l'apparition de mousses et verifiez l'etancheite apres chaque episode pluvieux.`, level: "info" }
     }
-    return { text: `Conditions meteo actuelles : ${weather.current.description} a ${weather.current.temp}°C. Votre toiture est en bon etat (score ${score}/100). Continuez a surveiller regulierement, surtout apres les periodes de gel ou de forte chaleur.`, level: "info" }
+    return { text: `Conditions meteo actuelles : ${w.current.description} a ${w.current.temp}°C. Votre toiture est en bon etat (score ${score}/100). Continuez a surveiller regulierement, surtout apres les periodes de gel ou de forte chaleur.`, level: "info" }
   }
 
   const recommendation = getWeatherRecommendation()
