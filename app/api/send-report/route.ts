@@ -1,14 +1,17 @@
 import { NextResponse } from "next/server"
 import nodemailer from "nodemailer"
 
+// Allow large body for PDF attachments (up to 20MB)
+export const maxDuration = 30
+
 export async function POST(req: Request) {
   try {
     const { email, address, globalScore, pdfBase64 } = await req.json()
     console.log("[v0] POST /api/send-report called, email:", email, "address:", address, "pdfBase64 length:", pdfBase64?.length || 0)
 
-    if (!email || !pdfBase64) {
-      console.log("[v0] send-report missing data, email:", !!email, "pdfBase64:", !!pdfBase64)
-      return NextResponse.json({ error: "Email et PDF requis" }, { status: 400 })
+    if (!email) {
+      console.log("[v0] send-report missing email")
+      return NextResponse.json({ error: "Email requis" }, { status: 400 })
     }
 
     const smtpPort = Number(process.env.SMTP_PORT) || 587
@@ -80,13 +83,13 @@ export async function POST(req: Request) {
           </div>
         </div>
       `,
-      attachments: [
+      attachments: pdfBase64 ? [
         {
           filename: `diagnostic-toiture-${new Date().toISOString().slice(0, 10)}.pdf`,
           content: Buffer.from(pdfBase64, "base64"),
           contentType: "application/pdf",
         },
-      ],
+      ] : [],
     })
 
     return NextResponse.json({ success: true })

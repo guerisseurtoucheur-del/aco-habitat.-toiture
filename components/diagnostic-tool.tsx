@@ -620,26 +620,46 @@ export function DiagnosticTool() {
           if (clientEmail) {
             setSendingEmail(true)
             try {
+              console.log("[v0] Generating PDF base64 for email...")
               const pdfBase64 = await generateDiagnosticPDFBase64(finalDiag, capturedImage || "", formattedAddress, mapMeasurements, clientInfo)
-              console.log("[v0] PDF base64 ready, length:", pdfBase64?.length, "sending to:", clientEmail)
-              const emailRes = await fetch("/api/send-report", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  email: clientEmail,
-                  name: clientName,
-                  address: formattedAddress,
-                  globalScore: finalDiag.scoreGlobal || 0,
-                  pdfBase64,
-                }),
-              })
-              const emailData = await emailRes.json()
-              console.log("[v0] Email result:", emailRes.status, JSON.stringify(emailData))
+              const pdfLength = pdfBase64?.length || 0
+              console.log("[v0] PDF base64 ready, length:", pdfLength, "chars (~" + Math.round(pdfLength / 1024) + "KB), sending to:", clientEmail)
+              
+              // If PDF is too large (>4MB), skip email attachment
+              if (pdfLength > 4 * 1024 * 1024) {
+                console.log("[v0] PDF too large for email, sending without attachment")
+                const emailRes = await fetch("/api/send-report", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    email: clientEmail,
+                    name: clientName,
+                    address: formattedAddress,
+                    globalScore: finalDiag.scoreGlobal || 0,
+                    pdfBase64: "",
+                  }),
+                })
+                console.log("[v0] Email (no attachment) result:", emailRes.status)
+              } else {
+                const emailRes = await fetch("/api/send-report", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    email: clientEmail,
+                    name: clientName,
+                    address: formattedAddress,
+                    globalScore: finalDiag.scoreGlobal || 0,
+                    pdfBase64,
+                  }),
+                })
+                const emailData = await emailRes.json()
+                console.log("[v0] Email result:", emailRes.status, JSON.stringify(emailData))
+              }
               setEmailSent(true)
-            } catch (e) { console.log("[v0] Email error:", e) }
+            } catch (e) { console.log("[v0] Email error:", String(e)) }
             finally { setSendingEmail(false) }
           }
-        }).catch((e) => console.log("[v0] PDF import error:", e))
+        }).catch((e) => console.log("[v0] PDF import error:", String(e)))
       }
     } catch {
       setError("Une erreur est survenue. Verifiez votre connexion et reessayez.")
