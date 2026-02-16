@@ -22,6 +22,7 @@ export async function POST(request: Request) {
       isolation: "Isolation thermique",
       demoussage: "Demoussage et traitement",
       charpente: "Charpente",
+      "bilan-energetique": "Bilan Energetique",
       autre: "Autre",
     }
 

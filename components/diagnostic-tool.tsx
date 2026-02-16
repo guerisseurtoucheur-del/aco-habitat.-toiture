@@ -344,13 +344,99 @@ function ThermalScoreCard({
         <p className="text-xs leading-relaxed text-muted-foreground">{commentaire}</p>
 
         {/* CTA */}
-        <a
-          href="mailto:aco.habitat@orange.fr?subject=Demande de bilan energetique"
-          className="flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-orange-500 to-red-500 px-4 py-2.5 text-xs font-semibold text-white transition-all hover:shadow-lg hover:shadow-orange-500/25"
-        >
-          <Flame size={12} />
-          Demander un bilan energetique
-        </a>
+        {energyFormSent ? (
+          <div className="flex w-full items-center justify-center gap-2 rounded-lg bg-green-500/10 border border-green-500/20 px-4 py-3">
+            <CheckCircle2 size={14} className="text-green-500" />
+            <span className="text-xs font-semibold text-green-500">Demande envoyee - nous vous recontactons sous 24h</span>
+          </div>
+        ) : showEnergyForm ? (
+          <form
+            onSubmit={async (e) => {
+              e.preventDefault()
+              setEnergyFormSending(true)
+              try {
+                const res = await fetch("/api/contact", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({
+                    name: energyForm.nom,
+                    phone: energyForm.telephone,
+                    email: energyForm.email,
+                    service: "bilan-energetique",
+                    message: `Demande de bilan energetique suite au diagnostic toiture.\n\nAdresse postale: ${energyForm.adresse}\nScore energetique: ${score}/100\nPerformance: ${label}\nEconomie estimee: ${economieEstimee.toLocaleString("fr-FR")} EUR/an\nSurface: ${surface} m2`,
+                  }),
+                })
+                if (res.ok) {
+                  setEnergyFormSent(true)
+                }
+              } catch {
+                // silently fail
+              } finally {
+                setEnergyFormSending(false)
+              }
+            }}
+            className="flex flex-col gap-2 rounded-lg border border-orange-500/20 bg-orange-500/5 p-3"
+          >
+            <p className="text-xs font-semibold text-orange-400">Demander un bilan energetique</p>
+            <input
+              type="text"
+              required
+              placeholder="Nom complet"
+              value={energyForm.nom}
+              onChange={(e) => setEnergyForm((f) => ({ ...f, nom: e.target.value }))}
+              className="rounded-md border border-border bg-background px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-orange-500"
+            />
+            <input
+              type="tel"
+              required
+              placeholder="Telephone"
+              value={energyForm.telephone}
+              onChange={(e) => setEnergyForm((f) => ({ ...f, telephone: e.target.value }))}
+              className="rounded-md border border-border bg-background px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-orange-500"
+            />
+            <input
+              type="email"
+              required
+              placeholder="Adresse email"
+              value={energyForm.email}
+              onChange={(e) => setEnergyForm((f) => ({ ...f, email: e.target.value }))}
+              className="rounded-md border border-border bg-background px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-orange-500"
+            />
+            <input
+              type="text"
+              required
+              placeholder="Adresse postale"
+              value={energyForm.adresse}
+              onChange={(e) => setEnergyForm((f) => ({ ...f, adresse: e.target.value }))}
+              className="rounded-md border border-border bg-background px-3 py-2 text-xs text-foreground placeholder:text-muted-foreground focus:outline-none focus:ring-1 focus:ring-orange-500"
+            />
+            <div className="flex gap-2">
+              <button
+                type="button"
+                onClick={() => setShowEnergyForm(false)}
+                className="flex-1 rounded-md border border-border px-3 py-2 text-xs font-medium text-muted-foreground transition-colors hover:bg-muted"
+              >
+                Annuler
+              </button>
+              <button
+                type="submit"
+                disabled={energyFormSending}
+                className="flex flex-1 items-center justify-center gap-2 rounded-md bg-gradient-to-r from-orange-500 to-red-500 px-3 py-2 text-xs font-semibold text-white transition-all hover:shadow-lg hover:shadow-orange-500/25 disabled:opacity-50"
+              >
+                {energyFormSending ? <Loader2 size={12} className="animate-spin" /> : <Send size={12} />}
+                {energyFormSending ? "Envoi..." : "Envoyer"}
+              </button>
+            </div>
+          </form>
+        ) : (
+          <button
+            onClick={() => setShowEnergyForm(true)}
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-orange-500 to-red-500 px-4 py-2.5 text-xs font-semibold text-white transition-all hover:shadow-lg hover:shadow-orange-500/25"
+          >
+            <Flame size={12} />
+            Demander un bilan energetique
+          </button>
+        )}
       </div>
     </div>
   )
@@ -390,6 +476,10 @@ export function DiagnosticTool() {
   const [acceptedDisclaimer, setAcceptedDisclaimer] = useState(false)
   const [emailSent, setEmailSent] = useState(false)
   const [sendingEmail, setSendingEmail] = useState(false)
+  const [showEnergyForm, setShowEnergyForm] = useState(false)
+  const [energyForm, setEnergyForm] = useState({ nom: "", telephone: "", email: "", adresse: "" })
+  const [energyFormSent, setEnergyFormSent] = useState(false)
+  const [energyFormSending, setEnergyFormSending] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const resultsRef = useRef<HTMLDivElement>(null)
   const handleSearchRef = useRef<() => void>(() => {})
