@@ -20,7 +20,7 @@ export async function POST(req: Request) {
     const scoreText = globalScore >= 75 ? "Bon etat" : globalScore >= 50 ? "A surveiller" : "Intervention recommandee"
 
     const { error } = await resend.emails.send({
-      from: "ACO-HABITAT Diagnostic <onboarding@resend.dev>",
+      from: "ACO-HABITAT Diagnostic <diagnostic@aco-habitat.fr>",
       to: email,
       subject: `Votre diagnostic toiture - ${address}`,
       html: `
