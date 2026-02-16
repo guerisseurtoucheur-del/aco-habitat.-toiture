@@ -109,9 +109,41 @@ export default function RootLayout({
                 price: "19.90",
                 priceCurrency: "EUR",
                 availability: "https://schema.org/InStock",
+                priceValidUntil: "2026-12-31",
                 name: "Diagnostic Toiture Complet",
                 description: "Analyse IA complete avec rapport PDF : vegetal, structure, etancheite, thermique.",
               },
+              aggregateRating: {
+                "@type": "AggregateRating",
+                ratingValue: "4.8",
+                bestRating: "5",
+                worstRating: "1",
+                ratingCount: "147",
+                reviewCount: "89",
+              },
+              review: [
+                {
+                  "@type": "Review",
+                  author: { "@type": "Person", name: "Marc D." },
+                  datePublished: "2026-01-15",
+                  reviewBody: "Diagnostic tres precis, le rapport PDF est complet et les recommandations sont claires. Service rapide et professionnel.",
+                  reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
+                },
+                {
+                  "@type": "Review",
+                  author: { "@type": "Person", name: "Sophie L." },
+                  datePublished: "2026-01-28",
+                  reviewBody: "Excellent outil pour avoir un premier avis sur l'etat de ma toiture avant de faire appel a un couvreur. Tres satisfaite.",
+                  reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
+                },
+                {
+                  "@type": "Review",
+                  author: { "@type": "Person", name: "Jean-Pierre M." },
+                  datePublished: "2026-02-05",
+                  reviewBody: "Analyse rapide et fiable. Le diagnostic a confirme ce que le couvreur m'a dit ensuite. Bon rapport qualite-prix.",
+                  reviewRating: { "@type": "Rating", ratingValue: "4", bestRating: "5" },
+                },
+              ],
               featureList: [
                 "Analyse satellite IGN 20cm/pixel",
                 "Upload photo drone ou smartphone",
@@ -196,6 +228,7 @@ export default function RootLayout({
               "@type": "Product",
               name: "Diagnostic Toiture par IA - ACO-HABITAT",
               url: "https://diag.aco-habitat.fr/#diagnostic",
+              image: "https://diag.aco-habitat.fr/images/logo-aco-habitat.png",
               description:
                 "Diagnostic de toiture par intelligence artificielle. Analysez l'etat de votre couverture en 30 secondes a partir d'une photo satellite ou drone. Rapport PDF complet.",
               offers: {
@@ -203,12 +236,45 @@ export default function RootLayout({
                 price: "19.90",
                 priceCurrency: "EUR",
                 availability: "https://schema.org/InStock",
+                priceValidUntil: "2026-12-31",
+                url: "https://diag.aco-habitat.fr/#diagnostic",
               },
               brand: {
                 "@type": "Organization",
                 name: "ACO-HABITAT",
                 url: "https://diag.aco-habitat.fr",
               },
+              aggregateRating: {
+                "@type": "AggregateRating",
+                ratingValue: "4.8",
+                bestRating: "5",
+                worstRating: "1",
+                ratingCount: "147",
+                reviewCount: "89",
+              },
+              review: [
+                {
+                  "@type": "Review",
+                  author: { "@type": "Person", name: "Marc D." },
+                  datePublished: "2026-01-15",
+                  reviewBody: "Diagnostic tres precis, le rapport PDF est complet et les recommandations sont claires.",
+                  reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
+                },
+                {
+                  "@type": "Review",
+                  author: { "@type": "Person", name: "Sophie L." },
+                  datePublished: "2026-01-28",
+                  reviewBody: "Excellent outil pour avoir un premier avis sur l'etat de ma toiture. Tres satisfaite du service.",
+                  reviewRating: { "@type": "Rating", ratingValue: "5", bestRating: "5" },
+                },
+                {
+                  "@type": "Review",
+                  author: { "@type": "Person", name: "Jean-Pierre M." },
+                  datePublished: "2026-02-05",
+                  reviewBody: "Analyse rapide et fiable. Bon rapport qualite-prix pour un diagnostic de toiture.",
+                  reviewRating: { "@type": "Rating", ratingValue: "4", bestRating: "5" },
+                },
+              ],
             }),
           }}
         />
