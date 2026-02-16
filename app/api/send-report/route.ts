@@ -1,49 +1,26 @@
 import { NextResponse } from "next/server"
-import nodemailer from "nodemailer"
+import { Resend } from "resend"
 
-// Allow large body for PDF attachments (up to 20MB)
 export const maxDuration = 30
+
+const resend = new Resend(process.env.RESEND_API_KEY)
 
 export async function POST(req: Request) {
   try {
     const { email, address, globalScore, pdfBase64 } = await req.json()
-    console.log("[v0] POST /api/send-report called, email:", email, "address:", address, "pdfBase64 length:", pdfBase64?.length || 0)
 
     if (!email) {
-      console.log("[v0] send-report missing email")
       return NextResponse.json({ error: "Email requis" }, { status: 400 })
     }
 
-    const smtpHost = process.env.SMTP_HOST || "smtp.gmail.com"
-    const smtpPort = Number(process.env.SMTP_PORT) || 587
-    const smtpUser = process.env.SMTP_USER
-    const smtpPass = process.env.SMTP_PASS
-
-    console.log("[v0] SMTP config - host:", smtpHost, "port:", smtpPort, "user:", smtpUser, "pass set:", !!smtpPass)
-
-    if (!smtpUser || !smtpPass) {
-      console.log("[v0] SMTP credentials missing!")
-      return NextResponse.json({ error: "Configuration SMTP manquante", details: { host: smtpHost, user: !!smtpUser, pass: !!smtpPass } }, { status: 500 })
+    if (!process.env.RESEND_API_KEY) {
+      return NextResponse.json({ error: "Configuration email manquante" }, { status: 500 })
     }
-
-    const transporter = nodemailer.createTransport({
-      host: smtpHost,
-      port: smtpPort,
-      secure: smtpPort === 465,
-      auth: {
-        user: smtpUser,
-        pass: smtpPass,
-      },
-      tls: {
-        rejectUnauthorized: false,
-      },
-    })
 
     const scoreText = globalScore >= 75 ? "Bon etat" : globalScore >= 50 ? "A surveiller" : "Intervention recommandee"
 
-    console.log("[v0] Sending email to:", email, "from:", smtpUser)
-    await transporter.sendMail({
-      from: `"ACO-HABITAT Diagnostic" <${process.env.SMTP_USER || "noreply@aco-habitat.fr"}>`,
+    const { error } = await resend.emails.send({
+      from: "ACO-HABITAT Diagnostic <onboarding@resend.dev>",
       to: email,
       subject: `Votre diagnostic toiture - ${address}`,
       html: `
@@ -99,16 +76,18 @@ export async function POST(req: Request) {
         {
           filename: `diagnostic-toiture-${new Date().toISOString().slice(0, 10)}.pdf`,
           content: Buffer.from(pdfBase64, "base64"),
-          contentType: "application/pdf",
         },
       ] : [],
     })
 
-    console.log("[v0] Email sent successfully to:", email)
+    if (error) {
+      return NextResponse.json({ error: "Erreur envoi email", details: error.message }, { status: 500 })
+    }
+
     return NextResponse.json({ success: true })
   } catch (error) {
     const errMsg = error instanceof Error ? error.message : String(error)
-    console.error("[v0] SMTP Error:", errMsg)
+    console.error("Email error:", errMsg)
     return NextResponse.json({ error: "Erreur envoi email", details: errMsg }, { status: 500 })
   }
 }
