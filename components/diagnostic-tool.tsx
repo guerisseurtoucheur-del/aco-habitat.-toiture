@@ -294,6 +294,12 @@ function ThermalScoreCard({
 }) {
   const scoreColor = scoreIsolation >= 70 ? "#22c55e" : scoreIsolation >= 40 ? "#f59e0b" : "#ef4444"
   const scoreLabel = scoreIsolation >= 70 ? "Bonne isolation" : scoreIsolation >= 40 ? "Isolation moyenne" : "Isolation insuffisante"
+  const score = scoreIsolation
+  const label = scoreLabel
+  const [showEnergyForm, setShowEnergyForm] = useState(false)
+  const [energyForm, setEnergyForm] = useState({ nom: "", telephone: "", email: "", adresse: "" })
+  const [energyFormSent, setEnergyFormSent] = useState(false)
+  const [energyFormSending, setEnergyFormSending] = useState(false)
 
   return (
     <div className="overflow-hidden rounded-xl border border-orange-500/30 bg-card">
@@ -476,10 +482,6 @@ export function DiagnosticTool() {
   const [acceptedDisclaimer, setAcceptedDisclaimer] = useState(false)
   const [emailSent, setEmailSent] = useState(false)
   const [sendingEmail, setSendingEmail] = useState(false)
-  const [showEnergyForm, setShowEnergyForm] = useState(false)
-  const [energyForm, setEnergyForm] = useState({ nom: "", telephone: "", email: "", adresse: "" })
-  const [energyFormSent, setEnergyFormSent] = useState(false)
-  const [energyFormSending, setEnergyFormSending] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const resultsRef = useRef<HTMLDivElement>(null)
   const handleSearchRef = useRef<() => void>(() => {})
