@@ -1,5 +1,7 @@
 import { NextResponse } from "next/server"
-import nodemailer from "nodemailer"
+import { Resend } from "resend"
+
+const resend = new Resend(process.env.RESEND_API_KEY)
 
 export async function POST(request: Request) {
   try {
@@ -22,16 +24,6 @@ export async function POST(request: Request) {
       charpente: "Charpente",
       autre: "Autre",
     }
-
-    const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST || "smtp.orange.fr",
-      port: Number(process.env.SMTP_PORT) || 465,
-      secure: true,
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
-    })
 
     const htmlContent = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
@@ -70,13 +62,17 @@ export async function POST(request: Request) {
       </div>
     `
 
-    await transporter.sendMail({
-      from: `"ACO-HABITAT Site Web" <${process.env.SMTP_USER}>`,
+    const { error } = await resend.emails.send({
+      from: "ACO-HABITAT Site Web <diagnostic@aco-habitat.fr>",
       to: "aco.habitat@orange.fr",
       replyTo: email,
       subject: `Nouvelle demande - ${serviceLabels[service] || service} - ${name}`,
       html: htmlContent,
     })
+
+    if (error) {
+      return NextResponse.json({ error: "Erreur lors de l'envoi.", details: error.message }, { status: 500 })
+    }
 
     return NextResponse.json({ success: true })
   } catch (error) {

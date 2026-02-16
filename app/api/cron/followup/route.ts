@@ -1,18 +1,17 @@
 import { NextResponse } from "next/server"
 import { neon } from "@neondatabase/serverless"
-import nodemailer from "nodemailer"
+import { Resend } from "resend"
 
 const sql = neon(process.env.DATABASE_URL!)
+const resend = new Resend(process.env.RESEND_API_KEY)
 
 export async function GET(req: Request) {
-  // Verify cron secret to prevent unauthorized access
   const authHeader = req.headers.get("authorization")
   if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
     return NextResponse.json({ error: "Non autorise" }, { status: 401 })
   }
 
   try {
-    // Find diagnostics older than 3 days that haven't received a follow-up
     const diagnostics = await sql`
       SELECT id, client_name, client_phone, email, address, score_global
       FROM diagnostics
@@ -26,20 +25,6 @@ export async function GET(req: Request) {
     if (diagnostics.length === 0) {
       return NextResponse.json({ message: "Aucun suivi a envoyer", sent: 0 })
     }
-
-    const smtpPort = Number(process.env.SMTP_PORT) || 587
-    const transporter = nodemailer.createTransport({
-      host: process.env.SMTP_HOST || "smtp.gmail.com",
-      port: smtpPort,
-      secure: smtpPort === 465,
-      auth: {
-        user: process.env.SMTP_USER,
-        pass: process.env.SMTP_PASS,
-      },
-      tls: {
-        rejectUnauthorized: false,
-      },
-    })
 
     let sentCount = 0
 
@@ -82,8 +67,8 @@ export async function GET(req: Request) {
           `
         }
 
-        await transporter.sendMail({
-          from: `"ACO-HABITAT" <${process.env.SMTP_USER || "noreply@aco-habitat.fr"}>`,
+        await resend.emails.send({
+          from: "ACO-HABITAT <diagnostic@aco-habitat.fr>",
           to: diag.email,
           subject: `Suivi de votre diagnostic toiture - ${address}`,
           html: `
