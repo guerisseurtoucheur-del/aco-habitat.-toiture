@@ -1,0 +1,132 @@
+Cree un site complet de diagnostic d'humidite des murs par IA pour ACO-HABITAT.
+
+Nom du site : diag-humidite.aco-habitat.fr
+Entreprise : ACO-HABITAT - Diagnostic Humidite par IA
+Telephone : 02.33.31.19.79
+Email : aco.habitat@orange.fr
+Slogan : "En direct avec IA"
+
+---
+
+DESIGN ET COULEURS :
+- S'inspirer des couleurs du logo : bleu ocean, turquoise, rose/magenta, orange vif sur fond sombre (style dark professionnel comme un dashboard)
+- Couleur primaire : bleu ocean / turquoise (pour l'eau/humidite)
+- Accents : orange (comme le logo ACO-HABITAT)
+- Fond : sombre (type #0a1628) avec cartes en #0f1d32
+- Style professionnel, moderne, inspire confiance
+- Favicon : utiliser le logo maison aquarelle fourni
+- Typographie moderne et lisible
+- Design mobile-first, responsive
+
+---
+
+FONCTIONNALITES PRINCIPALES (reproduire la meme architecture que le site diag.aco-habitat.fr qui fait du diagnostic toiture par IA) :
+
+1. Page d'accueil :
+- Navbar avec logo, navigation, telephone, email
+- Hero section avec titre "Diagnostic humidite par IA en 30 secondes"
+- Sous-titre : "Prenez en photo vos murs interieurs ou exterieurs. Notre IA analyse moisissures, salpetre, taches d'humidite, condensation et remontees capillaires. Recevez un rapport PDF complet instantanement."
+- Bouton CTA "Analyser mes murs - 19,90 EUR" qui amene au diagnostic
+- Section "Comment ca marche" en 3 etapes (Photographiez, L'IA analyse, Recevez votre rapport)
+- Section services (traitement hydrofuge, ventilation VMC, drainage, injection de resine, assechement des murs, renovation apres degat des eaux)
+- Section temoignages clients
+- Section FAQ sur l'humidite
+- Footer complet avec mentions legales, CGV, contact
+
+2. Outil de diagnostic IA :
+- Upload de photos de murs (smartphone, appareil photo) - PAS de satellite
+- Le client peut uploader plusieurs photos (murs interieurs, exterieurs, cave, sous-sol, salle de bain)
+- L'IA analyse et detecte : moisissures, salpetre, taches d'humidite, condensation, remontees capillaires, cloquage peinture, decollement papier peint, fissures avec infiltration, champignons
+- Score global d'humidite sur 100
+- Score par zone (cave, salle de bain, chambre, facade, sous-sol)
+- Estimation du taux d'humidite
+- Recommandations personnalisees
+- Formulaire client : nom, telephone, email, adresse postale, ville, code postal
+- Paiement Stripe a 19,90 EUR avant de recevoir le rapport complet
+
+3. Generation de rapport PDF :
+- Rapport PDF professionnel avec le logo ACO-HABITAT
+- Photo du mur analysee avec annotations
+- Score d'humidite global et par zone
+- Type d'humidite detecte (capillaire, condensation, infiltration, fuite)
+- Niveau de gravite (faible, moyen, eleve, critique)
+- Causes probables identifiees par l'IA
+- Recommandations de traitement detaillees
+- Estimation budgetaire des travaux
+- Envoi automatique par email via Resend depuis diagnostic@aco-habitat.fr
+
+4. Chatbot IA integre :
+- Chatbot flottant en bas a droite du site
+- Expert en humidite des murs et batiments
+- Connait tout sur : les causes d'humidite (remontees capillaires, condensation, infiltrations, fuites), les solutions (VMC, drainage, injection, hydrofuge, assechement), les prix moyens des traitements, les aides financieres, la reglementation
+- Peut repondre aux questions des clients avant et apres le diagnostic
+- Ton professionnel et rassurant
+
+5. Espace professionnel / Admin :
+- Page admin protegee par mot de passe
+- Tableau de bord avec statistiques (nombre de diagnostics, revenus, score moyen)
+- Liste de tous les diagnostics avec infos clients (nom, telephone, email, adresse, score)
+- Possibilite de voir les rapports PDF
+- Export des donnees
+- Filtres par date, score, ville
+
+6. Formulaire de contact :
+- Formulaire complet : nom, telephone, email, adresse postale, service souhaite, message
+- Envoi par email via Resend a aco.habitat@orange.fr
+- Confirmation visuelle apres envoi
+
+7. SEO et referencement :
+- Metadata optimisees pour le diagnostic humidite
+- Schema.org (LocalBusiness, Service, FAQ)
+- Sitemap.xml
+- Robots.txt
+- Open Graph et Twitter Cards
+
+---
+
+SERVICES EXISTANTS A REUTILISER (comptes deja crees, ne pas en recreer) :
+
+- Stripe : Utiliser le meme compte Stripe pour le paiement a 19,90 EUR (creer un nouveau produit "Diagnostic Humidite IA")
+- Resend : Utiliser la meme cle API RESEND_API_KEY, envoyer depuis diagnostic@aco-habitat.fr (domaine deja verifie)
+- Neon : Utiliser la meme base de donnees DATABASE_URL, creer de nouvelles tables pour les diagnostics humidite (ne pas toucher aux tables existantes de la toiture)
+- Vercel : Nouveau projet, meme compte
+- Google AI : Utiliser Gemini pour l'analyse des photos de murs (meme approche que pour la toiture)
+
+---
+
+STACK TECHNIQUE :
+- Next.js 16 App Router
+- TypeScript
+- Tailwind CSS v4
+- shadcn/ui
+- Resend pour les emails
+- Stripe pour les paiements
+- Neon (PostgreSQL) pour la base de donnees
+- AI SDK Vercel pour le chatbot et l'analyse IA
+- jsPDF pour la generation de PDF
+
+---
+
+TABLES A CREER DANS NEON (prefixer avec "humidity_" pour ne pas confondre avec les tables toiture) :
+
+- humidity_diagnostics : id, client_name, client_phone, email, address, city, postal_code, score_global, humidity_type, severity, recommendations, pdf_url, stripe_payment_id, created_at, followup_sent
+- humidity_contact_requests : id, name, phone, email, address, service, message, created_at
+
+---
+
+PAGES A CREER :
+- / - Page d'accueil
+- /mentions-legales - Mentions legales
+- /cgv - Conditions generales de vente
+- /admin - Espace professionnel (protege par mot de passe)
+- /api/analyze - API d'analyse IA des photos
+- /api/send-report - API d'envoi du rapport PDF
+- /api/contact - API formulaire de contact
+- /api/create-checkout - API Stripe checkout
+- /api/webhook - Webhook Stripe
+- /api/diagnostics - API liste des diagnostics (admin)
+- /api/chat - API chatbot IA
+
+---
+
+Commence par creer la structure complete du site. Utilise les variables d'environnement existantes : DATABASE_URL, RESEND_API_KEY, STRIPE_SECRET_KEY, STRIPE_WEBHOOK_SECRET, ADMIN_PASSWORD.
