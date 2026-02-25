@@ -15,9 +15,9 @@ const faqs = [
       "Vous pouvez utiliser une capture d'ecran de Google Maps en vue satellite, une photo prise par drone, ou toute photo aerienne de votre toiture. Plus l'image est nette et recente, plus le diagnostic sera precis.",
   },
   {
-    question: "Le diagnostic en ligne est-il vraiment gratuit ?",
+    question: "Combien coute le diagnostic en ligne ?",
     answer:
-      "Oui, le diagnostic IA en ligne est 100% gratuit et sans engagement. Vous recevez instantanement un rapport detaille avec les zones problematiques identifiees et des recommandations d'intervention.",
+      "Le diagnostic IA en ligne coute 59,90\u20AC. Vous recevez instantanement un rapport detaille avec les zones problematiques identifiees, une analyse thermique, un score d'isolation et des recommandations d'intervention. Le devis d'intervention qui suit est gratuit et sans engagement.",
   },
   {
     question: "Dans quelles zones intervenez-vous ?",
@@ -27,7 +27,7 @@ const faqs = [
   {
     question: "Combien coute une intervention de reparation ?",
     answer:
-      "Le cout depend de la nature et de l'etendue des travaux identifies lors du diagnostic. Nous etablissons un devis gratuit et detaille avant toute intervention. Nos prix sont transparents et competitifs.",
+      "Le cout depend de la nature et de l'etendue des travaux identifies lors du diagnostic. Le diagnostic IA coute 59,90\u20AC et le devis d'intervention est gratuit et detaille. Nos prix sont transparents et competitifs.",
   },
   {
     question: "Quelle est la precision du diagnostic IA ?",

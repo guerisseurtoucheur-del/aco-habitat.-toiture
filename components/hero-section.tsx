@@ -88,10 +88,10 @@ export function HeroSection() {
         <div className="animate-fade-up-delay-3 mt-10 flex flex-col items-center gap-4 sm:flex-row">
           <a
             href="#diagnostic"
-            aria-label="Lancer un diagnostic gratuit de votre toiture par intelligence artificielle"
+            aria-label="Lancer un diagnostic de votre toiture par intelligence artificielle pour 59,90 euros"
             className="group relative flex items-center gap-2 rounded-xl bg-primary px-8 py-4 text-base font-semibold text-primary-foreground transition-all hover:shadow-xl hover:shadow-primary/20"
           >
-            Lancer un diagnostic gratuit
+            Diagnostic IA - 59,90{"\u20AC"}
             <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
           </a>
           <a

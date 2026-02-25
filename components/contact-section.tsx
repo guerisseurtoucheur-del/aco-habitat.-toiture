@@ -95,7 +95,7 @@ export function ContactSection() {
             </h2>
             <p className="mt-4 max-w-lg text-pretty text-base leading-relaxed text-muted-foreground">
               Vous avez un doute sur l{"'"}etat de votre toiture ? Contactez-nous
-              pour un diagnostic gratuit ou un devis personnalise. Reponse sous 24h.
+              pour un diagnostic ou un devis personnalise. Reponse sous 24h.
             </p>
 
             <div className="mt-10 grid grid-cols-1 gap-4 sm:grid-cols-2">
@@ -264,7 +264,7 @@ export function ContactSection() {
               </button>
 
               <p className="text-xs text-center text-muted-foreground">
-                Reponse garantie sous 24h. Devis 100% gratuit et sans engagement.
+                Reponse garantie sous 24h. Devis d{"'"}intervention gratuit et sans engagement.
               </p>
             </form>
           )}

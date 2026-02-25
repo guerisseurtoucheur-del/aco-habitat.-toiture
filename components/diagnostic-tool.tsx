@@ -1409,7 +1409,7 @@ export function DiagnosticTool() {
                 >
                   <Download size={20} />
                   Generer mon rapport PDF complet
-                  <span className="ml-1 rounded-md bg-white/20 px-2 py-0.5 text-[10px] font-semibold">GRATUIT</span>
+                  <span className="ml-1 rounded-md bg-white/20 px-2 py-0.5 text-[10px] font-semibold">59,90{"\u20AC"}</span>
                 </button>
                 <p className="mt-3 text-[10px] text-muted-foreground">
                   Le rapport sera envoye par email apres verification par nos experts.

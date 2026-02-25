@@ -5,7 +5,7 @@ export default function manifest(): MetadataRoute.Manifest {
     name: "ACO-HABITAT - Diagnostic Toiture par IA",
     short_name: "ACO-HABITAT Diag",
     description:
-      "Diagnostic gratuit de votre toiture par intelligence artificielle. Analyse satellite, detection de problemes et devis en 30 secondes.",
+      "Diagnostic de votre toiture par intelligence artificielle pour 59,90\u20AC. Analyse satellite, detection de problemes et rapport en 30 secondes.",
     start_url: "/",
     display: "standalone",
     background_color: "#060a13",

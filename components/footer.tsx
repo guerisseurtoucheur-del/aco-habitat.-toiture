@@ -49,7 +49,7 @@ export function Footer() {
               Pret a analyser votre toiture ?
             </h3>
             <p className="mt-3 text-base text-muted-foreground">
-              Diagnostic IA gratuit en moins de 30 secondes. Sans engagement.
+              Diagnostic IA complet pour seulement 59,90{"\u20AC"}. Resultat en 30 secondes.
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <a
