@@ -1,7 +1,11 @@
 import type { Metadata, Viewport } from "next"
 import { Inter, Space_Grotesk } from "next/font/google"
+import dynamic from "next/dynamic"
 import "./globals.css"
-import { Chatbot } from "@/components/chatbot"
+
+const Chatbot = dynamic(() => import("@/components/chatbot").then(mod => ({ default: mod.Chatbot })), {
+  ssr: false,
+})
 
 const _inter = Inter({
   subsets: ["latin"],
@@ -114,7 +118,7 @@ export default function RootLayout({
               image: "https://diag.aco-habitat.fr/images/logo-aco-habitat.png",
               offers: {
                 "@type": "Offer",
-                price: "19.90",
+                price: "59.90",
                 priceCurrency: "EUR",
                 availability: "https://schema.org/InStock",
                 priceValidUntil: "2026-12-31",
@@ -197,7 +201,7 @@ export default function RootLayout({
                   name: "Combien coute un diagnostic ?",
                   acceptedAnswer: {
                     "@type": "Answer",
-                    text: "Un diagnostic complet coute 19,90 EUR. Vous recevez instantanement un rapport PDF detaille avec les zones problematiques identifiees, les scores par categorie et des recommandations.",
+                    text: "Un diagnostic complet coute 59,90 EUR. Vous recevez instantanement un rapport PDF detaille avec les zones problematiques identifiees, les scores par categorie et des recommandations.",
                   },
                 },
                 {
@@ -241,7 +245,7 @@ export default function RootLayout({
                 "Diagnostic de toiture par intelligence artificielle. Analysez l'etat de votre couverture en 30 secondes a partir d'une photo satellite ou drone. Rapport PDF complet.",
               offers: {
                 "@type": "Offer",
-                price: "19.90",
+                price: "59.90",
                 priceCurrency: "EUR",
                 availability: "https://schema.org/InStock",
                 priceValidUntil: "2026-12-31",
@@ -417,7 +421,7 @@ export default function RootLayout({
                       areaServed: "France",
                       serviceType: "Diagnostic toiture",
                     },
-                    price: "19.90",
+                    price: "59.90",
                     priceCurrency: "EUR",
                   },
                   {
