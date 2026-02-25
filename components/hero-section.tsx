@@ -1,5 +1,6 @@
 "use client"
 
+import Image from "next/image"
 import { Scan, Shield, Droplets, ArrowRight, Zap } from "lucide-react"
 import { useEffect, useState } from "react"
 import { WeatherAlertBanner } from "@/components/weather-alert-banner"
