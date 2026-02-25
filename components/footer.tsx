@@ -24,12 +24,12 @@ const footerLinks = [
   {
     title: "Zones d'intervention",
     links: [
-      { label: "Ile-de-France", href: "#contact" },
-      { label: "Nord / Hauts-de-France", href: "#contact" },
-      { label: "Grand Est", href: "#contact" },
-      { label: "Normandie", href: "#contact" },
-      { label: "Bretagne / Pays de la Loire", href: "#contact" },
-      { label: "Toute la France", href: "#contact" },
+      { label: "Couvreur Orne (61)", href: "/couvreur/couvreur-toiture-orne-61" },
+      { label: "Couvreur Paris (75)", href: "/couvreur/couvreur-toiture-paris-75" },
+      { label: "Couvreur Calvados (14)", href: "/couvreur/couvreur-toiture-calvados-14" },
+      { label: "Couvreur Nord (59)", href: "/couvreur/couvreur-toiture-nord-59" },
+      { label: "Couvreur Rhone (69)", href: "/couvreur/couvreur-toiture-rhone-69" },
+      { label: "Tous les departements", href: "/couvreur/couvreur-toiture-orne-61" },
     ],
   },
 ]

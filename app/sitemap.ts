@@ -1,9 +1,10 @@
 import type { MetadataRoute } from "next"
+import { departments } from "@/lib/departments"
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = "https://diag.aco-habitat.fr"
 
-  return [
+  const mainPages: MetadataRoute.Sitemap = [
     {
       url: baseUrl,
       lastModified: new Date(),
@@ -47,4 +48,14 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.8,
     },
   ]
+
+  // 101 department pages
+  const departmentPages: MetadataRoute.Sitemap = departments.map((dept) => ({
+    url: `${baseUrl}/couvreur/${dept.slug}`,
+    lastModified: new Date(),
+    changeFrequency: "monthly" as const,
+    priority: 0.7,
+  }))
+
+  return [...mainPages, ...departmentPages]
 }
