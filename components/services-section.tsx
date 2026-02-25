@@ -1,11 +1,13 @@
 "use client"
 
+import Link from "next/link"
 import { Hammer, Thermometer, Home, TreePine, HardHat, Search, ArrowUpRight } from "lucide-react"
 
 const services = [
   {
     icon: Search,
     title: "Diagnostic IA",
+    slug: "diagnostic-ia",
     description:
       "Analyse complete de votre toiture par intelligence artificielle a partir d'une simple photo satellite ou drone.",
     highlight: true,
@@ -13,6 +15,7 @@ const services = [
   {
     icon: Hammer,
     title: "Reparation",
+    slug: "reparation-toiture",
     description:
       "Intervention rapide pour fuites, tuiles cassees, faitage endommage et tous types de reparations urgentes.",
     highlight: false,
@@ -20,6 +23,7 @@ const services = [
   {
     icon: Home,
     title: "Renovation complete",
+    slug: "renovation-toiture",
     description:
       "Renovation integrale de couverture : depose, charpente, pose de nouvelles tuiles ou ardoises.",
     highlight: false,
@@ -27,6 +31,7 @@ const services = [
   {
     icon: Thermometer,
     title: "Isolation thermique",
+    slug: "isolation-thermique",
     description:
       "Isolation de combles et sous-toiture pour reduire votre facture energetique et ameliorer votre confort.",
     highlight: false,
@@ -34,6 +39,7 @@ const services = [
   {
     icon: TreePine,
     title: "Demoussage",
+    slug: "demoussage",
     description:
       "Nettoyage haute pression, traitement anti-mousse et application d'hydrofuge protecteur longue duree.",
     highlight: false,
@@ -41,6 +47,7 @@ const services = [
   {
     icon: HardHat,
     title: "Charpente",
+    slug: "charpente",
     description:
       "Expertise et travaux de charpente : renforcement, remplacement de pieces, traitement curatif du bois.",
     highlight: false,
@@ -73,8 +80,9 @@ export function ServicesSection() {
 
         <div className="mt-14 grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {services.map((service) => (
-            <div
+            <Link
               key={service.title}
+              href={`/services/${service.slug}`}
               className={`group relative flex flex-col gap-5 rounded-2xl border p-7 transition-all duration-300 ${
                 service.highlight
                   ? "border-primary/30 bg-primary/5 hover:border-primary/50 hover:bg-primary/10"
@@ -105,7 +113,7 @@ export function ServicesSection() {
                   {service.description}
                 </p>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
       </div>

@@ -2,32 +2,46 @@ import { Star, Quote } from "lucide-react"
 
 const testimonials = [
   {
-    name: "Marie Dubois",
-    location: "Versailles (78)",
+    name: "N. Teixeira",
+    location: "Meudon (92)",
     rating: 5,
-    text: "Incroyable ! J'ai juste envoye une capture Google Maps de ma toiture et en 30 secondes j'avais un diagnostic complet. L'equipe est intervenue 3 jours apres pour le demoussage. Travail impeccable.",
-    service: "Diagnostic IA + Demoussage",
+    text: "On visitait une maison a acheter et la toiture nous inquietait. En 2 minutes on avait le diagnostic : mousse importante et faitage a reprendre. On a negocie 8 000 EUR de moins sur le prix. L'achat le plus rentable de ma vie.",
+    service: "Achat immobilier",
   },
   {
-    name: "Philippe Martin",
-    location: "Creteil (94)",
+    name: "V. Kratzer",
+    location: "Colmar (68)",
     rating: 5,
-    text: "Le diagnostic IA a detecte des tuiles deplacees que je ne voyais meme pas depuis le sol. Reparation rapide et propre. Je recommande vivement ACO-HABITAT pour leur professionnalisme.",
-    service: "Reparation toiture",
+    text: "Apres la grele de juin, je voulais savoir si ma toiture avait souffert avant d'appeler un couvreur. Le rapport a detecte 3 zones de tuiles deplacees. Le couvreur m'a dit que le PDF etait plus precis que certains devis qu'il recoit.",
+    service: "Diagnostic complet",
   },
   {
-    name: "Isabelle Moreau",
-    location: "Saint-Denis (93)",
+    name: "A. Benkhedda",
+    location: "Villeurbanne (69)",
     rating: 5,
-    text: "Renovation complete de notre toiture suite au diagnostic. Le rapport detaille nous a permis de comprendre exactement les travaux necessaires. Excellent rapport qualite/prix.",
-    service: "Renovation complete",
+    text: "Je mets en vente mon pavillon et l'agent immobilier m'a conseille de faire verifier la toiture. Le diagnostic IA montre que tout est en bon etat, je l'ai mis en annexe de l'annonce. Ca rassure les acheteurs.",
+    service: "Vente immobiliere",
   },
   {
-    name: "Laurent Petit",
-    location: "Boulogne (92)",
+    name: "E. Lindqvist",
+    location: "Bayonne (64)",
     rating: 5,
-    text: "L'outil de diagnostic est bluffant. On voit clairement les zones problematiques avec les calques superposes. Intervention rapide pour l'isolation des combles. Tres satisfait.",
-    service: "Isolation thermique",
+    text: "On a achete une longere en Bearn sans pouvoir monter sur le toit. Le diagnostic a revele des problemes d'etancheite au niveau de la noue. On a fait chiffrer les travaux avant de signer, ca nous a evite une mauvaise surprise.",
+    service: "Achat immobilier",
+  },
+  {
+    name: "H. Marechal",
+    location: "Chartres (28)",
+    rating: 5,
+    text: "Ma toiture a 25 ans et je me demandais si c'etait le moment de la refaire. Le score global de 72/100 m'a rassure : encore quelques annees tranquille, juste un nettoyage a prevoir. J'ai economise un devis inutile.",
+    service: "Diagnostic preventif",
+  },
+  {
+    name: "S. Oliveira",
+    location: "Perpignan (66)",
+    rating: 5,
+    text: "J'ai fait le diagnostic avant de vendre pour anticiper les remarques des acheteurs. Le rapport a montre une zone de mousse et un debut de fissure au faitage. J'ai fait reparer avant les visites, ca m'a coute 400 EUR au lieu de perdre 5 000 EUR en negociation.",
+    service: "Vente immobiliere",
   },
 ]
 
@@ -45,14 +59,14 @@ export function TestimonialsSection() {
             className="mt-4 text-balance text-3xl font-bold tracking-tight text-foreground md:text-4xl lg:text-5xl"
             style={{ fontFamily: "var(--font-heading)" }}
           >
-            Ils nous font confiance
+            Ce que disent nos utilisateurs
           </h2>
           <p className="mt-4 text-pretty text-base leading-relaxed text-muted-foreground">
-            Decouvrez les retours de nos clients partout en France.
+            Des proprietaires qui ont fait analyser leur toiture avec ACO-HABITAT.
           </p>
         </div>
 
-        <div className="mt-14 grid grid-cols-1 gap-5 sm:grid-cols-2">
+        <div className="mt-14 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {testimonials.map((testimonial) => (
             <div
               key={testimonial.name}

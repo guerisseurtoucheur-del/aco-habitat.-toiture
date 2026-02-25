@@ -2,25 +2,44 @@
 
 import { useState, useEffect } from "react"
 import Link from "next/link"
-import { Menu, X, Zap, Phone, Mail } from "lucide-react"
+import Image from "next/image"
+import { Menu, X, Zap, Phone, Mail, Satellite } from "lucide-react"
 
 const navLinks = [
-  { href: "#services", label: "Services" },
   { href: "#diagnostic", label: "Diagnostic IA" },
-  { href: "#methode", label: "Methode" },
-  { href: "#temoignages", label: "Temoignages" },
+  { href: "#methode", label: "Comment ca marche" },
+  { href: "#tarifs", label: "Tarifs" },
+  { href: "#immobilier", label: "Immobilier" },
   { href: "#faq", label: "FAQ" },
-  { href: "#contact", label: "Contact" },
+  { href: "#couvreurs", label: "Trouver un couvreur" },
 ]
 
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
+  const [currentTime, setCurrentTime] = useState<string>("")
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20)
     window.addEventListener("scroll", handleScroll, { passive: true })
     return () => window.removeEventListener("scroll", handleScroll)
+  }, [])
+
+  useEffect(() => {
+    const updateTime = () => {
+      const now = new Date()
+      setCurrentTime(
+        now.toLocaleTimeString("fr-FR", {
+          hour: "2-digit",
+          minute: "2-digit",
+          second: "2-digit",
+          timeZone: "Europe/Paris",
+        })
+      )
+    }
+    updateTime()
+    const interval = setInterval(updateTime, 1000)
+    return () => clearInterval(interval)
   }, [])
 
   return (
@@ -49,23 +68,44 @@ export function Navbar() {
               <span className="font-medium">aco.habitat@orange.fr</span>
             </a>
           </div>
-          <span className="hidden text-xs text-muted-foreground sm:block">
-            Intervention sur toute la France
-          </span>
+          <div className="hidden items-center gap-4 sm:flex">
+            <span className="text-xs text-muted-foreground">
+              Analyse par satellite disponible partout en France
+            </span>
+            {currentTime && (
+              <>
+                <span className="h-3 w-px bg-border" />
+                <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                  <Satellite size={11} className="text-primary" />
+                  <span className="font-mono text-[11px] tracking-wider tabular-nums text-primary/80">
+                    {currentTime}
+                  </span>
+                  <span className="text-[9px] text-muted-foreground/60 uppercase tracking-widest">UTC+1</span>
+                </span>
+              </>
+            )}
+          </div>
         </div>
       </div>
       <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
         <Link href="/" className="flex items-center gap-3 group">
-          <div className="relative flex h-10 w-10 items-center justify-center rounded-xl bg-primary transition-transform group-hover:scale-105">
-            <span className="text-sm font-bold text-primary-foreground font-sans tracking-wide">A</span>
-            <div className="absolute inset-0 rounded-xl bg-primary/50 blur-lg opacity-0 group-hover:opacity-100 transition-opacity" />
+          <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full transition-transform group-hover:scale-105">
+            <Image
+              src="/images/logo-aco-habitat.png"
+              alt="Logo ACO-HABITAT"
+              width={44}
+              height={44}
+              className="object-cover"
+              priority
+            />
+            <div className="absolute inset-0 rounded-full ring-1 ring-primary/20 group-hover:ring-primary/40 transition-all" />
           </div>
           <div className="flex flex-col">
             <span className="text-base font-bold tracking-tight text-foreground font-sans leading-tight">
               ACO-HABITAT
             </span>
             <span className="text-[10px] font-medium text-muted-foreground tracking-widest uppercase">
-              Expert Toiture
+              Diagnostic Toiture par IA
             </span>
           </div>
         </Link>
@@ -84,10 +124,10 @@ export function Navbar() {
 
         <div className="hidden lg:flex items-center gap-3">
           <a
-            href="tel:+33233311979"
+            href="#tarifs"
             className="rounded-lg border border-border px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-secondary"
           >
-            02 33 31 19 79
+            Voir les tarifs
           </a>
           <a
             href="#diagnostic"
@@ -122,11 +162,11 @@ export function Navbar() {
             ))}
             <div className="mt-4 flex flex-col gap-3">
               <a
-                href="tel:+33233311979"
+                href="#tarifs"
                 onClick={() => setMobileOpen(false)}
                 className="rounded-lg border border-border px-4 py-3 text-center text-sm font-medium text-foreground"
               >
-                02 33 31 19 79
+                Voir les tarifs
               </a>
               <a
                 href="#diagnostic"

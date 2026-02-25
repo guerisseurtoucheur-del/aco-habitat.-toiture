@@ -19,6 +19,7 @@ export async function POST(request: Request) {
       isolation: "Isolation thermique",
       demoussage: "Demoussage et traitement",
       charpente: "Charpente",
+      "bilan-energetique": "Bilan Energetique",
       autre: "Autre",
     }
 
@@ -79,6 +80,10 @@ export async function POST(request: Request) {
       subject: `Nouvelle demande - ${serviceLabels[service] || service} - ${name}`,
       html: htmlContent,
     })
+
+    if (error) {
+      return NextResponse.json({ error: "Erreur lors de l'envoi.", details: error.message }, { status: 500 })
+    }
 
     return NextResponse.json({ success: true })
   } catch (error) {

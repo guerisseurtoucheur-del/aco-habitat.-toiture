@@ -1,11 +1,12 @@
 import { Navbar } from "@/components/navbar"
 import { HeroSection } from "@/components/hero-section"
-import { ServicesSection } from "@/components/services-section"
+import { PricingSection } from "@/components/pricing-section"
 import { MethodSection } from "@/components/method-section"
 import { DiagnosticTool } from "@/components/diagnostic-tool"
 import { TestimonialsSection } from "@/components/testimonials-section"
+import { ImmobilierSection } from "@/components/immobilier-section"
 import { FaqSection } from "@/components/faq-section"
-import { ContactSection } from "@/components/contact-section"
+import { CouvreurSection } from "@/components/couvreur-section"
 import { Footer } from "@/components/footer"
 import { StructuredData } from "@/components/structured-data"
 
@@ -16,12 +17,13 @@ export default function HomePage() {
       <Navbar />
       <main>
         <HeroSection />
-        <ServicesSection />
         <MethodSection />
         <DiagnosticTool />
+        <PricingSection />
         <TestimonialsSection />
+        <ImmobilierSection />
         <FaqSection />
-        <ContactSection />
+        <CouvreurSection />
       </main>
       <Footer />
     </>
