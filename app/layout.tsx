@@ -1,11 +1,7 @@
 import type { Metadata, Viewport } from "next"
 import { Inter, Space_Grotesk } from "next/font/google"
-import dynamic from "next/dynamic"
 import "./globals.css"
-
-const Chatbot = dynamic(() => import("@/components/chatbot").then(mod => ({ default: mod.Chatbot })), {
-  ssr: false,
-})
+import { ChatbotWrapper } from "@/components/chatbot-wrapper"
 
 const _inter = Inter({
   subsets: ["latin"],
@@ -556,7 +552,7 @@ export default function RootLayout({
           }}
         />
         {children}
-        <Chatbot />
+        <ChatbotWrapper />
       </body>
     </html>
   )
