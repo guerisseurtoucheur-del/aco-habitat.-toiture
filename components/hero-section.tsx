@@ -124,7 +124,7 @@ export function HeroSection() {
         <div className="animate-fade-up-delay-3 mt-8 flex flex-col items-center gap-3 text-sm text-muted-foreground sm:mt-12 sm:flex-row sm:gap-6">
           <div className="flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-2">
             <Zap size={14} className="text-primary" />
-            <span className="font-semibold text-foreground">19,90 EUR</span>
+            <span className="font-semibold text-foreground">59,90 EUR</span>
             <span>par diagnostic</span>
           </div>
           <div className="hidden h-4 w-px bg-border sm:block" />

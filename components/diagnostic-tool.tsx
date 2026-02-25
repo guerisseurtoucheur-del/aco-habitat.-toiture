@@ -837,7 +837,7 @@ export function DiagnosticTool() {
           </h2>
           <p className="text-lg leading-relaxed text-muted-foreground">
             Entrez votre adresse ou uploadez une photo (drone, smartphone).
-            Analyse complete par IA en 30 secondes. Rapport PDF inclus. 19,90 EUR.
+            Analyse complete par IA en 30 secondes. Rapport PDF inclus. 59,90 EUR.
           </p>
         </div>
 

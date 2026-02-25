@@ -11,6 +11,6 @@ export const PRODUCTS: Product[] = [
     name: "Diagnostic Toiture par IA",
     description:
       "Analyse complete de votre toiture : vegetal, structure, etancheite, thermique. Rapport PDF inclus.",
-    priceInCents: 1990, // 19,90 EUR
+    priceInCents: 5990, // 59,90 EUR
   },
 ]

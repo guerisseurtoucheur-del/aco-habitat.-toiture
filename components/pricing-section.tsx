@@ -26,7 +26,7 @@ export function PricingSection() {
             style={{ fontFamily: "var(--font-heading)" }}
           >
             Un diagnostic complet pour{" "}
-            <span className="text-gradient">19,90 EUR</span>
+            <span className="text-gradient">59,90 EUR</span>
           </h2>
           <p className="mt-4 text-pretty text-base leading-relaxed text-muted-foreground">
             Pas d{"'"}abonnement, pas de frais caches. Payez uniquement quand vous en avez besoin.
@@ -43,7 +43,7 @@ export function PricingSection() {
                   className="text-4xl font-bold text-foreground sm:text-6xl"
                   style={{ fontFamily: "var(--font-heading)" }}
                 >
-                  19,90
+                  59,90
                 </span>
                 <span className="text-lg text-muted-foreground sm:text-xl">EUR</span>
                 <span className="ml-2 text-xs text-muted-foreground sm:text-sm">/ diagnostic</span>
