@@ -49,13 +49,12 @@ export function HeroSection() {
     <section className="relative flex min-h-screen items-center overflow-hidden">
       {/* Background layers */}
       <div className="absolute inset-0 z-0">
-        <video
-          src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/diag.aco-habitat.satelitte.video-udYSb78QcWnfnkDh3V4kfBnzQAtNyk.MP4"
-          autoPlay
-          muted
-          loop
-          playsInline
-          className="h-full w-full object-cover opacity-25"
+        <Image
+          src="/images/hero-roof.jpg"
+          alt="Diagnostic toiture par intelligence artificielle - Vue aerienne satellite d'un toit analyse par ACO-HABITAT expert couvreur"
+          fill
+          className="object-cover opacity-15"
+          priority
         />
         <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/90 to-background" />
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--color-glow-blue),_transparent_60%)]" />
@@ -106,13 +105,15 @@ export function HeroSection() {
         <div className="animate-fade-up-delay-3 mt-10 flex flex-col items-center gap-4 sm:flex-row">
           <a
             href="#diagnostic"
+            aria-label="Lancer un diagnostic de votre toiture par intelligence artificielle pour 59,90 euros"
             className="group relative flex items-center gap-2 rounded-xl bg-primary px-8 py-4 text-base font-semibold text-primary-foreground transition-all hover:shadow-xl hover:shadow-primary/20"
           >
-            Analyser ma toiture - 19,90 EUR
+            Diagnostic IA - 59,90{"\u20AC"}
             <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
           </a>
           <a
             href="#methode"
+            aria-label="Decouvrir la methode de diagnostic toiture IA ACO-HABITAT"
             className="group flex items-center gap-2 rounded-xl border border-border bg-secondary/50 px-8 py-4 text-base font-medium text-secondary-foreground transition-all hover:bg-secondary hover:border-border/80"
           >
             Comment ca marche

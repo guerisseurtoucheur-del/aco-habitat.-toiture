@@ -1,58 +1,61 @@
 import type { MetadataRoute } from "next"
+import { departments } from "@/lib/departments"
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = "https://diag.aco-habitat.fr"
 
-  const services = [
-    "couverture",
-    "charpente",
-    "diagnostic-ia",
-    "reparation-toiture",
-    "renovation-toiture",
-    "isolation-thermique",
-    "demoussage",
+  const mainPages: MetadataRoute.Sitemap = [
+    {
+      url: baseUrl,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 1.0,
+    },
+    {
+      url: `${baseUrl}/#diagnostic`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/#services`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
+    {
+      url: `${baseUrl}/#methode`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/#temoignages`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.6,
+    },
+    {
+      url: `${baseUrl}/#faq`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.6,
+    },
+    {
+      url: `${baseUrl}/#contact`,
+      lastModified: new Date(),
+      changeFrequency: "monthly",
+      priority: 0.8,
+    },
   ]
 
-  const guides = [
-    "diagnostic-toiture-satellite",
-    "quand-renover-toiture",
-    "prix-renovation-toiture",
-    "mousse-toiture-dangers",
-    "glossaire-toiture",
-    "degats-grele-toiture",
-    "duree-de-vie-toiture",
-    "signes-mauvaise-isolation-toiture",
-    "methodologie-diagnostic-ia",
-  ]
-
-  const servicePages = services.map((service) => ({
-    url: `${baseUrl}/services/${service}`,
-    lastModified: new Date(),
-    changeFrequency: "monthly" as const,
-    priority: 0.8,
-  }))
-
-  const guidePages = guides.map((guide) => ({
-    url: `${baseUrl}/guide/${guide}`,
+  // 101 department pages
+  const departmentPages: MetadataRoute.Sitemap = departments.map((dept) => ({
+    url: `${baseUrl}/couvreur/${dept.slug}`,
     lastModified: new Date(),
     changeFrequency: "monthly" as const,
     priority: 0.7,
   }))
 
-  return [
-    {
-      url: baseUrl,
-      lastModified: new Date(),
-      changeFrequency: "weekly",
-      priority: 1,
-    },
-    {
-      url: `${baseUrl}/mentions-legales`,
-      lastModified: new Date(),
-      changeFrequency: "yearly",
-      priority: 0.3,
-    },
-    ...servicePages,
-    ...guidePages,
-  ]
+  return [...mainPages, ...departmentPages]
 }

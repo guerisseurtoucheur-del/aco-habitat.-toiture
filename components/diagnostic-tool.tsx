@@ -1756,8 +1756,8 @@ export function DiagnosticTool() {
                   className="group relative inline-flex items-center gap-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-8 py-4 text-base font-bold text-white shadow-lg shadow-cyan-500/25 transition-all hover:shadow-xl hover:shadow-cyan-500/30"
                 >
                   <Download size={20} />
-                  Re-telecharger le rapport PDF
-                  <span className="ml-1 rounded-md bg-white/20 px-2 py-0.5 text-[10px] font-semibold">INCLUS</span>
+                  Generer mon rapport PDF complet
+                  <span className="ml-1 rounded-md bg-white/20 px-2 py-0.5 text-[10px] font-semibold">59,90{"\u20AC"}</span>
                 </button>
                 {emailSent ? (
                   <p className="mt-4 flex items-center justify-center gap-1.5 text-xs font-medium text-green-400">

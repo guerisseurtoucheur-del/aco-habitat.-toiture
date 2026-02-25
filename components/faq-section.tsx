@@ -15,9 +15,9 @@ const faqs = [
       "Vous pouvez utiliser notre carte satellite IGN integree (20cm/pixel), une capture Google Maps en vue satellite, une photo prise par drone, ou une photo prise depuis le sol avec votre smartphone. Plus l'image est nette et recente, plus le diagnostic sera precis.",
   },
   {
-    question: "Combien coute un diagnostic ?",
+    question: "Combien coute le diagnostic en ligne ?",
     answer:
-      "Un diagnostic complet coute 19,90 EUR. Le paiement est securise par Stripe. Pas d'abonnement, pas de frais caches. Vous payez uniquement quand vous lancez une analyse. Le rapport PDF est genere instantanement.",
+      "Le diagnostic IA en ligne coute 59,90\u20AC. Vous recevez instantanement un rapport detaille avec les zones problematiques identifiees, une analyse thermique, un score d'isolation et des recommandations d'intervention. Le devis d'intervention qui suit est gratuit et sans engagement.",
   },
   {
     question: "Que contient le rapport PDF ?",
@@ -27,7 +27,7 @@ const faqs = [
   {
     question: "Comment trouver un couvreur apres le diagnostic ?",
     answer:
-      "Notre annuaire de couvreurs vous permet de trouver un professionnel qualifie pres de chez vous. Vous pouvez lui transmettre directement votre rapport PDF pour obtenir un devis precis adapte aux problemes detectes.",
+      "Le cout depend de la nature et de l'etendue des travaux identifies lors du diagnostic. Le diagnostic IA coute 59,90\u20AC et le devis d'intervention est gratuit et detaille. Nos prix sont transparents et competitifs.",
   },
   {
     question: "Le diagnostic est-il disponible partout en France ?",

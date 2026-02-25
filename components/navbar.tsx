@@ -134,7 +134,7 @@ export function Navbar() {
             className="group relative flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition-all hover:shadow-lg hover:shadow-primary/25"
           >
             <Zap size={14} className="transition-transform group-hover:scale-110" />
-            Analyser ma toiture - 19,90 EUR
+            Diagnostic 59,90{"\u20AC"}
           </a>
         </div>
 
@@ -174,7 +174,7 @@ export function Navbar() {
                 className="flex items-center justify-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-medium text-primary-foreground"
               >
                 <Zap size={14} />
-                Analyser ma toiture - 19,90 EUR
+                Diagnostic 59,90{"\u20AC"}
               </a>
             </div>
           </div>

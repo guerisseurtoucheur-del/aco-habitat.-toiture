@@ -33,10 +33,12 @@ const footerLinks: { title: string; links: FooterLink[] }[] = [
   {
     title: "Entreprise",
     links: [
-      { label: "A propos", href: "#methode" },
-      { label: "Contact / Support", href: "mailto:aco.habitat@orange.fr" },
-      { label: "Mentions legales & CGV", href: "/mentions-legales" },
-      { label: "Espace pro", href: "/admin" },
+      { label: "Couvreur Orne (61)", href: "/couvreur/couvreur-toiture-orne-61" },
+      { label: "Couvreur Paris (75)", href: "/couvreur/couvreur-toiture-paris-75" },
+      { label: "Couvreur Calvados (14)", href: "/couvreur/couvreur-toiture-calvados-14" },
+      { label: "Couvreur Nord (59)", href: "/couvreur/couvreur-toiture-nord-59" },
+      { label: "Couvreur Rhone (69)", href: "/couvreur/couvreur-toiture-rhone-69" },
+      { label: "Tous les departements", href: "/couvreur/couvreur-toiture-orne-61" },
     ],
   },
 ]
@@ -56,7 +58,7 @@ export function Footer() {
               Pret a analyser votre toiture ?
             </h3>
             <p className="mt-3 text-base text-muted-foreground">
-              Analyse complete par IA en 30 secondes. Rapport PDF instantane.
+              Diagnostic IA complet pour seulement 59,90{"\u20AC"}. Resultat en 30 secondes.
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <a

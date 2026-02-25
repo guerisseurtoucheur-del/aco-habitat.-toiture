@@ -8,10 +8,12 @@ import { ImmobilierSection } from "@/components/immobilier-section"
 import { FaqSection } from "@/components/faq-section"
 import { CouvreurSection } from "@/components/couvreur-section"
 import { Footer } from "@/components/footer"
+import { StructuredData } from "@/components/structured-data"
 
 export default function HomePage() {
   return (
     <>
+      <StructuredData />
       <Navbar />
       <main>
         <HeroSection />

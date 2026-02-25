@@ -14,50 +14,33 @@ const _spaceGrotesk = Space_Grotesk({
 })
 
 export const metadata: Metadata = {
-  title: "ACO-HABITAT | Diagnostic Toiture par IA - Analyse Satellite & Photo | 19,90 EUR",
+  metadataBase: new URL("https://diag.aco-habitat.fr"),
+  title: {
+    default: "Diagnostic Toiture IA 59,90\u20AC | ACO-HABITAT Expert Couvreur France",
+    template: "%s | ACO-HABITAT Diagnostic Toiture",
+  },
   description:
-    "Analysez l'etat de votre toiture en 30 secondes par intelligence artificielle. Photo satellite ou drone. Rapport PDF complet : mousse, fissures, etancheite, thermique. 19,90 EUR par analyse.",
+    "Analysez l'etat de votre toiture en 30 secondes par intelligence artificielle pour seulement 59,90\u20AC. Diagnostic vegetal, structurel, etancheite et thermique. Couvreur expert demoussage, infiltration, renovation toiture. Devis d'intervention gratuit partout en France.",
   keywords: [
-    "diagnostic toiture",
+    "diagnostic toiture IA 59 euros",
     "diagnostic toiture IA",
     "analyse toiture satellite",
-    "analyse toiture drone",
-    "etat toiture",
-    "mousse toiture",
-    "fissure toiture",
+    "couvreur France",
+    "expert toiture",
+    "demoussage toiture",
     "infiltration toiture",
-    "rapport toiture PDF",
-    "diagnostic toiture en ligne",
+    "renovation toiture",
+    "reparation toiture",
+    "couvreur Normandie",
+    "couvreur Alencon",
+    "devis toiture gratuit",
     "ACO-HABITAT",
-    "inspection toiture",
-    "toiture intelligence artificielle",
   ],
-  metadataBase: new URL("https://diag.aco-habitat.fr"),
+  authors: [{ name: "ACO-HABITAT", url: "https://diag.aco-habitat.fr" }],
+  creator: "ACO-HABITAT",
+  publisher: "ACO-HABITAT",
   alternates: {
     canonical: "/",
-  },
-  openGraph: {
-    title: "ACO-HABITAT | Diagnostic Toiture par IA - 19,90 EUR",
-    description:
-      "Analysez votre toiture en 30 secondes par IA. Photo satellite ou drone. Rapport PDF complet avec detection mousse, fissures, etancheite.",
-    type: "website",
-    locale: "fr_FR",
-    siteName: "ACO-HABITAT",
-    url: "https://diag.aco-habitat.fr",
-    images: [
-      {
-        url: "/images/logo-aco-habitat.png",
-        width: 1024,
-        height: 1024,
-        alt: "ACO-HABITAT - Diagnostic Toiture par IA",
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "ACO-HABITAT | Diagnostic Toiture par IA",
-    description:
-      "Analysez votre toiture en 30 secondes par IA. Rapport PDF complet. 19,90 EUR par diagnostic.",
   },
   robots: {
     index: true,
@@ -70,6 +53,31 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
+  openGraph: {
+    type: "website",
+    locale: "fr_FR",
+    url: "https://diag.aco-habitat.fr",
+    siteName: "ACO-HABITAT Diagnostic Toiture",
+    title: "Diagnostic Toiture IA 59,90\u20AC en 30s | ACO-HABITAT Expert Couvreur",
+    description:
+      "Analysez votre toiture par IA pour 59,90\u20AC : vue satellite, diagnostic vegetal, structurel, etancheite et thermique. Devis d'intervention gratuit. Couvreur expert France entiere.",
+    images: [
+      {
+        url: "/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "ACO-HABITAT - Diagnostic toiture par intelligence artificielle",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Diagnostic Toiture IA 59,90\u20AC | ACO-HABITAT",
+    description:
+      "Analysez votre toiture en 30s par IA pour 59,90\u20AC. Diagnostic complet : vegetal, structure, etancheite, thermique. Devis d'intervention gratuit.",
+    images: ["/og-image.jpg"],
+  },
+  category: "construction",
 }
 
 export const viewport: Viewport = {

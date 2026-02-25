@@ -1,7 +1,4 @@
 import { NextResponse } from "next/server"
-import { Resend } from "resend"
-
-const resend = new Resend(process.env.RESEND_API_KEY)
 
 export async function POST(request: Request) {
   try {
@@ -63,8 +60,21 @@ export async function POST(request: Request) {
       </div>
     `
 
-    const { error } = await resend.emails.send({
-      from: "ACO-HABITAT Site Web <diagnostic@aco-habitat.fr>",
+    // Use nodemailer dynamically to avoid build-time bundling issues
+    const nodemailer = await import("nodemailer")
+    
+    const transporter = nodemailer.default.createTransport({
+      host: process.env.SMTP_HOST || "smtp.orange.fr",
+      port: Number(process.env.SMTP_PORT) || 465,
+      secure: true,
+      auth: {
+        user: process.env.SMTP_USER,
+        pass: process.env.SMTP_PASS,
+      },
+    })
+
+    await transporter.sendMail({
+      from: `"ACO-HABITAT Site Web" <${process.env.SMTP_USER}>`,
       to: "aco.habitat@orange.fr",
       replyTo: email,
       subject: `Nouvelle demande - ${serviceLabels[service] || service} - ${name}`,
