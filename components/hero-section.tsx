@@ -39,7 +39,7 @@ export function HeroSection() {
       <div className="absolute inset-0 z-0">
         <Image
           src="/images/hero-roof.jpg"
-          alt="Vue aerienne d'une toiture"
+          alt="Diagnostic toiture par intelligence artificielle - Vue aerienne satellite d'un toit analyse par ACO-HABITAT expert couvreur"
           fill
           className="object-cover opacity-15"
           priority
@@ -88,6 +88,7 @@ export function HeroSection() {
         <div className="animate-fade-up-delay-3 mt-10 flex flex-col items-center gap-4 sm:flex-row">
           <a
             href="#diagnostic"
+            aria-label="Lancer un diagnostic gratuit de votre toiture par intelligence artificielle"
             className="group relative flex items-center gap-2 rounded-xl bg-primary px-8 py-4 text-base font-semibold text-primary-foreground transition-all hover:shadow-xl hover:shadow-primary/20"
           >
             Lancer un diagnostic gratuit
@@ -95,6 +96,7 @@ export function HeroSection() {
           </a>
           <a
             href="#methode"
+            aria-label="Decouvrir la methode de diagnostic toiture IA ACO-HABITAT"
             className="group flex items-center gap-2 rounded-xl border border-border bg-secondary/50 px-8 py-4 text-base font-medium text-secondary-foreground transition-all hover:bg-secondary hover:border-border/80"
           >
             Decouvrir notre methode

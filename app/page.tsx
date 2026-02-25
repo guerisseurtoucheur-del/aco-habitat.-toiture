@@ -7,10 +7,12 @@ import { TestimonialsSection } from "@/components/testimonials-section"
 import { FaqSection } from "@/components/faq-section"
 import { ContactSection } from "@/components/contact-section"
 import { Footer } from "@/components/footer"
+import { StructuredData } from "@/components/structured-data"
 
 export default function HomePage() {
   return (
     <>
+      <StructuredData />
       <Navbar />
       <main>
         <HeroSection />
