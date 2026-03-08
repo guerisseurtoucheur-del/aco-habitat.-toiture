@@ -117,7 +117,7 @@ export function ImmobilierSection() {
         <div className="mx-auto mt-10 grid max-w-2xl grid-cols-3 gap-px overflow-hidden rounded-2xl border border-border bg-border sm:mt-14">
           {[
             { value: "30%", label: "de la valeur du bien" },
-            { value: "19,90 EUR", label: "le diagnostic" },
+            { value: "59,90 EUR", label: "le diagnostic" },
             { value: "30 sec", label: "pour le resultat" },
           ].map(({ value, label }) => (
             <div key={label} className="flex flex-col items-center gap-1 bg-card px-3 py-5 sm:px-6 sm:py-6">

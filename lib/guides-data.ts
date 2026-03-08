@@ -380,7 +380,7 @@ export const guidesData: GuideData[] = [
     sections: [
       {
         title: "Le diagnostic toiture n'est pas obligatoire... mais indispensable",
-        content: "Contrairement au DPE, a l'amiante ou au plomb, le diagnostic de toiture n'est pas obligatoire lors d'une vente immobiliere. C'est un angle mort de la legislation que beaucoup d'acheteurs decouvrent trop tard. Le vendeur n'a aucune obligation de vous informer sur l'etat de la couverture, sauf vice cache avere. Resultat : des milliers d'acheteurs chaque annee decouvrent apres la signature que leur toiture necessite des travaux importants. Un diagnostic preventif de 19,90 euros peut vous eviter une facture de 15 000 euros.",
+        content: "Contrairement au DPE, a l'amiante ou au plomb, le diagnostic de toiture n'est pas obligatoire lors d'une vente immobiliere. C'est un angle mort de la legislation que beaucoup d'acheteurs decouvrent trop tard. Le vendeur n'a aucune obligation de vous informer sur l'etat de la couverture, sauf vice cache avere. Resultat : des milliers d'acheteurs chaque annee decouvrent apres la signature que leur toiture necessite des travaux importants. Un diagnostic preventif de 59,90 euros peut vous eviter une facture de 15 000 euros.",
       },
       {
         title: "Les 5 points a verifier sur la toiture avant d'acheter",
@@ -422,7 +422,7 @@ export const guidesData: GuideData[] = [
       },
       {
         question: "Combien coute un diagnostic toiture avant achat ?",
-        answer: "Le diagnostic IA ACO-HABITAT coute 19,90 euros et prend moins de 30 secondes. Pour une inspection physique complete par un couvreur, comptez entre 150 et 300 euros. Le rapport IA suffit souvent pour une premiere evaluation et pour la negociation.",
+        answer: "Le diagnostic IA ACO-HABITAT coute 59,90 euros et prend moins de 30 secondes. Pour une inspection physique complete par un couvreur, comptez entre 150 et 300 euros. Le rapport IA suffit souvent pour une premiere evaluation et pour la negociation.",
       },
     ],
     relatedServices: ["diagnostic-ia", "couverture", "renovation-toiture"],
@@ -953,7 +953,7 @@ Faire un diagnostic toiture avant achat vous permet de :
 - **Anticiper les travaux** et les integrer dans votre plan de financement
 - **Eviter les mauvaises surprises** : fuites, infiltrations, isolation defaillante
 
-Un diagnostic IA ACO-HABITAT coute 19,90 EUR. C'est 0,01% du prix d'une maison a 200 000 EUR. L'investissement le plus rentable de votre achat immobilier.`,
+Un diagnostic IA ACO-HABITAT coute 59,90 EUR. C'est 0,01% du prix d'une maison a 200 000 EUR. L'investissement le plus rentable de votre achat immobilier.`,
       },
       {
         title: "Vendeur : comment la toiture impacte votre prix de vente",
@@ -979,7 +979,7 @@ Pour l'agent immobilier et le mandataire :
 
 Vous pouvez realiser le diagnostic lors de la visite d'estimation, directement depuis votre smartphone. Le rapport PDF est immediatement disponible pour etre integre au dossier.
 
-A seulement 19,90 EUR par diagnostic, c'est un investissement negligeable par rapport a la valeur du mandat que vous pouvez decrocher.`,
+A seulement 59,90 EUR par diagnostic, c'est un investissement negligeable par rapport a la valeur du mandat que vous pouvez decrocher.`,
       },
       {
         title: "Notaire : securiser l'acte et le devoir de conseil",
@@ -1042,7 +1042,7 @@ Un diagnostic toiture IA, meme indicatif, constitue un element de transparence q
       {
         question: "Un agent immobilier peut-il proposer ce service a ses clients ?",
         answer:
-          "Absolument. A 19,90 EUR par diagnostic, c'est un service premium a proposer aux vendeurs pour valoriser leur bien ou aux acheteurs pour les rassurer. Le rapport professionnel renforce votre credibilite.",
+          "Absolument. A 59,90 EUR par diagnostic, c'est un service premium a proposer aux vendeurs pour valoriser leur bien ou aux acheteurs pour les rassurer. Le rapport professionnel renforce votre credibilite.",
       },
     ],
     relatedServices: ["diagnostic-ia", "couverture"],
