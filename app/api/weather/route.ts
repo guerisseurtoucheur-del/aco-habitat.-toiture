@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server"
 
-const OPENWEATHER_API_KEY = process.env.OPENWEATHER_API_KEY
+const OPENWEATHER_API_KEY = process.env.OPENWEATHER_API_KEY || process.env.CLE_API_OPENWEATHER
 
 interface WeatherAlert {
   event: string
