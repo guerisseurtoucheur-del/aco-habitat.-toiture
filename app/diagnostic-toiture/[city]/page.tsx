@@ -20,7 +20,10 @@ import {
   ArrowRight,
   Snowflake,
   CloudRain,
-  ExternalLink
+  ExternalLink,
+  Phone,
+  Mail,
+  Clock
 } from "lucide-react"
 
 interface PageProps {
@@ -85,8 +88,10 @@ function CityStructuredData({ city }: { city: typeof citiesData[string] }) {
         "name": `ACO-HABITAT Diagnostic Toiture ${city.name}`,
         "description": city.seoContent.metaDescription,
         "url": `https://diag.aco-habitat.fr/diagnostic-toiture/${city.slug}`,
-        "telephone": "+33-XXX-XXX-XXX",
+        "telephone": "+33 2 33 31 19 79",
+        "email": "aco.habitat@orange.fr",
         "priceRange": "$$",
+        "foundingDate": "2006",
         "image": "https://diag.aco-habitat.fr/og-image.jpg",
         "address": {
           "@type": "PostalAddress",
@@ -775,6 +780,32 @@ export default async function CityPage({ params }: PageProps) {
                     <Badge key={commune} variant="outline">{commune}</Badge>
                   ))}
                 </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Contact Section */}
+        <section className="border-t border-border/50 bg-primary/5 py-10">
+          <div className="mx-auto max-w-4xl px-4 sm:px-6">
+            <div className="text-center">
+              <h2 className="mb-2 text-xl font-bold text-foreground">ACO-HABITAT - Expert toiture depuis 2006</h2>
+              <p className="mb-6 text-muted-foreground">Une question sur votre toiture a {cityData.name} ? Contactez-nous !</p>
+              <div className="flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-8">
+                <a 
+                  href="tel:+33233311979" 
+                  className="flex items-center gap-2 text-lg font-semibold text-primary hover:underline"
+                >
+                  <Phone className="h-5 w-5" />
+                  02 33 31 19 79
+                </a>
+                <a 
+                  href="mailto:aco.habitat@orange.fr" 
+                  className="flex items-center gap-2 text-lg font-semibold text-primary hover:underline"
+                >
+                  <Mail className="h-5 w-5" />
+                  aco.habitat@orange.fr
+                </a>
               </div>
             </div>
           </div>

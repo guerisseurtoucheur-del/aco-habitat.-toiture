@@ -17,7 +17,9 @@ import {
   Droplets,
   CheckCircle2,
   Building2,
-  ExternalLink
+  ExternalLink,
+  Phone,
+  Mail
 } from "lucide-react"
 
 export async function generateStaticParams() {
@@ -472,6 +474,32 @@ export default async function RegionPage({
                   <ArrowRight className="h-4 w-4 text-muted-foreground transition-transform group-hover:translate-x-1" />
                 </Link>
               ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Contact Section */}
+        <section className="border-t border-border/50 bg-primary/5 py-10">
+          <div className="mx-auto max-w-4xl px-4 sm:px-6">
+            <div className="text-center">
+              <h2 className="mb-2 text-xl font-bold text-foreground">ACO-HABITAT - Expert toiture depuis 2006</h2>
+              <p className="mb-6 text-muted-foreground">Une question sur votre toiture en {regionData.name} ? Contactez-nous !</p>
+              <div className="flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-8">
+                <a 
+                  href="tel:+33233311979" 
+                  className="flex items-center gap-2 text-lg font-semibold text-primary hover:underline"
+                >
+                  <Phone className="h-5 w-5" />
+                  02 33 31 19 79
+                </a>
+                <a 
+                  href="mailto:aco.habitat@orange.fr" 
+                  className="flex items-center gap-2 text-lg font-semibold text-primary hover:underline"
+                >
+                  <Mail className="h-5 w-5" />
+                  aco.habitat@orange.fr
+                </a>
+              </div>
             </div>
           </div>
         </section>

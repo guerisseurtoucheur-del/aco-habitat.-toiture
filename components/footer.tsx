@@ -1,5 +1,5 @@
 import Image from "next/image"
-import { Zap, ExternalLink } from "lucide-react"
+import { Zap, ExternalLink, Phone, Mail } from "lucide-react"
 
 interface FooterLink {
   label: string
@@ -167,13 +167,16 @@ export function Footer() {
                 Analysez l{"'"}etat de votre couverture en 30 secondes. Rapport PDF complet.
               </p>
               <div className="flex flex-col gap-2 text-sm text-muted-foreground">
-                <a href="tel:+33233311979" className="hover:text-foreground transition-colors">
+                <a href="tel:+33233311979" className="flex items-center gap-2 hover:text-foreground transition-colors">
+                  <Phone size={14} />
                   02 33 31 19 79
                 </a>
-                <a href="mailto:aco.habitat@orange.fr" className="hover:text-foreground transition-colors">
+                <a href="mailto:aco.habitat@orange.fr" className="flex items-center gap-2 hover:text-foreground transition-colors">
+                  <Mail size={14} />
                   aco.habitat@orange.fr
                 </a>
               </div>
+              <p className="text-xs text-muted-foreground">Expert toiture depuis 2006</p>
 
               {/* Price badge */}
               <div className="flex items-center gap-3 rounded-xl border border-primary/20 bg-primary/5 px-4 py-3">
