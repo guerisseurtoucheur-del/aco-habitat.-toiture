@@ -1,4 +1,4 @@
-// PDF generation module v2 - safe property access
+// PDF generation module v2.1 - with Georisques integration
 import jsPDF from "jspdf"
 import type { DiagnosticResult } from "./diagnostic-types"
 import type { GeorisquesData } from "./georisques"
