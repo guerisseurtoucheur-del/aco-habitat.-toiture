@@ -31,14 +31,23 @@ const footerLinks: { title: string; links: FooterLink[] }[] = [
     ],
   },
   {
-    title: "Entreprise",
+    title: "Nos autres diagnostics",
     links: [
-      { label: "Couvreur Orne (61)", href: "/couvreur/couvreur-toiture-orne-61" },
-      { label: "Couvreur Paris (75)", href: "/couvreur/couvreur-toiture-paris-75" },
-      { label: "Couvreur Calvados (14)", href: "/couvreur/couvreur-toiture-calvados-14" },
-      { label: "Couvreur Nord (59)", href: "/couvreur/couvreur-toiture-nord-59" },
-      { label: "Couvreur Rhone (69)", href: "/couvreur/couvreur-toiture-rhone-69" },
-      { label: "Tous les departements", href: "/couvreur/couvreur-toiture-orne-61" },
+      { label: "Diagnostic Humidite IA", href: "https://humidite.aco-habitat.fr", external: true },
+      { label: "Diagnostic Charpente IA", href: "https://traitement-bois.fr", external: true },
+      { label: "Traitement Merule", href: "https://traitement-bois.fr", external: true },
+      { label: "Traitement Insectes Bois", href: "https://traitement-bois.fr", external: true },
+    ],
+  },
+  {
+    title: "Diagnostic par ville",
+    links: [
+      { label: "Diagnostic toiture Paris", href: "/diagnostic-toiture/paris" },
+      { label: "Diagnostic toiture Lyon", href: "/diagnostic-toiture/lyon" },
+      { label: "Diagnostic toiture Marseille", href: "/diagnostic-toiture/marseille" },
+      { label: "Diagnostic toiture Toulouse", href: "/diagnostic-toiture/toulouse" },
+      { label: "Diagnostic toiture Bordeaux", href: "/diagnostic-toiture/bordeaux" },
+      { label: "Toutes les villes", href: "/diagnostic-toiture" },
     ],
   },
 ]
@@ -79,43 +88,61 @@ export function Footer() {
         </div>
       </div>
 
-      {/* Cross-selling charpente banner */}
-      <div className="border-t border-amber-500/20 bg-amber-500/5">
-        <div className="mx-auto flex max-w-7xl flex-col items-start gap-3 px-4 py-4 sm:flex-row sm:items-center sm:justify-between sm:gap-4 sm:px-6">
-          <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-amber-500/15">
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-amber-400">
-                <path d="M3 21h18" />
-                <path d="M12 2L2 7h20L12 2z" />
-                <path d="M6 12v7" />
-                <path d="M18 12v7" />
-              </svg>
-            </div>
-            <div>
-              <p className="text-sm font-semibold text-foreground">
-                Diagnostic charpente par IA
-              </p>
-              <p className="text-xs text-muted-foreground">
-                Analysez aussi votre charpente sur notre site dedie
-              </p>
-            </div>
+      {/* Cross-selling autres diagnostics banner */}
+      <div className="border-t border-primary/20 bg-primary/5">
+        <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
+          <p className="mb-4 text-center text-sm font-semibold text-foreground">
+            Decouvrez nos autres diagnostics IA
+          </p>
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+            {/* Diagnostic Humidite */}
+            <a
+              href="https://humidite.aco-habitat.fr"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-3 rounded-xl border border-cyan-500/30 bg-cyan-500/10 px-4 py-3 transition-all hover:bg-cyan-500/20"
+            >
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-cyan-500/15">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-cyan-400">
+                  <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-foreground">Diagnostic Humidite IA</p>
+                <p className="text-xs text-muted-foreground">Analysez les problemes d{"'"}humidite</p>
+              </div>
+              <ExternalLink size={14} className="shrink-0 text-cyan-400" />
+            </a>
+            
+            {/* Diagnostic Charpente */}
+            <a
+              href="https://traitement-bois.fr"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-3 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 transition-all hover:bg-amber-500/20"
+            >
+              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-amber-500/15">
+                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-amber-400">
+                  <path d="M3 21h18" />
+                  <path d="M12 2L2 7h20L12 2z" />
+                  <path d="M6 12v7" />
+                  <path d="M18 12v7" />
+                </svg>
+              </div>
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-foreground">Diagnostic Charpente IA</p>
+                <p className="text-xs text-muted-foreground">Merule, insectes xylophages, etat du bois</p>
+              </div>
+              <ExternalLink size={14} className="shrink-0 text-amber-400" />
+            </a>
           </div>
-          <a
-            href="https://aco-habitat.fr"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="flex shrink-0 items-center gap-2 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-2 text-xs font-semibold text-amber-400 transition-all hover:bg-amber-500/20"
-          >
-            aco-habitat.fr
-            <ExternalLink size={12} />
-          </a>
         </div>
       </div>
 
       {/* Footer links */}
       <div className="border-t border-border">
         <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14">
-          <div className="grid grid-cols-2 gap-8 sm:grid-cols-2 lg:grid-cols-4">
+          <div className="grid grid-cols-2 gap-8 sm:grid-cols-2 lg:grid-cols-5">
             {/* Brand */}
             <div className="col-span-2 flex flex-col gap-4 sm:col-span-1">
               <div className="flex items-center gap-3">

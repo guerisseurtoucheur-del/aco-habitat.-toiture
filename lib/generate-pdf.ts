@@ -489,6 +489,36 @@ async function buildPDF(
     y += 24
   }
 
+  // ── NOS AUTRES DIAGNOSTICS IA ──
+  checkNewPage(45)
+  y += 6
+  drawLine(y)
+  y += 6
+  
+  doc.setFillColor(240, 249, 255) // light blue
+  doc.roundedRect(margin, y, contentW, 36, 2, 2, "F")
+  doc.setDrawColor(59, 130, 246)
+  doc.setLineWidth(0.4)
+  doc.roundedRect(margin, y, contentW, 36, 2, 2, "S")
+  
+  addText("NOS AUTRES DIAGNOSTICS IA", margin + 4, y + 6, 9, "bold", [30, 64, 175])
+  
+  // Diagnostic Humidite
+  doc.setFillColor(6, 182, 212) // cyan
+  doc.roundedRect(margin + 4, y + 10, 4, 4, 1, 1, "F")
+  addText("Diagnostic Humidite IA", margin + 12, y + 13, 8, "bold", [8, 145, 178])
+  addText("Analysez les problemes d'humidite de votre maison", margin + 12, y + 18, 7, "normal", [80, 80, 80])
+  addText("humidite.aco-habitat.fr", margin + contentW / 2 + 10, y + 13, 7, "bold", [8, 145, 178])
+  
+  // Diagnostic Charpente / Bois
+  doc.setFillColor(245, 158, 11) // amber
+  doc.roundedRect(margin + 4, y + 23, 4, 4, 1, 1, "F")
+  addText("Diagnostic Charpente & Bois IA", margin + 12, y + 26, 8, "bold", [180, 100, 0])
+  addText("Merule, insectes xylophages, etat de la charpente", margin + 12, y + 31, 7, "normal", [80, 80, 80])
+  addText("traitement-bois.fr", margin + contentW / 2 + 10, y + 26, 7, "bold", [180, 100, 0])
+  
+  y += 42
+
   // Legal disclaimer
   checkNewPage(35)
   y += 6
