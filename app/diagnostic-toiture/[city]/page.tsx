@@ -19,7 +19,8 @@ import {
   Building,
   ArrowRight,
   Snowflake,
-  CloudRain
+  CloudRain,
+  ExternalLink
 } from "lucide-react"
 
 interface PageProps {
@@ -91,7 +92,6 @@ function CityStructuredData({ city }: { city: typeof citiesData[string] }) {
           "@type": "PostalAddress",
           "addressLocality": city.name,
           "addressRegion": city.region,
-          "postalCode": city.postalCode,
           "addressCountry": "FR"
         },
         "geo": {

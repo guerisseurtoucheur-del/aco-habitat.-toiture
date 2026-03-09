@@ -1353,11 +1353,6 @@ export const cityList = Object.values(citiesData).map(city => ({
   population: city.population
 }))
 
-// Fonction pour obtenir les villes par region
-export function getCitiesByRegion(regionSlug: string): CityData[] {
-  return Object.values(citiesData).filter(city => city.regionSlug === regionSlug)
-}
-
 // Fonction pour obtenir les villes voisines
 export function getNearbyCities(citySlug: string, limit: number = 5): CityData[] {
   const city = citiesData[citySlug]

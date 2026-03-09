@@ -205,3 +205,11 @@ export const regionList = Object.values(regionsData).map(region => ({
   name: region.name,
   departmentCount: region.departments.length
 }))
+
+export function getRegionBySlug(slug: string): RegionData | undefined {
+  return regionsData[slug]
+}
+
+export function getAllRegions(): RegionData[] {
+  return Object.values(regionsData)
+}
