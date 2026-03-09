@@ -1,6 +1,8 @@
 // PDF generation module v2 - safe property access
 import jsPDF from "jspdf"
 import type { DiagnosticResult } from "./diagnostic-types"
+import type { GeorisquesData } from "./georisques"
+import { getInondationLabel, getArgilesLabel, getSeismeLabel, getRadonLabel, getRiskColor } from "./georisques"
 
 function safeScore(obj: { score?: number } | undefined | null): number {
   if (!obj) return 0
@@ -84,7 +86,8 @@ async function buildPDF(
   capturedImage: string,
   address: string,
   measurements: { type: string; value: number }[],
-  clientInfo?: { name?: string; phone?: string; email?: string }
+  clientInfo?: { name?: string; phone?: string; email?: string },
+  georisques?: GeorisquesData | null
 ) {
   const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" })
   const pageW = doc.internal.pageSize.getWidth()
@@ -489,6 +492,74 @@ async function buildPDF(
   
   y += 30
 
+  // ── SECTION GEORISQUES ──
+  if (georisques && !georisques.erreur) {
+    checkNewPage(65)
+    drawLine(y)
+    y += 8
+    addText("RISQUES NATURELS - DONNEES GEORISQUES", margin, y, 12, "bold", [24, 24, 27])
+    y += 4
+    addText("Source : georisques.gouv.fr - API officielle du gouvernement francais", margin, y, 6, "normal", [150, 150, 150])
+    y += 8
+
+    // Inondation
+    const inondColor = getRiskColor(georisques.inondation.niveau)
+    doc.setFillColor(georisques.inondation.present ? 254, 243, 199 : 240, 253, 244) // amber-100 or green-50
+    doc.roundedRect(margin, y, contentW / 2 - 2, 22, 2, 2, "F")
+    doc.setDrawColor(...inondColor)
+    doc.setLineWidth(0.4)
+    doc.roundedRect(margin, y, contentW / 2 - 2, 22, 2, 2, "S")
+    addText("ZONE INONDABLE", margin + 4, y + 6, 7, "bold", inondColor)
+    addText(georisques.inondation.present ? "OUI" : "NON", margin + 4, y + 13, 11, "bold", inondColor)
+    addText(getInondationLabel(georisques.inondation.niveau), margin + 4, y + 19, 6, "normal", [100, 100, 100])
+    if (georisques.inondation.ppr) {
+      addText("PPR approuve", margin + 45, y + 13, 6, "normal", [180, 100, 0])
+    }
+
+    // Argiles
+    const argilesColor = getRiskColor(georisques.argiles.niveau)
+    doc.setFillColor(georisques.argiles.niveau === "fort" ? 254, 226, 226 : 240, 253, 244) // red-100 or green-50
+    doc.roundedRect(margin + contentW / 2 + 2, y, contentW / 2 - 2, 22, 2, 2, "F")
+    doc.setDrawColor(...argilesColor)
+    doc.roundedRect(margin + contentW / 2 + 2, y, contentW / 2 - 2, 22, 2, 2, "S")
+    addText("RETRAIT-GONFLEMENT ARGILES", margin + contentW / 2 + 6, y + 6, 7, "bold", argilesColor)
+    addText(georisques.argiles.present ? getArgilesLabel(georisques.argiles.niveau) : "Non concerne", margin + contentW / 2 + 6, y + 13, 10, "bold", argilesColor)
+    addText("Risque pour les fondations", margin + contentW / 2 + 6, y + 19, 6, "normal", [100, 100, 100])
+    y += 26
+
+    // Seisme
+    const seismeZone = georisques.seisme.zone
+    const seismeColor: [number, number, number] = seismeZone && seismeZone >= 3 ? [245, 158, 11] : [34, 197, 94]
+    doc.setFillColor(245, 245, 250)
+    doc.roundedRect(margin, y, contentW / 2 - 2, 18, 2, 2, "F")
+    addText("ZONE SISMIQUE", margin + 4, y + 5, 7, "bold", seismeColor)
+    addText(getSeismeLabel(seismeZone), margin + 4, y + 12, 9, "bold", seismeColor)
+
+    // Radon
+    const radonNiveau = georisques.radon.niveau
+    const radonColor: [number, number, number] = radonNiveau === 3 ? [239, 68, 68] : radonNiveau === 2 ? [245, 158, 11] : [34, 197, 94]
+    doc.setFillColor(245, 245, 250)
+    doc.roundedRect(margin + contentW / 2 + 2, y, contentW / 2 - 2, 18, 2, 2, "F")
+    addText("POTENTIEL RADON", margin + contentW / 2 + 6, y + 5, 7, "bold", radonColor)
+    addText(getRadonLabel(radonNiveau), margin + contentW / 2 + 6, y + 12, 9, "bold", radonColor)
+    y += 22
+
+    // Catastrophes naturelles
+    if (georisques.catnat.count > 0) {
+      doc.setFillColor(255, 251, 235)
+      doc.roundedRect(margin, y, contentW, 18, 2, 2, "F")
+      addText(`CATASTROPHES NATURELLES : ${georisques.catnat.count} arrete(s) CATNAT sur cette commune`, margin + 4, y + 6, 7, "bold", [180, 100, 0])
+      if (georisques.catnat.recents.length > 0) {
+        addText(`Recents : ${georisques.catnat.recents.slice(0, 3).join(", ")}`, margin + 4, y + 12, 6, "normal", [100, 100, 100])
+      }
+      y += 22
+    }
+
+    // Warning
+    addText("Ces informations sont fournies a titre indicatif. Consultez georisques.gouv.fr pour le detail complet.", margin, y, 6, "normal", [150, 150, 150])
+    y += 8
+  }
+
   // ═══════════════════════════════════════
   // PAGE 3: Fiche couvreur + legal
   // ═══════════════════════════════════════
@@ -718,12 +789,13 @@ export async function generateDiagnosticPDF(
   capturedImage: string,
   address: string,
   measurements: { type: string; value: number }[],
-  clientInfo?: { name?: string; phone?: string; email?: string }
-) {
-  const doc = await buildPDF(diagnostic, capturedImage, address, measurements, clientInfo)
+  clientInfo?: { name?: string; phone?: string; email?: string },
+  georisques?: GeorisquesData | null
+  ) {
+  const doc = await buildPDF(diagnostic, capturedImage, address, measurements, clientInfo, georisques)
   const fileName = `diagnostic-toiture-aco-habitat-${new Date().toISOString().slice(0, 10)}.pdf`
   doc.save(fileName)
-}
+  }
 
 /** Generate the PDF and return as base64 string (for email attachment) */
 export async function generateDiagnosticPDFBase64(
@@ -731,9 +803,10 @@ export async function generateDiagnosticPDFBase64(
   capturedImage: string,
   address: string,
   measurements: { type: string; value: number }[],
-  clientInfo?: { name?: string; phone?: string; email?: string }
-): Promise<string> {
-  const doc = await buildPDF(diagnostic, capturedImage, address, measurements, clientInfo)
+  clientInfo?: { name?: string; phone?: string; email?: string },
+  georisques?: GeorisquesData | null
+  ): Promise<string> {
+  const doc = await buildPDF(diagnostic, capturedImage, address, measurements, clientInfo, georisques)
   const arrayBuffer = doc.output("arraybuffer")
   const uint8 = new Uint8Array(arrayBuffer)
   let binary = ""

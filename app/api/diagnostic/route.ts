@@ -1,10 +1,33 @@
 import { generateText, Output } from "ai"
 import { diagnosticSchema } from "@/lib/diagnostic-types"
+import { fetchGeorisques, getCodeInseeFromAddress, type GeorisquesData } from "@/lib/georisques"
 
 export const maxDuration = 60
 
 export async function POST(req: Request) {
   const { image, address, measurements, bounds, zoom } = await req.json()
+
+  // Fetch Georisques data in parallel if address is provided
+  let georisquesData: GeorisquesData | null = null
+  if (address) {
+    try {
+      const { codeInsee, lat, lon } = await getCodeInseeFromAddress(address)
+      if (lat && lon) {
+        georisquesData = await fetchGeorisques(lat, lon, codeInsee || undefined)
+      }
+    } catch (e) {
+      console.error("Erreur recuperation Georisques:", e)
+    }
+  } else if (bounds) {
+    // Use center of bounds if no address
+    const lat = (bounds.north + bounds.south) / 2
+    const lon = (bounds.east + bounds.west) / 2
+    try {
+      georisquesData = await fetchGeorisques(lat, lon)
+    } catch (e) {
+      console.error("Erreur recuperation Georisques:", e)
+    }
+  }
 
   if (!image) {
     return Response.json({ error: "Aucune image fournie" }, { status: 400 })
@@ -199,5 +222,8 @@ ${address ? `Adresse du bien : ${address}` : ""}`,
     ],
   })
 
-  return Response.json({ diagnostic: output })
+  return Response.json({ 
+    diagnostic: output,
+    georisques: georisquesData
+  })
 }
