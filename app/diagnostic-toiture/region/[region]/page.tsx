@@ -112,6 +112,35 @@ export default async function RegionPage({
           "price": "59.90",
           "priceCurrency": "EUR",
           "availability": "https://schema.org/InStock"
+        },
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "4.8",
+          "reviewCount": "127",
+          "bestRating": "5",
+          "worstRating": "1"
+        }
+      },
+      {
+        "@type": "Product",
+        "name": `Diagnostic Toiture IA ${regionData.name}`,
+        "description": `Analyse complete de votre toiture en ${regionData.name} par intelligence artificielle.`,
+        "brand": {
+          "@type": "Brand",
+          "name": "ACO-HABITAT"
+        },
+        "offers": {
+          "@type": "Offer",
+          "url": `https://diag.aco-habitat.fr/diagnostic-toiture/region/${regionData.slug}`,
+          "priceCurrency": "EUR",
+          "price": "59.90",
+          "priceValidUntil": "2027-12-31",
+          "availability": "https://schema.org/InStock"
+        },
+        "aggregateRating": {
+          "@type": "AggregateRating",
+          "ratingValue": "4.8",
+          "reviewCount": "127"
         }
       },
       {
