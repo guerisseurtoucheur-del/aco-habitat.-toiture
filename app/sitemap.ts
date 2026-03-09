@@ -1,5 +1,7 @@
 import type { MetadataRoute } from "next"
 import { departments } from "@/lib/departments"
+import { citiesData } from "@/lib/cities-data"
+import { regionsData } from "@/lib/regions-data"
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = "https://diag.aco-habitat.fr"
@@ -10,6 +12,12 @@ export default function sitemap(): MetadataRoute.Sitemap {
       lastModified: new Date(),
       changeFrequency: "weekly",
       priority: 1.0,
+    },
+    {
+      url: `${baseUrl}/diagnostic-toiture`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.95,
     },
     {
       url: `${baseUrl}/#diagnostic`,
@@ -57,5 +65,21 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.7,
   }))
 
-  return [...mainPages, ...departmentPages]
+  // City pages (high priority for SEO)
+  const cityPages: MetadataRoute.Sitemap = Object.values(citiesData).map((city) => ({
+    url: `${baseUrl}/diagnostic-toiture/${city.slug}`,
+    lastModified: new Date(),
+    changeFrequency: "monthly" as const,
+    priority: 0.85,
+  }))
+
+  // Region pages
+  const regionPages: MetadataRoute.Sitemap = Object.values(regionsData).map((region) => ({
+    url: `${baseUrl}/diagnostic-toiture/region/${region.slug}`,
+    lastModified: new Date(),
+    changeFrequency: "monthly" as const,
+    priority: 0.8,
+  }))
+
+  return [...mainPages, ...cityPages, ...regionPages, ...departmentPages]
 }

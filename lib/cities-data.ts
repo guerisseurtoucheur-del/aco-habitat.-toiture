@@ -1369,3 +1369,15 @@ export function getNearbyCities(citySlug: string, limit: number = 5): CityData[]
     .sort((a, b) => b.population - a.population)
     .slice(0, limit)
 }
+
+// Fonction pour obtenir les villes par region
+export function getCitiesByRegion(region: string): CityData[] {
+  return Object.values(citiesData)
+    .filter(city => city.region === region)
+    .sort((a, b) => b.population - a.population)
+}
+
+// Fonction pour obtenir toutes les villes
+export function getAllCities(): CityData[] {
+  return Object.values(citiesData).sort((a, b) => b.population - a.population)
+}

@@ -40,14 +40,14 @@ const footerLinks: { title: string; links: FooterLink[] }[] = [
     ],
   },
   {
-    title: "Couvreurs",
+    title: "Diagnostic par ville",
     links: [
-      { label: "Couvreur Orne (61)", href: "/couvreur/couvreur-toiture-orne-61" },
-      { label: "Couvreur Paris (75)", href: "/couvreur/couvreur-toiture-paris-75" },
-      { label: "Couvreur Calvados (14)", href: "/couvreur/couvreur-toiture-calvados-14" },
-      { label: "Couvreur Nord (59)", href: "/couvreur/couvreur-toiture-nord-59" },
-      { label: "Couvreur Rhone (69)", href: "/couvreur/couvreur-toiture-rhone-69" },
-      { label: "Tous les departements", href: "/couvreur/couvreur-toiture-orne-61" },
+      { label: "Diagnostic toiture Paris", href: "/diagnostic-toiture/paris" },
+      { label: "Diagnostic toiture Lyon", href: "/diagnostic-toiture/lyon" },
+      { label: "Diagnostic toiture Marseille", href: "/diagnostic-toiture/marseille" },
+      { label: "Diagnostic toiture Toulouse", href: "/diagnostic-toiture/toulouse" },
+      { label: "Diagnostic toiture Bordeaux", href: "/diagnostic-toiture/bordeaux" },
+      { label: "Toutes les villes", href: "/diagnostic-toiture" },
     ],
   },
 ]
