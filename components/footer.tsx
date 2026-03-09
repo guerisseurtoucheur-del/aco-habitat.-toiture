@@ -221,6 +221,7 @@ export function Footer() {
           <div className="flex gap-6 text-xs text-muted-foreground">
             <a href="/mentions-legales" className="hover:text-foreground transition-colors">Mentions legales & CGV</a>
             <a href="/mentions-legales#donnees" className="hover:text-foreground transition-colors">Confidentialite</a>
+            <a href="/admin" className="hover:text-foreground transition-colors">Espace Pro</a>
           </div>
         </div>
       </div>
