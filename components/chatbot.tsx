@@ -59,12 +59,7 @@ export function Chatbot() {
         <MessageSquare size={24} className="text-primary-foreground" />
       </button>
 
-      {/* Notification dot */}
-      {!isOpen && messages.length === 0 && (
-        <span className="fixed bottom-16 right-5 z-50 flex h-5 w-5 items-center justify-center rounded-full bg-accent text-[10px] font-bold text-accent-foreground shadow-md">
-          1
-        </span>
-      )}
+
 
       {/* Chat window */}
       <div
