@@ -39,7 +39,7 @@ export async function generateMetadata({
   }
 
   const title = `Diagnostic Toiture ${regionData.name} | Analyse IA en 30s | ACO-HABITAT`
-  const description = `Diagnostic toiture par IA en ${regionData.name}. Analyse des toitures ${regionData.roofTypes.slice(0, 3).join(", ")} adaptees au climat ${regionData.climate}. ${regionData.cities.length}+ villes couvertes. Rapport PDF detaille a 59,90 EUR.`
+  const description = `Diagnostic toiture par IA en ${regionData.name}. Analyse des toitures ${regionData.mainRoofTypes.slice(0, 3).join(", ")} adaptees au climat ${regionData.climate}. ${regionData.departments.length} departements couverts. Rapport PDF detaille a 59,90 EUR.`
 
   return {
     title,
@@ -174,7 +174,7 @@ export default async function RegionPage({
             "name": `Quels types de toitures trouve-t-on en ${regionData.name} ?`,
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": `En ${regionData.name}, on trouve principalement des toitures en ${regionData.roofTypes.join(", ")}. Ces materiaux sont adaptes au climat ${regionData.climate} de la region.`
+              "text": `En ${regionData.name}, on trouve principalement des toitures en ${regionData.mainRoofTypes.join(", ")}. Ces materiaux sont adaptes au climat ${regionData.climate} de la region.`
             }
           },
           {
@@ -237,7 +237,7 @@ export default async function RegionPage({
                 </p>
 
                 <div className="mb-8 flex flex-wrap gap-2">
-                  {regionData.roofTypes.map((type) => (
+                  {regionData.mainRoofTypes.map((type) => (
                     <Badge key={type} variant="outline">{type}</Badge>
                   ))}
                 </div>
@@ -265,7 +265,7 @@ export default async function RegionPage({
                 <div className="grid grid-cols-2 gap-4">
                   <div className="rounded-lg bg-background/50 p-4">
                     <Building2 className="mb-2 h-5 w-5 text-primary" />
-                    <p className="text-2xl font-bold text-foreground">{regionData.cities.length}+</p>
+                    <p className="text-2xl font-bold text-foreground">{citiesInRegion.length}+</p>
                     <p className="text-sm text-muted-foreground">Villes couvertes</p>
                   </div>
                   <div className="rounded-lg bg-background/50 p-4">
@@ -280,7 +280,7 @@ export default async function RegionPage({
                   </div>
                   <div className="rounded-lg bg-background/50 p-4">
                     <Home className="mb-2 h-5 w-5 text-amber-500" />
-                    <p className="text-2xl font-bold text-foreground">{regionData.roofTypes.length}</p>
+                    <p className="text-2xl font-bold text-foreground">{regionData.mainRoofTypes.length}</p>
                     <p className="text-sm text-muted-foreground">Types de toitures</p>
                   </div>
                 </div>
@@ -309,7 +309,7 @@ export default async function RegionPage({
                     {regionData.description}
                   </p>
                   <div className="space-y-2">
-                    {regionData.roofTypes.map((type) => (
+                    {regionData.mainRoofTypes.map((type) => (
                       <div key={type} className="flex items-center gap-2">
                         <CheckCircle2 className="h-4 w-4 text-green-500" />
                         <span className="text-sm">Toiture {type}</span>
@@ -411,7 +411,7 @@ export default async function RegionPage({
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground">
-                    En {regionData.name}, on trouve principalement des toitures en {regionData.roofTypes.join(", ")}. 
+                    En {regionData.name}, on trouve principalement des toitures en {regionData.mainRoofTypes.join(", ")}. 
                     Ces materiaux sont parfaitement adaptes au climat {regionData.climate} de la region. 
                     Notre IA est entrainee a analyser ces types de couvertures specifiques.
                   </p>
