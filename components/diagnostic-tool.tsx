@@ -3,6 +3,7 @@
 import { useState, useRef, useCallback, useEffect } from "react"
 import dynamic from "next/dynamic"
 import { WeatherDiagnosticWidget } from "@/components/weather-diagnostic-widget"
+import type { GeorisquesData } from "@/lib/georisques"
 import {
   MapPin,
   Search,
@@ -474,6 +475,7 @@ export function DiagnosticTool() {
   const [mapMeasurements, setMapMeasurements] = useState<MapMeasurement[]>([])
   const [formattedAddress, setFormattedAddress] = useState("")
   const [diagnostic, setDiagnostic] = useState<DiagnosticResult | null>(null)
+  const [georisques, setGeorisques] = useState<GeorisquesData | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [uploadMode, setUploadMode] = useState(false)
   const [clientName, setClientName] = useState("")
@@ -663,6 +665,7 @@ export function DiagnosticTool() {
 
       const finalDiag = ensureRealisticZones(diagData.diagnostic)
       setDiagnostic(finalDiag)
+      setGeorisques(diagData.georisques || null)
       setStep("results")
 
       // Scroll to results
@@ -698,7 +701,7 @@ export function DiagnosticTool() {
         // 2. Auto-download PDF (separate, non-blocking)
         import("@/lib/generate-pdf").then(async ({ generateDiagnosticPDF }) => {
           const clientInfo = { name: clientName, phone: clientPhone, email: clientEmail }
-          await generateDiagnosticPDF(finalDiag, capturedImage || "", formattedAddress, mapMeasurements, clientInfo)
+          await generateDiagnosticPDF(finalDiag, capturedImage || "", formattedAddress, mapMeasurements, clientInfo, diagData.georisques)
         }).catch(() => {})
 
         // Email is now sent manually via button in results section
@@ -781,10 +784,11 @@ export function DiagnosticTool() {
     setPredictions([])
     setShowDropdown(false)
     setMapCenter(null)
-    setCapturedImage(null)
-    setMapMeasurements([])
-    setDiagnostic(null)
-    setError(null)
+setCapturedImage(null)
+  setMapMeasurements([])
+  setDiagnostic(null)
+  setGeorisques(null)
+  setError(null)
     setUploadMode(false)
   }
 
@@ -1743,16 +1747,17 @@ export function DiagnosticTool() {
                   zones detectees, analyse thermique et recommandations d{"'"}intervention.
                 </p>
                 <button
-                  onClick={async () => {
-                    const { generateDiagnosticPDF } = await import("@/lib/generate-pdf")
-                    await generateDiagnosticPDF(
-                      diagnostic,
-                      capturedImage || "",
-                      formattedAddress,
-                      mapMeasurements,
-                      { name: clientName, phone: clientPhone, email: clientEmail }
-                    )
-                  }}
+onClick={async () => {
+  const { generateDiagnosticPDF } = await import("@/lib/generate-pdf")
+  await generateDiagnosticPDF(
+  diagnostic,
+  capturedImage || "",
+  formattedAddress,
+  mapMeasurements,
+  { name: clientName, phone: clientPhone, email: clientEmail },
+  georisques
+  )
+  }}
                   className="group relative inline-flex items-center gap-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-8 py-4 text-base font-bold text-white shadow-lg shadow-cyan-500/25 transition-all hover:shadow-xl hover:shadow-cyan-500/30"
                 >
                   <Download size={20} />

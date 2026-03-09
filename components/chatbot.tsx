@@ -46,6 +46,22 @@ export function Chatbot() {
 
   return (
     <>
+      {/* Speech bubble with question */}
+      {!isOpen && (
+        <div 
+          onClick={() => setIsOpen(true)}
+          className="fixed bottom-20 right-5 z-50 max-w-[220px] cursor-pointer animate-in fade-in slide-in-from-bottom-2 duration-500"
+        >
+          <div className="rounded-xl bg-card border border-border px-4 py-3 shadow-lg hover:shadow-xl transition-shadow">
+            <p className="text-sm font-medium text-foreground">Une question sur votre toiture ?</p>
+            <p className="text-xs text-muted-foreground mt-1">Je peux vous aider !</p>
+          </div>
+          {/* Triangle pointer */}
+          <div className="absolute -bottom-2 right-6 h-0 w-0 border-l-[8px] border-r-[8px] border-t-[8px] border-l-transparent border-r-transparent border-t-card drop-shadow-sm" />
+          <div className="absolute -bottom-[9px] right-6 h-0 w-0 border-l-[8px] border-r-[8px] border-t-[8px] border-l-transparent border-r-transparent border-t-border -z-10" />
+        </div>
+      )}
+
       {/* Floating button */}
       <button
         onClick={() => setIsOpen(!isOpen)}
@@ -59,12 +75,7 @@ export function Chatbot() {
         <MessageSquare size={24} className="text-primary-foreground" />
       </button>
 
-      {/* Notification dot */}
-      {!isOpen && messages.length === 0 && (
-        <span className="fixed bottom-16 right-5 z-50 flex h-5 w-5 items-center justify-center rounded-full bg-accent text-[10px] font-bold text-accent-foreground shadow-md">
-          1
-        </span>
-      )}
+
 
       {/* Chat window */}
       <div

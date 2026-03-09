@@ -41,10 +41,74 @@ function formatDate(dateStr: string) {
 function generateAdminPDF(d: DiagnosticRecord) {
   const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" })
   const pageW = 210
+  const pageH = 297
   const margin = 15
   const contentW = pageW - margin * 2
   let y = margin
+  let pageNum = 1
 
+  const scoreColor = (s: number): [number, number, number] =>
+    s >= 70 ? [34, 197, 94] : s >= 50 ? [245, 158, 11] : [239, 68, 68]
+
+  const urgencyLevel = (score: number) => {
+    if (score >= 80) return { label: "Aucune urgence", color: [34, 197, 94] as [number, number, number], delay: "Entretien courant" }
+    if (score >= 60) return { label: "Faible urgence", color: [132, 204, 22] as [number, number, number], delay: "Dans les 2 ans" }
+    if (score >= 40) return { label: "Urgence moderee", color: [245, 158, 11] as [number, number, number], delay: "Dans l'annee" }
+    if (score >= 20) return { label: "Urgence elevee", color: [249, 115, 22] as [number, number, number], delay: "Dans les 3 mois" }
+    return { label: "Urgence critique", color: [239, 68, 68] as [number, number, number], delay: "Immediat" }
+  }
+
+  const estimatePriceRange = (type: string, score: number) => {
+    const surf = 100
+    if (type?.toLowerCase().includes("ardoise")) {
+      if (score < 40) return { min: Math.round(surf * 120), max: Math.round(surf * 180), label: "Refection ardoise" }
+      if (score < 60) return { min: Math.round(surf * 15), max: Math.round(surf * 30), label: "Reparation partielle" }
+      return { min: 200, max: 500, label: "Entretien preventif" }
+    }
+    if (type?.toLowerCase().includes("tuile")) {
+      if (score < 40) return { min: Math.round(surf * 80), max: Math.round(surf * 140), label: "Refection tuiles" }
+      if (score < 60) return { min: Math.round(surf * 10), max: Math.round(surf * 25), label: "Remplacement tuiles" }
+      return { min: 150, max: 400, label: "Nettoyage + traitement" }
+    }
+    if (score < 40) return { min: Math.round(surf * 90), max: Math.round(surf * 150), label: "Refection complete" }
+    if (score < 60) return { min: Math.round(surf * 12), max: Math.round(surf * 30), label: "Reparations" }
+    return { min: 150, max: 450, label: "Entretien" }
+  }
+
+  const estimateLifespan = (type: string, score: number) => {
+    let baseYears = 30
+    if (type?.toLowerCase().includes("ardoise")) baseYears = 80
+    else if (type?.toLowerCase().includes("tuile")) baseYears = 50
+    else if (type?.toLowerCase().includes("zinc")) baseYears = 40
+    const remaining = Math.round((score / 100) * baseYears * 0.5)
+    if (score >= 80) return { years: remaining + 15, comment: "Excellente duree de vie restante" }
+    if (score >= 60) return { years: remaining + 8, comment: "Bonne duree de vie avec entretien regulier" }
+    if (score >= 40) return { years: remaining + 3, comment: "Travaux necessaires pour prolonger" }
+    return { years: remaining, comment: "Refection a envisager rapidement" }
+  }
+
+  const addFooter = () => {
+    doc.setFillColor(10, 10, 10)
+    doc.rect(0, pageH - 12, pageW, 12, "F")
+    doc.setFontSize(6)
+    doc.setTextColor(100, 100, 100)
+    doc.text("ACO-HABITAT - Expert toiture depuis 2006 | 02 33 31 19 79 | aco.habitat@orange.fr | diag.aco-habitat.fr", margin, pageH - 5)
+    doc.text(`Page ${pageNum}`, pageW - margin - 10, pageH - 5)
+  }
+
+  const checkNewPage = (neededSpace: number) => {
+    if (y + neededSpace > pageH - 20) {
+      addFooter()
+      doc.addPage()
+      pageNum++
+      y = margin
+    }
+  }
+
+  // ══════════════════════════════════
+  // PAGE 1: Header + Scores
+  // ══════════════════════════════════
+  
   // Header
   doc.setFillColor(10, 10, 10)
   doc.rect(0, 0, pageW, 42, "F")
@@ -85,10 +149,7 @@ function generateAdminPDF(d: DiagnosticRecord) {
   y += 40
 
   // Score global
-  const scoreColor = (s: number): [number, number, number] =>
-    s >= 70 ? [34, 197, 94] : s >= 50 ? [245, 158, 11] : [239, 68, 68]
   const [r, g, b] = scoreColor(d.score_global)
-
   doc.setFillColor(20, 20, 20)
   doc.roundedRect(margin, y, contentW, 35, 3, 3, "F")
   doc.setFont("helvetica", "bold")
@@ -101,8 +162,6 @@ function generateAdminPDF(d: DiagnosticRecord) {
   doc.setFontSize(14)
   doc.setTextColor(100, 100, 100)
   doc.text("/100", margin + 5 + doc.getStringUnitWidth(`${d.score_global || 0}`) * 32 * 0.35 + 2, y + 28)
-
-  // Etat general
   const etat = d.score_global >= 70 ? "Bon etat general" : d.score_global >= 50 ? "Etat moyen - Surveillance conseillee" : "Etat preoccupant - Intervention recommandee"
   doc.setFontSize(10)
   doc.setTextColor(r, g, b)
@@ -116,7 +175,6 @@ function generateAdminPDF(d: DiagnosticRecord) {
     { label: "Etancheite", score: d.score_etancheite },
     { label: "Thermique", score: d.score_thermique },
   ]
-
   const boxW = (contentW - 9) / 4
   scores.forEach((s, i) => {
     const bx = margin + i * (boxW + 3)
@@ -160,9 +218,169 @@ function generateAdminPDF(d: DiagnosticRecord) {
     doc.text(lines, margin + 8, y)
     y += lines.length * 5 + 3
   })
-  y += 5
+  y += 8
 
-  // Paiement
+  // ══════════════════════════════════
+  // PAGE 2: Budget + Duree de vie + Calendrier
+  // ══════════════════════════════════
+  
+  // Estimation budget
+  checkNewPage(50)
+  doc.setFont("helvetica", "bold")
+  doc.setFontSize(11)
+  doc.setTextColor(24, 24, 27)
+  doc.text("ESTIMATION BUDGET TRAVAUX", margin, y)
+  y += 8
+
+  const priceEstimate = estimatePriceRange(d.toiture_type || "", d.score_global)
+  const urgency = urgencyLevel(d.score_global)
+
+  // Budget box
+  doc.setFillColor(240, 253, 244)
+  doc.roundedRect(margin, y, contentW / 2 - 4, 28, 2, 2, "F")
+  doc.setDrawColor(34, 197, 94)
+  doc.setLineWidth(0.3)
+  doc.roundedRect(margin, y, contentW / 2 - 4, 28, 2, 2, "S")
+  doc.setFont("helvetica", "bold")
+  doc.setFontSize(7)
+  doc.setTextColor(34, 197, 94)
+  doc.text("BUDGET ESTIME", margin + 4, y + 6)
+  doc.setFontSize(12)
+  doc.setTextColor(24, 24, 27)
+  doc.text(`${priceEstimate.min.toLocaleString('fr-FR')} - ${priceEstimate.max.toLocaleString('fr-FR')} EUR`, margin + 4, y + 14)
+  doc.setFontSize(7)
+  doc.setTextColor(100, 100, 100)
+  doc.text(priceEstimate.label, margin + 4, y + 22)
+
+  // Urgency box
+  doc.setFillColor(255, 251, 235)
+  doc.roundedRect(margin + contentW / 2 + 4, y, contentW / 2 - 4, 28, 2, 2, "F")
+  doc.setDrawColor(...urgency.color)
+  doc.roundedRect(margin + contentW / 2 + 4, y, contentW / 2 - 4, 28, 2, 2, "S")
+  doc.setTextColor(...urgency.color)
+  doc.setFontSize(7)
+  doc.text("NIVEAU D'URGENCE", margin + contentW / 2 + 8, y + 6)
+  doc.setFontSize(11)
+  doc.text(urgency.label, margin + contentW / 2 + 8, y + 14)
+  doc.setFontSize(7)
+  doc.setTextColor(100, 100, 100)
+  doc.text(`Intervention : ${urgency.delay}`, margin + contentW / 2 + 8, y + 22)
+  y += 34
+
+  doc.setFontSize(6)
+  doc.setTextColor(150, 150, 150)
+  doc.text("* Estimations indicatives basees sur les tarifs moyens 2026. Demandez plusieurs devis.", margin, y)
+  y += 10
+
+  // Duree de vie
+  checkNewPage(35)
+  const lifespan = estimateLifespan(d.toiture_type || "", d.score_global)
+  doc.setFillColor(240, 249, 255)
+  doc.roundedRect(margin, y, contentW, 24, 2, 2, "F")
+  doc.setFont("helvetica", "bold")
+  doc.setFontSize(8)
+  doc.setTextColor(30, 64, 175)
+  doc.text("DUREE DE VIE ESTIMEE DE VOTRE TOITURE", margin + 4, y + 6)
+  doc.setFontSize(14)
+  doc.setTextColor(24, 24, 27)
+  doc.text(`${lifespan.years} ans`, margin + 4, y + 15)
+  doc.setFontSize(8)
+  doc.setTextColor(100, 100, 100)
+  doc.text(`(${d.toiture_type || "Type non precise"})`, margin + 35, y + 15)
+  doc.setFontSize(7)
+  doc.text(lifespan.comment, margin + 4, y + 21)
+
+  // Progress bar
+  const lifespanBarW = contentW - 100
+  const lifespanProgress = Math.min(100, (lifespan.years / 50) * 100)
+  doc.setFillColor(230, 230, 235)
+  doc.roundedRect(margin + 90, y + 10, lifespanBarW, 6, 2, 2, "F")
+  doc.setFillColor(...scoreColor(d.score_global))
+  if (lifespanProgress > 3) doc.roundedRect(margin + 90, y + 10, (lifespanProgress / 100) * lifespanBarW, 6, 2, 2, "F")
+  y += 30
+
+  // Calendrier entretien
+  checkNewPage(50)
+  doc.setFont("helvetica", "bold")
+  doc.setFontSize(11)
+  doc.setTextColor(24, 24, 27)
+  doc.text("CALENDRIER D'ENTRETIEN ANNUEL", margin, y)
+  y += 8
+
+  const calendar = [
+    { season: "Printemps", task: "Inspection generale apres l'hiver, nettoyage gouttieres" },
+    { season: "Ete", task: "Traitement anti-mousse, verification ventilation" },
+    { season: "Automne", task: "Nettoyage feuilles, verification etancheite" },
+    { season: "Hiver", task: "Surveillance neige/gel, verification fixations" }
+  ]
+  const calWidth = (contentW - 6) / 4
+  const seasonColors: [number, number, number][] = [
+    [132, 204, 22], [245, 158, 11], [249, 115, 22], [59, 130, 246]
+  ]
+
+  calendar.forEach((item, i) => {
+    const xPos = margin + (i * (calWidth + 2))
+    doc.setFillColor(...seasonColors[i])
+    doc.roundedRect(xPos, y, calWidth, 6, 1, 1, "F")
+    doc.setFont("helvetica", "bold")
+    doc.setFontSize(6)
+    doc.setTextColor(255, 255, 255)
+    doc.text(item.season, xPos + 2, y + 4)
+    doc.setFillColor(250, 250, 252)
+    doc.roundedRect(xPos, y + 6, calWidth, 18, 0, 0, "F")
+    doc.setFont("helvetica", "normal")
+    doc.setFontSize(6)
+    doc.setTextColor(60, 60, 60)
+    const taskLines = doc.splitTextToSize(item.task, calWidth - 4)
+    doc.text(taskLines, xPos + 2, y + 11)
+  })
+  y += 30
+
+  // ══════════════════════════════════
+  // PAGE 3: Cross-selling + Legal
+  // ══════════════════════════════════
+  checkNewPage(60)
+
+  // Nos autres diagnostics
+  doc.setFillColor(240, 249, 255)
+  doc.roundedRect(margin, y, contentW, 36, 2, 2, "F")
+  doc.setDrawColor(59, 130, 246)
+  doc.setLineWidth(0.4)
+  doc.roundedRect(margin, y, contentW, 36, 2, 2, "S")
+  doc.setFont("helvetica", "bold")
+  doc.setFontSize(9)
+  doc.setTextColor(30, 64, 175)
+  doc.text("NOS AUTRES DIAGNOSTICS IA", margin + 4, y + 6)
+  
+  // Humidite
+  doc.setFillColor(6, 182, 212)
+  doc.roundedRect(margin + 4, y + 10, 4, 4, 1, 1, "F")
+  doc.setFont("helvetica", "bold")
+  doc.setFontSize(8)
+  doc.setTextColor(8, 145, 178)
+  doc.text("Diagnostic Humidite IA", margin + 12, y + 13)
+  doc.setFont("helvetica", "normal")
+  doc.setFontSize(7)
+  doc.setTextColor(80, 80, 80)
+  doc.text("Analysez les problemes d'humidite de votre maison", margin + 12, y + 18)
+  doc.setFont("helvetica", "bold")
+  doc.setTextColor(8, 145, 178)
+  doc.text("humidite.aco-habitat.fr", margin + contentW / 2 + 10, y + 13)
+  
+  // Charpente
+  doc.setFillColor(245, 158, 11)
+  doc.roundedRect(margin + 4, y + 23, 4, 4, 1, 1, "F")
+  doc.setTextColor(180, 100, 0)
+  doc.text("Diagnostic Charpente & Bois IA", margin + 12, y + 26)
+  doc.setFont("helvetica", "normal")
+  doc.setTextColor(80, 80, 80)
+  doc.text("Merule, insectes xylophages, etat de la charpente", margin + 12, y + 31)
+  doc.setFont("helvetica", "bold")
+  doc.setTextColor(180, 100, 0)
+  doc.text("traitement-bois.fr", margin + contentW / 2 + 10, y + 26)
+  y += 42
+
+  // Paiement ref
   if (d.stripe_session_id) {
     doc.setFillColor(245, 245, 245)
     doc.roundedRect(margin, y, contentW, 10, 2, 2, "F")
@@ -172,12 +390,25 @@ function generateAdminPDF(d: DiagnosticRecord) {
     y += 14
   }
 
-  // Footer
-  doc.setFillColor(10, 10, 10)
-  doc.rect(0, 282, pageW, 15, "F")
+  // Legal disclaimer
+  checkNewPage(30)
+  doc.setFillColor(255, 251, 235)
+  doc.roundedRect(margin, y, contentW, 22, 2, 2, "F")
+  doc.setDrawColor(245, 158, 11)
+  doc.roundedRect(margin, y, contentW, 22, 2, 2, "S")
+  doc.setFont("helvetica", "bold")
   doc.setFontSize(7)
-  doc.setTextColor(100, 100, 100)
-  doc.text("ACO-HABITAT - Diagnostic Toiture | aco.habitat@orange.fr | 02 33 31 19 79", pageW / 2, 290, { align: "center" })
+  doc.setTextColor(180, 100, 0)
+  doc.text("AVERTISSEMENT LEGAL", margin + 4, y + 5)
+  doc.setFont("helvetica", "normal")
+  doc.setFontSize(6)
+  doc.setTextColor(100, 80, 60)
+  const legalText = "Ce rapport est base sur l'analyse automatisee d'images par intelligence artificielle. Il ne remplace pas un diagnostic realise par un professionnel qualifie. ACO-HABITAT decline toute responsabilite en cas d'erreur d'interpretation. Pour tous travaux, faites appel a un couvreur certifie."
+  const legalLines = doc.splitTextToSize(legalText, contentW - 8)
+  doc.text(legalLines, margin + 4, y + 10)
+
+  // Add footer to last page
+  addFooter()
 
   const fileName = `diagnostic-${d.id}-${d.client_name || "client"}-${new Date(d.created_at).toISOString().slice(0, 10)}.pdf`
   doc.save(fileName.replace(/\s+/g, "-").toLowerCase())
