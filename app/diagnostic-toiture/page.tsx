@@ -184,10 +184,10 @@ export default function DiagnosticToiturePage() {
                     </CardHeader>
                     <CardContent>
                       <p className="mb-3 text-sm text-muted-foreground">
-                        Climat {region.climate} - {region.cities.length}+ villes
+                        {region.climate.split(" ").slice(0, 3).join(" ")} - {region.departments.length} departements
                       </p>
                       <div className="flex flex-wrap gap-1">
-                        {region.roofTypes.slice(0, 3).map((type) => (
+                        {region.mainRoofTypes.slice(0, 3).map((type) => (
                           <Badge key={type} variant="secondary" className="text-xs">
                             {type}
                           </Badge>
