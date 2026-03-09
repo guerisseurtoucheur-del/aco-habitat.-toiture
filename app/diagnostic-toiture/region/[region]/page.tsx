@@ -182,7 +182,7 @@ export default async function RegionPage({
             "name": `Quels sont les problemes de toiture frequents en ${regionData.name} ?`,
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": `Les problemes courants en ${regionData.name} incluent : ${regionData.commonProblems.join(", ")}. Notre diagnostic IA detecte ces problemes specifiques au climat regional.`
+              "text": `Les problemes courants en ${regionData.name} incluent : ${regionData.mainProblems.join(", ")}. Notre diagnostic IA detecte ces problemes specifiques au climat regional.`
             }
           },
           {
@@ -233,7 +233,7 @@ export default async function RegionPage({
                 <p className="mb-6 text-lg text-muted-foreground">
                   Analysez votre toiture en 30 secondes grace a notre IA specialisee 
                   pour le climat {regionData.climate} de la region {regionData.name}. 
-                  Detection des problemes specifiques : {regionData.commonProblems.slice(0, 2).join(", ")}.
+                  Detection des problemes specifiques : {regionData.mainProblems.slice(0, 2).join(", ")}.
                 </p>
 
                 <div className="mb-8 flex flex-wrap gap-2">
@@ -265,7 +265,7 @@ export default async function RegionPage({
                 <div className="grid grid-cols-2 gap-4">
                   <div className="rounded-lg bg-background/50 p-4">
                     <Building2 className="mb-2 h-5 w-5 text-primary" />
-                    <p className="text-2xl font-bold text-foreground">{citiesInRegion.length}+</p>
+                    <p className="text-2xl font-bold text-foreground">{regionCities.length}+</p>
                     <p className="text-sm text-muted-foreground">Villes couvertes</p>
                   </div>
                   <div className="rounded-lg bg-background/50 p-4">
@@ -306,7 +306,7 @@ export default async function RegionPage({
                 </CardHeader>
                 <CardContent>
                   <p className="mb-4 text-muted-foreground">
-                    {regionData.description}
+                    Le climat {regionData.climate} de la region {regionData.name} influence directement le choix des materiaux de couverture et les problemes rencontres.
                   </p>
                   <div className="space-y-2">
                     {regionData.mainRoofTypes.map((type) => (
@@ -331,7 +331,7 @@ export default async function RegionPage({
                     Notre IA detecte les problemes specifiques au climat de {regionData.name} :
                   </p>
                   <ul className="space-y-2">
-                    {regionData.commonProblems.map((problem) => (
+                    {regionData.mainProblems.map((problem) => (
                       <li key={problem} className="flex items-start gap-2">
                         <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500" />
                         <span className="text-sm">{problem}</span>
@@ -426,7 +426,7 @@ export default async function RegionPage({
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground">
-                    Les problemes courants en {regionData.name} incluent : {regionData.commonProblems.join(", ")}. 
+                    Les problemes courants en {regionData.name} incluent : {regionData.mainProblems.join(", ")}. 
                     Notre diagnostic IA detecte ces problemes specifiques au climat regional et vous fournit 
                     des recommandations adaptees.
                   </p>
@@ -484,7 +484,7 @@ export default async function RegionPage({
             </h2>
             <p className="mb-8 text-muted-foreground">
               Notre IA specialisee detecte les problemes specifiques au climat {regionData.climate} : 
-              {regionData.commonProblems.slice(0, 3).join(", ")}. 
+              {regionData.mainProblems.slice(0, 3).join(", ")}. 
               Rapport PDF detaille en 30 secondes.
             </p>
             <div className="flex flex-col justify-center gap-4 sm:flex-row">
