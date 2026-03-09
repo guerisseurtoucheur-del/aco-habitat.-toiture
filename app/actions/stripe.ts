@@ -26,6 +26,19 @@ export async function startCheckoutSession(productId: string) {
       },
     ],
     mode: 'payment',
+    metadata: {
+      site: 'aco-habitat-toiture',
+      site_name: 'ACO-HABITAT Diagnostic Toiture',
+      site_url: 'diag.aco-habitat.fr',
+      product_id: product.id,
+    },
+    payment_intent_data: {
+      metadata: {
+        site: 'aco-habitat-toiture',
+        site_name: 'ACO-HABITAT Diagnostic Toiture',
+        product_id: product.id,
+      },
+    },
   })
 
   return {
