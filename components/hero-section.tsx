@@ -4,6 +4,7 @@ import Image from "next/image"
 import { Scan, Shield, Droplets, ArrowRight, Zap } from "lucide-react"
 import { useEffect, useState } from "react"
 import { WeatherAlertBanner } from "@/components/weather-alert-banner"
+import { WeatherHomeWidget } from "@/components/weather-home-widget"
 
 function AnimatedCounter({ target, suffix = "" }: { target: number; suffix?: string }) {
   const [count, setCount] = useState(0)
@@ -132,8 +133,13 @@ export function HeroSection() {
           <span>Rapport PDF inclus</span>
         </div>
 
+        {/* Weather widget */}
+        <div className="animate-fade-up-delay-3 mt-10 w-full max-w-sm">
+          <WeatherHomeWidget />
+        </div>
+
         {/* Stats bar */}
-        <div className="mt-12 w-full max-w-4xl sm:mt-20">
+        <div className="mt-12 w-full max-w-4xl sm:mt-16">
           <div className="grid grid-cols-3 gap-px rounded-2xl border border-border bg-border overflow-hidden">
             <div className="flex flex-col items-center gap-1 bg-card px-3 py-5 sm:gap-2 sm:px-6 sm:py-8">
               <span className="text-xl font-bold text-foreground sm:text-3xl" style={{ fontFamily: "var(--font-heading)" }}>
