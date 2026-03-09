@@ -19,7 +19,8 @@ import {
   Building,
   ArrowRight,
   Snowflake,
-  CloudRain
+  CloudRain,
+  ExternalLink
 } from "lucide-react"
 
 interface PageProps {
