@@ -6,11 +6,15 @@ import { ChatbotWrapper } from "@/components/chatbot-wrapper"
 const _inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
+  display: "swap",
+  preload: true,
 })
 
 const _spaceGrotesk = Space_Grotesk({
   subsets: ["latin"],
   variable: "--font-space-grotesk",
+  display: "swap",
+  preload: true,
 })
 
 export const metadata: Metadata = {
@@ -96,6 +100,14 @@ export default function RootLayout({
 }) {
   return (
     <html lang="fr" suppressHydrationWarning>
+      <head>
+        {/* Preconnect to critical third-party origins */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link rel="preconnect" href="https://api.openweathermap.org" />
+        <link rel="dns-prefetch" href="https://wxs.ign.fr" />
+        <link rel="dns-prefetch" href="https://api.stripe.com" />
+      </head>
       <body className="font-sans min-h-screen overflow-x-hidden">
         <script
           type="application/ld+json"
