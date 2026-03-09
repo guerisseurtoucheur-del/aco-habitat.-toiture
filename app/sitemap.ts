@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next"
 import { departments } from "@/lib/departments"
 import { citiesData } from "@/lib/cities-data"
 import { regionsData } from "@/lib/regions-data"
+import { departmentsData } from "@/lib/departments-data"
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = "https://diag.aco-habitat.fr"
@@ -81,5 +82,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.8,
   }))
 
-  return [...mainPages, ...cityPages, ...regionPages, ...departmentPages]
+  // New department SEO pages (95 departments)
+  const deptSeoPages: MetadataRoute.Sitemap = Object.values(departmentsData).map((dept) => ({
+    url: `${baseUrl}/diagnostic-toiture/departement/${dept.slug}`,
+    lastModified: new Date(),
+    changeFrequency: "monthly" as const,
+    priority: 0.75,
+  }))
+
+  return [...mainPages, ...cityPages, ...regionPages, ...departmentPages, ...deptSeoPages]
 }

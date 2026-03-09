@@ -2,6 +2,7 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { regionsData } from "@/lib/regions-data"
 import { getAllCities } from "@/lib/cities-data"
+import { getAllDepartments } from "@/lib/departments-data"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
@@ -38,6 +39,7 @@ export const metadata: Metadata = {
 export default function DiagnosticToiturePage() {
   const regions = Object.values(regionsData)
   const cities = getAllCities().slice(0, 24) // Top 24 cities
+  const departments = getAllDepartments()
 
   const schemaData = {
     "@context": "https://schema.org",
@@ -196,6 +198,29 @@ export default function DiagnosticToiturePage() {
                     </CardContent>
                   </Link>
                 </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Departments Section */}
+        <section id="departements" className="border-b border-border/50 py-12 sm:py-16">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6">
+            <div className="mb-8 flex items-center justify-between">
+              <h2 className="text-2xl font-bold text-foreground sm:text-3xl">
+                Tous les departements ({departments.length})
+              </h2>
+            </div>
+            <div className="grid gap-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5">
+              {departments.map((dept) => (
+                <Link 
+                  key={dept.code}
+                  href={`/diagnostic-toiture/departement/${dept.slug}`}
+                  className="group flex items-center gap-2 rounded-lg border border-border bg-card p-3 text-sm transition-all hover:border-primary/30 hover:shadow-sm"
+                >
+                  <Badge variant="outline" className="shrink-0">{dept.code}</Badge>
+                  <span className="truncate font-medium text-foreground group-hover:text-primary">{dept.name}</span>
+                </Link>
               ))}
             </div>
           </div>
