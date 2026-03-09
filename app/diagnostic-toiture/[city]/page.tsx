@@ -92,7 +92,6 @@ function CityStructuredData({ city }: { city: typeof citiesData[string] }) {
           "@type": "PostalAddress",
           "addressLocality": city.name,
           "addressRegion": city.region,
-          "postalCode": city.postalCode,
           "addressCountry": "FR"
         },
         "geo": {
