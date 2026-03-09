@@ -663,10 +663,10 @@ export function DiagnosticTool() {
         return
       }
 
-const finalDiag = ensureRealisticZones(diagData.diagnostic)
-  setDiagnostic(finalDiag)
-  setGeorisques(diagData.georisques || null)
-  setStep("results")
+      const finalDiag = ensureRealisticZones(diagData.diagnostic)
+      setDiagnostic(finalDiag)
+      setGeorisques(diagData.georisques || null)
+      setStep("results")
 
       // Scroll to results
       setTimeout(() => {
@@ -698,11 +698,11 @@ const finalDiag = ensureRealisticZones(diagData.diagnostic)
           console.log("[v0] DB save:", r.status, t)
         }).catch((e) => console.log("[v0] DB save error:", e))
 
-// 2. Auto-download PDF (separate, non-blocking)
-  import("@/lib/generate-pdf").then(async ({ generateDiagnosticPDF }) => {
-  const clientInfo = { name: clientName, phone: clientPhone, email: clientEmail }
-  await generateDiagnosticPDF(finalDiag, capturedImage || "", formattedAddress, mapMeasurements, clientInfo, diagData.georisques)
-  }).catch(() => {})
+        // 2. Auto-download PDF (separate, non-blocking)
+        import("@/lib/generate-pdf").then(async ({ generateDiagnosticPDF }) => {
+          const clientInfo = { name: clientName, phone: clientPhone, email: clientEmail }
+          await generateDiagnosticPDF(finalDiag, capturedImage || "", formattedAddress, mapMeasurements, clientInfo, diagData.georisques)
+        }).catch(() => {})
 
         // Email is now sent manually via button in results section
       }

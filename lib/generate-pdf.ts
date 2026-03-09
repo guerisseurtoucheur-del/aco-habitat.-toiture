@@ -504,7 +504,11 @@ async function buildPDF(
 
     // Inondation
     const inondColor = getRiskColor(georisques.inondation.niveau)
-    doc.setFillColor(georisques.inondation.present ? 254, 243, 199 : 240, 253, 244) // amber-100 or green-50
+    if (georisques.inondation.present) {
+      doc.setFillColor(254, 243, 199) // amber-100
+    } else {
+      doc.setFillColor(240, 253, 244) // green-50
+    }
     doc.roundedRect(margin, y, contentW / 2 - 2, 22, 2, 2, "F")
     doc.setDrawColor(...inondColor)
     doc.setLineWidth(0.4)
@@ -518,7 +522,11 @@ async function buildPDF(
 
     // Argiles
     const argilesColor = getRiskColor(georisques.argiles.niveau)
-    doc.setFillColor(georisques.argiles.niveau === "fort" ? 254, 226, 226 : 240, 253, 244) // red-100 or green-50
+    if (georisques.argiles.niveau === "fort") {
+      doc.setFillColor(254, 226, 226) // red-100
+    } else {
+      doc.setFillColor(240, 253, 244) // green-50
+    }
     doc.roundedRect(margin + contentW / 2 + 2, y, contentW / 2 - 2, 22, 2, 2, "F")
     doc.setDrawColor(...argilesColor)
     doc.roundedRect(margin + contentW / 2 + 2, y, contentW / 2 - 2, 22, 2, 2, "S")
