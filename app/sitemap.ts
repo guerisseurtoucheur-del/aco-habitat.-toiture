@@ -3,6 +3,7 @@ import { departments } from "@/lib/departments"
 import { citiesData } from "@/lib/cities-data"
 import { regionsData } from "@/lib/regions-data"
 import { departmentsData } from "@/lib/departments-data"
+import { getAllArticles } from "@/lib/blog-data"
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const baseUrl = "https://diag.aco-habitat.fr"
@@ -90,5 +91,22 @@ export default function sitemap(): MetadataRoute.Sitemap {
     priority: 0.75,
   }))
 
-  return [...mainPages, ...cityPages, ...regionPages, ...departmentPages, ...deptSeoPages]
+  // Blog pages
+  const blogArticles = getAllArticles()
+  const blogPages: MetadataRoute.Sitemap = [
+    {
+      url: `${baseUrl}/blog`,
+      lastModified: new Date(),
+      changeFrequency: "weekly" as const,
+      priority: 0.85,
+    },
+    ...blogArticles.map((article) => ({
+      url: `${baseUrl}/blog/${article.slug}`,
+      lastModified: new Date(article.date),
+      changeFrequency: "monthly" as const,
+      priority: 0.8,
+    })),
+  ]
+
+  return [...mainPages, ...cityPages, ...regionPages, ...departmentPages, ...deptSeoPages, ...blogPages]
 }
