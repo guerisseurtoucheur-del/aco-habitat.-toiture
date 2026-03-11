@@ -1,8 +1,24 @@
-// PDF generation module v2.1 - with Georisques integration
+// PDF generation module v2.2 - with Georisques, Weather History & Photo Annotations
 import jsPDF from "jspdf"
 import type { DiagnosticResult } from "./diagnostic-types"
 import type { GeorisquesData } from "./georisques"
 import { getInondationLabel, getArgilesLabel, getSeismeLabel, getRadonLabel, getRiskColor } from "./georisques"
+import type { WeatherHistory, WeatherEvent } from "./weather-history"
+import { getEventColor, formatEventForPDF } from "./weather-history"
+
+// Types for analyzed photos
+export interface AnnotatedPhoto {
+  imageDataUrl: string // Base64 data URL of the annotated image
+  damageZones: {
+    id: string
+    type: string
+    label: string
+    severity: "leger" | "modere" | "grave"
+    description: string
+  }[]
+  overallCondition: string
+  summary: string
+}
 
 function safeScore(obj: { score?: number } | undefined | null): number {
   if (!obj) return 0
@@ -87,7 +103,9 @@ async function buildPDF(
   address: string,
   measurements: { type: string; value: number }[],
   clientInfo?: { name?: string; phone?: string; email?: string },
-  georisques?: GeorisquesData | null
+  georisques?: GeorisquesData | null,
+  weatherHistory?: WeatherHistory | null,
+  annotatedPhotos?: AnnotatedPhoto[] | null
 ) {
   const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" })
   const pageW = doc.internal.pageSize.getWidth()
@@ -380,7 +398,7 @@ async function buildPDF(
     }
   }
 
-  // ── RECOMMANDATIONS ──
+  // ─�� RECOMMANDATIONS ──
   checkNewPage(40)
   drawLine(y)
   y += 8
@@ -718,6 +736,142 @@ async function buildPDF(
     y += 24
   }
 
+  // ═══════════════════════════════════════
+  // WEATHER HISTORY SECTION (if available)
+  // ═══════════════════════════════════════
+  if (weatherHistory && weatherHistory.events && weatherHistory.events.length > 0) {
+    checkNewPage(60)
+    y += 6
+    drawLine(y)
+    y += 6
+    
+    addText("HISTORIQUE METEO - 30 DERNIERS JOURS", margin, y, 11, "bold", [30, 64, 175])
+    y += 8
+    
+    // Summary box
+    doc.setFillColor(239, 246, 255) // blue-50
+    const summaryLines = doc.splitTextToSize(weatherHistory.summary, contentW - 10)
+    const summaryHeight = summaryLines.length * 4 + 8
+    doc.roundedRect(margin, y, contentW, summaryHeight, 2, 2, "F")
+    doc.setDrawColor(59, 130, 246)
+    doc.setLineWidth(0.4)
+    doc.roundedRect(margin, y, contentW, summaryHeight, 2, 2, "S")
+    
+    doc.setFontSize(8)
+    doc.setFont("helvetica", "normal")
+    doc.setTextColor(30, 64, 175)
+    doc.text(summaryLines, margin + 5, y + 6)
+    y += summaryHeight + 4
+    
+    // Weather events table
+    const significantEvents = weatherHistory.events.slice(0, 8) // Max 8 events
+    if (significantEvents.length > 0) {
+      addText("Evenements significatifs detectes :", margin, y, 8, "bold", [50, 50, 50])
+      y += 6
+      
+      significantEvents.forEach((event: WeatherEvent) => {
+        checkNewPage(10)
+        const eventDate = new Date(event.date).toLocaleDateString("fr-FR", { day: "2-digit", month: "short" })
+        const severityColor = event.severity === "extreme" ? [220, 38, 38] as [number, number, number] : 
+                             event.severity === "fort" ? [249, 115, 22] as [number, number, number] : 
+                             [234, 179, 8] as [number, number, number]
+        
+        // Severity indicator
+        doc.setFillColor(...severityColor)
+        doc.circle(margin + 3, y + 2, 2, "F")
+        
+        addText(eventDate, margin + 8, y + 3, 7, "bold", [80, 80, 80])
+        addText(event.description, margin + 30, y + 3, 7, "normal", [60, 60, 60])
+        
+        const severityLabel = event.severity === "extreme" ? "EXTREME" : event.severity === "fort" ? "FORT" : "Modere"
+        addText(`[${severityLabel}]`, margin + contentW - 25, y + 3, 6, "bold", severityColor)
+        y += 6
+      })
+      y += 4
+    }
+  }
+
+  // ═══════════════════════════════════════
+  // ANNOTATED PHOTOS SECTION (if available)
+  // ═══════════════════════════════════════
+  if (annotatedPhotos && annotatedPhotos.length > 0) {
+    // New page for photos
+    doc.addPage()
+    y = margin
+    
+    addText("CONSTATS VISUELS - PHOTOS ANALYSEES", margin, y, 12, "bold", [30, 64, 175])
+    y += 10
+    
+    for (let i = 0; i < annotatedPhotos.length; i++) {
+      const photo = annotatedPhotos[i]
+      
+      checkNewPage(100)
+      
+      addText(`Photo ${i + 1}`, margin, y, 10, "bold", [50, 50, 50])
+      
+      // Overall condition badge
+      const conditionColor = photo.overallCondition === "bon" ? [34, 197, 94] as [number, number, number] :
+                            photo.overallCondition === "moyen" ? [245, 158, 11] as [number, number, number] :
+                            photo.overallCondition === "mauvais" ? [249, 115, 22] as [number, number, number] :
+                            [239, 68, 68] as [number, number, number]
+      
+      doc.setFillColor(...conditionColor)
+      doc.roundedRect(margin + 25, y - 3, 25, 6, 1, 1, "F")
+      addText(photo.overallCondition.toUpperCase(), margin + 27, y, 6, "bold", [255, 255, 255])
+      y += 6
+      
+      // Add the annotated image
+      try {
+        const imgWidth = contentW
+        const imgHeight = 70 // Fixed height for consistency
+        doc.addImage(photo.imageDataUrl, "JPEG", margin, y, imgWidth, imgHeight)
+        y += imgHeight + 4
+      } catch (imgError) {
+        addText("(Image non disponible)", margin, y + 10, 8, "normal", [150, 150, 150])
+        y += 25
+      }
+      
+      // Photo summary
+      doc.setFontSize(7)
+      doc.setFont("helvetica", "normal")
+      doc.setTextColor(60, 60, 60)
+      const photoSummaryLines = doc.splitTextToSize(photo.summary, contentW)
+      doc.text(photoSummaryLines, margin, y)
+      y += photoSummaryLines.length * 3.5 + 4
+      
+      // Damage zones list
+      if (photo.damageZones && photo.damageZones.length > 0) {
+        addText("Dommages detectes :", margin, y, 8, "bold", [50, 50, 50])
+        y += 5
+        
+        photo.damageZones.forEach((zone, zoneIndex) => {
+          const severityColor = zone.severity === "grave" ? [220, 38, 38] as [number, number, number] :
+                               zone.severity === "modere" ? [249, 115, 22] as [number, number, number] :
+                               [234, 179, 8] as [number, number, number]
+          
+          doc.setFillColor(...severityColor)
+          doc.circle(margin + 3, y + 1.5, 1.5, "F")
+          
+          addText(`${zoneIndex + 1}. ${zone.label}`, margin + 7, y + 2, 7, "bold", [60, 60, 60])
+          
+          const severityLabel = zone.severity === "grave" ? "GRAVE" : zone.severity === "modere" ? "MODERE" : "LEGER"
+          addText(`[${severityLabel}]`, margin + 60, y + 2, 6, "normal", severityColor)
+          
+          if (zone.description) {
+            y += 4
+            doc.setFontSize(6)
+            doc.setFont("helvetica", "italic")
+            doc.setTextColor(100, 100, 100)
+            doc.text(zone.description, margin + 7, y + 2)
+          }
+          y += 5
+        })
+      }
+      
+      y += 8
+    }
+  }
+
   // ── NOS AUTRES DIAGNOSTICS IA ──
   checkNewPage(45)
   y += 6
@@ -798,12 +952,14 @@ export async function generateDiagnosticPDF(
   address: string,
   measurements: { type: string; value: number }[],
   clientInfo?: { name?: string; phone?: string; email?: string },
-  georisques?: GeorisquesData | null
-  ) {
-  const doc = await buildPDF(diagnostic, capturedImage, address, measurements, clientInfo, georisques)
+  georisques?: GeorisquesData | null,
+  weatherHistory?: WeatherHistory | null,
+  annotatedPhotos?: AnnotatedPhoto[] | null
+) {
+  const doc = await buildPDF(diagnostic, capturedImage, address, measurements, clientInfo, georisques, weatherHistory, annotatedPhotos)
   const fileName = `diagnostic-toiture-aco-habitat-${new Date().toISOString().slice(0, 10)}.pdf`
   doc.save(fileName)
-  }
+}
 
 /** Generate the PDF and return as base64 string (for email attachment) */
 export async function generateDiagnosticPDFBase64(
@@ -812,9 +968,11 @@ export async function generateDiagnosticPDFBase64(
   address: string,
   measurements: { type: string; value: number }[],
   clientInfo?: { name?: string; phone?: string; email?: string },
-  georisques?: GeorisquesData | null
-  ): Promise<string> {
-  const doc = await buildPDF(diagnostic, capturedImage, address, measurements, clientInfo, georisques)
+  georisques?: GeorisquesData | null,
+  weatherHistory?: WeatherHistory | null,
+  annotatedPhotos?: AnnotatedPhoto[] | null
+): Promise<string> {
+  const doc = await buildPDF(diagnostic, capturedImage, address, measurements, clientInfo, georisques, weatherHistory, annotatedPhotos)
   const arrayBuffer = doc.output("arraybuffer")
   const uint8 = new Uint8Array(arrayBuffer)
   let binary = ""
