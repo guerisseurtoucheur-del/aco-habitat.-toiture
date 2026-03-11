@@ -4,7 +4,7 @@ import { useState, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Camera, Upload, X, Loader2, AlertTriangle, CheckCircle } from "lucide-react"
+import { Camera, Upload, X, Loader2, AlertTriangle, CheckCircle, MapPin, User, Phone, Mail, Home } from "lucide-react"
 
 export interface DamageZone {
   id: string
@@ -18,6 +18,16 @@ export interface DamageZone {
     width: number
     height: number
   }
+}
+
+export interface ClientInfo {
+  nom: string
+  prenom: string
+  telephone: string
+  email: string
+  adresse: string
+  codePostal: string
+  ville: string
 }
 
 export interface AnalyzedPhoto {
@@ -37,14 +47,38 @@ export interface AnalyzedPhoto {
 interface PhotoUploadAnnotatorProps {
   maxPhotos?: number
   onPhotosChange: (photos: AnalyzedPhoto[]) => void
+  onClientInfoChange?: (clientInfo: ClientInfo) => void
+  showClientForm?: boolean
 }
 
 export function PhotoUploadAnnotator({
   maxPhotos = 3,
   onPhotosChange,
+  onClientInfoChange,
+  showClientForm = true,
 }: PhotoUploadAnnotatorProps) {
   const [photos, setPhotos] = useState<AnalyzedPhoto[]>([])
+  const [clientInfo, setClientInfo] = useState<ClientInfo>({
+    nom: "",
+    prenom: "",
+    telephone: "",
+    email: "",
+    adresse: "",
+    codePostal: "",
+    ville: "",
+  })
+  const [showForm, setShowForm] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  
+  const handleClientInfoChange = (field: keyof ClientInfo, value: string) => {
+    const updated = { ...clientInfo, [field]: value }
+    setClientInfo(updated)
+    onClientInfoChange?.(updated)
+  }
+  
+  const isClientInfoComplete = () => {
+    return clientInfo.nom && clientInfo.telephone && clientInfo.adresse && clientInfo.codePostal && clientInfo.ville
+  }
 
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files
@@ -187,6 +221,161 @@ export function PhotoUploadAnnotator({
         </p>
       </CardHeader>
       <CardContent className="space-y-4">
+        
+        {/* Formulaire coordonnees client */}
+        {showClientForm && (
+          <div className="rounded-lg border border-primary/30 bg-primary/5 p-4">
+            <button
+              type="button"
+              onClick={() => setShowForm(!showForm)}
+              className="flex w-full items-center justify-between"
+            >
+              <div className="flex items-center gap-2">
+                <User className="h-5 w-5 text-primary" />
+                <span className="font-semibold text-foreground">Vos coordonnees</span>
+                {isClientInfoComplete() && (
+                  <CheckCircle className="h-4 w-4 text-green-500" />
+                )}
+              </div>
+              <span className="text-xs text-primary">{showForm ? "Masquer" : "Remplir"}</span>
+            </button>
+            
+            {!showForm && !isClientInfoComplete() && (
+              <p className="mt-2 text-xs text-muted-foreground">
+                Renseignez vos coordonnees pour recevoir le diagnostic complet par email
+              </p>
+            )}
+            
+            {showForm && (
+              <div className="mt-4 space-y-4">
+                {/* Nom et Prenom */}
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <label htmlFor="nom" className="text-sm font-medium text-foreground">
+                      Nom <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                      <input
+                        id="nom"
+                        type="text"
+                        placeholder="Votre nom"
+                        value={clientInfo.nom}
+                        onChange={(e) => handleClientInfoChange("nom", e.target.value)}
+                        className="w-full rounded-md border border-border bg-background px-3 py-2 pl-10 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="prenom" className="text-sm font-medium text-foreground">Prenom</label>
+                    <input
+                      id="prenom"
+                      type="text"
+                      placeholder="Votre prenom"
+                      value={clientInfo.prenom}
+                      onChange={(e) => handleClientInfoChange("prenom", e.target.value)}
+                      className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                    />
+                  </div>
+                </div>
+                
+                {/* Telephone et Email */}
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <label htmlFor="telephone" className="text-sm font-medium text-foreground">
+                      Telephone <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                      <input
+                        id="telephone"
+                        type="tel"
+                        placeholder="06 12 34 56 78"
+                        value={clientInfo.telephone}
+                        onChange={(e) => handleClientInfoChange("telephone", e.target.value)}
+                        className="w-full rounded-md border border-border bg-background px-3 py-2 pl-10 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="email" className="text-sm font-medium text-foreground">Email</label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                      <input
+                        id="email"
+                        type="email"
+                        placeholder="email@exemple.fr"
+                        value={clientInfo.email}
+                        onChange={(e) => handleClientInfoChange("email", e.target.value)}
+                        className="w-full rounded-md border border-border bg-background px-3 py-2 pl-10 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                      />
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Adresse */}
+                <div className="space-y-2">
+                  <label htmlFor="adresse" className="text-sm font-medium text-foreground">
+                    Adresse <span className="text-red-500">*</span>
+                  </label>
+                  <div className="relative">
+                    <Home className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <input
+                      id="adresse"
+                      type="text"
+                      placeholder="12 rue de la Toiture"
+                      value={clientInfo.adresse}
+                      onChange={(e) => handleClientInfoChange("adresse", e.target.value)}
+                      className="w-full rounded-md border border-border bg-background px-3 py-2 pl-10 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                    />
+                  </div>
+                </div>
+                
+                {/* Code postal et Ville */}
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <label htmlFor="codePostal" className="text-sm font-medium text-foreground">
+                      Code postal <span className="text-red-500">*</span>
+                    </label>
+                    <div className="relative">
+                      <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                      <input
+                        id="codePostal"
+                        type="text"
+                        placeholder="75001"
+                        maxLength={5}
+                        value={clientInfo.codePostal}
+                        onChange={(e) => handleClientInfoChange("codePostal", e.target.value)}
+                        className="w-full rounded-md border border-border bg-background px-3 py-2 pl-10 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="ville" className="text-sm font-medium text-foreground">
+                      Ville <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      id="ville"
+                      type="text"
+                      placeholder="Paris"
+                      value={clientInfo.ville}
+                      onChange={(e) => handleClientInfoChange("ville", e.target.value)}
+                      className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
+                    />
+                  </div>
+                </div>
+                
+                {isClientInfoComplete() && (
+                  <div className="flex items-center gap-2 rounded-lg bg-green-500/10 p-2 text-sm text-green-600">
+                    <CheckCircle className="h-4 w-4" />
+                    Coordonnees completes - Vous recevrez le diagnostic par email
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+        
         {/* Upload zone */}
         {photos.length < maxPhotos && (
           <div
@@ -351,90 +540,102 @@ export async function generateAnnotatedImageDataUrl(
       // Draw the original image
       ctx.drawImage(img, 0, 0)
 
-      // Draw damage zones - PLUS VISIBLE
+      // Draw damage zones with RED ARROWS and LABELS (like professional diagnosis)
       damageZones.forEach((zone, index) => {
-        const x = (zone.position.x - zone.position.width / 2) / 100 * img.width
-        const y = (zone.position.y - zone.position.height / 2) / 100 * img.height
-        const width = zone.position.width / 100 * img.width
-        const height = zone.position.height / 100 * img.height
-
-        // Set color based on severity - ROUGE VIF pour tous les dommages
-        const color = zone.severity === "grave" ? "#dc2626" :
-                     zone.severity === "modere" ? "#f97316" : "#eab308"
-
-        // Draw outer glow effect
-        ctx.shadowColor = color
-        ctx.shadowBlur = 15
+        // Target point (center of damage zone)
+        const targetX = zone.position.x / 100 * img.width
+        const targetY = zone.position.y / 100 * img.height
+        
+        // Calculate label position (outside the zone, alternating positions)
+        const isLeftSide = index % 2 === 0
+        const labelOffsetX = isLeftSide ? -180 : 80
+        const labelOffsetY = (index % 3 - 1) * 60
+        
+        const labelX = Math.max(20, Math.min(img.width - 250, targetX + labelOffsetX))
+        const labelY = Math.max(50, Math.min(img.height - 80, targetY + labelOffsetY))
+        
+        // Arrow start point (from label)
+        const arrowStartX = isLeftSide ? labelX + 230 : labelX
+        const arrowStartY = labelY + 15
+        
+        // DRAW RED ARROW
+        const color = "#dc2626" // Always red for visibility
+        
+        ctx.strokeStyle = color
+        ctx.fillStyle = color
+        ctx.lineWidth = 4
+        ctx.lineCap = "round"
+        ctx.lineJoin = "round"
+        
+        // Draw arrow line with shadow
+        ctx.shadowColor = "rgba(0,0,0,0.5)"
+        ctx.shadowBlur = 4
+        ctx.shadowOffsetX = 2
+        ctx.shadowOffsetY = 2
+        
+        ctx.beginPath()
+        ctx.moveTo(arrowStartX, arrowStartY)
+        ctx.lineTo(targetX, targetY)
+        ctx.stroke()
+        
+        // Draw arrowhead
+        const angle = Math.atan2(targetY - arrowStartY, targetX - arrowStartX)
+        const arrowHeadLength = 20
+        ctx.beginPath()
+        ctx.moveTo(targetX, targetY)
+        ctx.lineTo(
+          targetX - arrowHeadLength * Math.cos(angle - Math.PI / 6),
+          targetY - arrowHeadLength * Math.sin(angle - Math.PI / 6)
+        )
+        ctx.lineTo(
+          targetX - arrowHeadLength * Math.cos(angle + Math.PI / 6),
+          targetY - arrowHeadLength * Math.sin(angle + Math.PI / 6)
+        )
+        ctx.closePath()
+        ctx.fill()
+        
+        // Reset shadow for text
+        ctx.shadowBlur = 0
         ctx.shadowOffsetX = 0
         ctx.shadowOffsetY = 0
-
-        // Draw thick rectangle border
-        ctx.strokeStyle = color
-        ctx.lineWidth = 6
-        ctx.strokeRect(x, y, width, height)
         
-        // Reset shadow for fill
-        ctx.shadowBlur = 0
-
-        // Draw semi-transparent fill
-        ctx.fillStyle = color + "40" // 25% opacity
-        ctx.fillRect(x, y, width, height)
-
-        // Draw corner markers (more visible)
-        const cornerSize = Math.min(width, height) * 0.15
-        ctx.fillStyle = color
-        // Top-left corner
-        ctx.fillRect(x - 3, y - 3, cornerSize, 6)
-        ctx.fillRect(x - 3, y - 3, 6, cornerSize)
-        // Top-right corner
-        ctx.fillRect(x + width - cornerSize + 3, y - 3, cornerSize, 6)
-        ctx.fillRect(x + width - 3, y - 3, 6, cornerSize)
-        // Bottom-left corner
-        ctx.fillRect(x - 3, y + height - 3, cornerSize, 6)
-        ctx.fillRect(x - 3, y + height - cornerSize + 3, 6, cornerSize)
-        // Bottom-right corner
-        ctx.fillRect(x + width - cornerSize + 3, y + height - 3, cornerSize, 6)
-        ctx.fillRect(x + width - 3, y + height - cornerSize + 3, 6, cornerSize)
-
-        // Draw label background - PLUS GRAND ET VISIBLE
-        const labelText = `${zone.label.toUpperCase()}`
-        const severityText = zone.severity === "grave" ? "GRAVE" : zone.severity === "modere" ? "MODERE" : "LEGER"
-        ctx.font = "bold 18px Arial"
-        const textWidth = ctx.measureText(labelText).width
-        const severityWidth = ctx.measureText(severityText).width
-        
-        // Background pill
-        ctx.fillStyle = color
-        ctx.beginPath()
-        const labelY = y - 35
-        const labelHeight = 30
-        const labelPadding = 12
-        const totalWidth = textWidth + severityWidth + labelPadding * 3 + 10
-        ctx.roundRect(x, labelY, totalWidth, labelHeight, 6)
-        ctx.fill()
-
-        // Label text (white)
-        ctx.fillStyle = "#ffffff"
+        // DRAW LABEL with red background
+        const labelText = zone.label.toUpperCase()
         ctx.font = "bold 16px Arial"
-        ctx.fillText(labelText, x + labelPadding, labelY + 20)
+        const textMetrics = ctx.measureText(labelText)
+        const textWidth = textMetrics.width
+        const padding = 10
+        const labelHeight = 32
+        const labelWidth = textWidth + padding * 2
         
-        // Severity badge
-        ctx.fillStyle = "#00000066"
-        ctx.beginPath()
-        ctx.roundRect(x + textWidth + labelPadding + 8, labelY + 4, severityWidth + 10, 22, 4)
-        ctx.fill()
-        ctx.fillStyle = "#ffffff"
-        ctx.font = "bold 12px Arial"
-        ctx.fillText(severityText, x + textWidth + labelPadding + 13, labelY + 19)
-        
-        // Number indicator
-        ctx.fillStyle = "#ffffff"
-        ctx.beginPath()
-        ctx.arc(x + width - 15, y + 15, 12, 0, Math.PI * 2)
-        ctx.fill()
+        // Label background (red)
         ctx.fillStyle = color
-        ctx.font = "bold 14px Arial"
-        ctx.fillText(String(index + 1), x + width - 19, y + 20)
+        ctx.beginPath()
+        if (ctx.roundRect) {
+          ctx.roundRect(labelX, labelY, labelWidth, labelHeight, 4)
+        } else {
+          ctx.rect(labelX, labelY, labelWidth, labelHeight)
+        }
+        ctx.fill()
+        
+        // White border
+        ctx.strokeStyle = "#ffffff"
+        ctx.lineWidth = 2
+        ctx.stroke()
+        
+        // Label text (white, bold)
+        ctx.fillStyle = "#ffffff"
+        ctx.font = "bold 15px Arial"
+        ctx.fillText(labelText, labelX + padding, labelY + 22)
+        
+        // Small circle at target point
+        ctx.beginPath()
+        ctx.arc(targetX, targetY, 8, 0, Math.PI * 2)
+        ctx.fillStyle = color
+        ctx.fill()
+        ctx.strokeStyle = "#ffffff"
+        ctx.lineWidth = 3
+        ctx.stroke()
       })
 
       resolve(canvas.toDataURL("image/jpeg", 0.9))

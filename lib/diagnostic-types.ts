@@ -74,6 +74,23 @@ export const diagnosticSchema = z.object({
   recommandations: z
     .array(z.string())
     .describe("List of 3-5 recommended actions in French, ordered by priority"),
+  traitementHydrofuge: z.object({
+    necessaire: z
+      .boolean()
+      .describe("true si un traitement hydrofuge est recommande (tuiles poreuses, mousse presente, toiture de plus de 15 ans)"),
+    urgence: z
+      .enum(["faible", "moyenne", "haute"])
+      .describe("Niveau d'urgence du traitement : faible (preventif), moyenne (porosite visible), haute (infiltrations probables)"),
+    raisons: z
+      .array(z.string())
+      .describe("Liste des raisons justifiant le traitement hydrofuge (ex: 'Tuiles poreuses', 'Presence de mousse importante', 'Toiture de plus de 20 ans')"),
+    benefices: z
+      .array(z.string())
+      .describe("Liste des benefices du traitement (ex: 'Impermeabilisation de la toiture', 'Protection contre le gel', 'Prolongation de la duree de vie de 10-15 ans')"),
+    coutEstime: z
+      .string()
+      .describe("Estimation du cout du traitement nettoyage + hydrofuge en euros (ex: '15-25 EUR/m2' ou '1500-3000 EUR pour cette surface')"),
+  }).optional(),
   thermique: z.object({
     scoreIsolation: z
       .number()
