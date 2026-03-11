@@ -120,6 +120,15 @@ Examine :
 - **Gouttieres** (si visibles) : pente correcte, fixations, debris
 - **Zones de stagnation** : cuvettes visibles sur toits plats
 - **Traces d'humidite** : taches sombres irregulieres, auréoles
+- **POROSITE DES TUILES/ARDOISES** : tuiles qui semblent absorbantes, couleur irreguliere, surface rugueuse et mate (signe de porosite), traces de gel/degat
+
+### 4bis. TRAITEMENT HYDROFUGE RECOMMANDE ?
+Analyse si un traitement hydrofuge serait benefique :
+- Tuiles poreuses (aspect mat, couleur ternie, surface absorbante)
+- Presence de mousse/lichen (signe d'humidite retenue)
+- Tuiles de plus de 15-20 ans sans traitement
+- Micro-fissures visibles sur les tuiles
+Si OUI : recommande un nettoyage haute pression + application d'hydrofuge pour impermeabiliser la toiture et prolonger sa duree de vie de 10-15 ans.
 
 ### 5. ANALYSE THERMIQUE (score /100)
 Evalue :

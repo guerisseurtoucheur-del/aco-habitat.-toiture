@@ -351,90 +351,102 @@ export async function generateAnnotatedImageDataUrl(
       // Draw the original image
       ctx.drawImage(img, 0, 0)
 
-      // Draw damage zones - PLUS VISIBLE
+      // Draw damage zones with RED ARROWS and LABELS (like professional diagnosis)
       damageZones.forEach((zone, index) => {
-        const x = (zone.position.x - zone.position.width / 2) / 100 * img.width
-        const y = (zone.position.y - zone.position.height / 2) / 100 * img.height
-        const width = zone.position.width / 100 * img.width
-        const height = zone.position.height / 100 * img.height
-
-        // Set color based on severity - ROUGE VIF pour tous les dommages
-        const color = zone.severity === "grave" ? "#dc2626" :
-                     zone.severity === "modere" ? "#f97316" : "#eab308"
-
-        // Draw outer glow effect
-        ctx.shadowColor = color
-        ctx.shadowBlur = 15
+        // Target point (center of damage zone)
+        const targetX = zone.position.x / 100 * img.width
+        const targetY = zone.position.y / 100 * img.height
+        
+        // Calculate label position (outside the zone, alternating positions)
+        const isLeftSide = index % 2 === 0
+        const labelOffsetX = isLeftSide ? -180 : 80
+        const labelOffsetY = (index % 3 - 1) * 60
+        
+        const labelX = Math.max(20, Math.min(img.width - 250, targetX + labelOffsetX))
+        const labelY = Math.max(50, Math.min(img.height - 80, targetY + labelOffsetY))
+        
+        // Arrow start point (from label)
+        const arrowStartX = isLeftSide ? labelX + 230 : labelX
+        const arrowStartY = labelY + 15
+        
+        // DRAW RED ARROW
+        const color = "#dc2626" // Always red for visibility
+        
+        ctx.strokeStyle = color
+        ctx.fillStyle = color
+        ctx.lineWidth = 4
+        ctx.lineCap = "round"
+        ctx.lineJoin = "round"
+        
+        // Draw arrow line with shadow
+        ctx.shadowColor = "rgba(0,0,0,0.5)"
+        ctx.shadowBlur = 4
+        ctx.shadowOffsetX = 2
+        ctx.shadowOffsetY = 2
+        
+        ctx.beginPath()
+        ctx.moveTo(arrowStartX, arrowStartY)
+        ctx.lineTo(targetX, targetY)
+        ctx.stroke()
+        
+        // Draw arrowhead
+        const angle = Math.atan2(targetY - arrowStartY, targetX - arrowStartX)
+        const arrowHeadLength = 20
+        ctx.beginPath()
+        ctx.moveTo(targetX, targetY)
+        ctx.lineTo(
+          targetX - arrowHeadLength * Math.cos(angle - Math.PI / 6),
+          targetY - arrowHeadLength * Math.sin(angle - Math.PI / 6)
+        )
+        ctx.lineTo(
+          targetX - arrowHeadLength * Math.cos(angle + Math.PI / 6),
+          targetY - arrowHeadLength * Math.sin(angle + Math.PI / 6)
+        )
+        ctx.closePath()
+        ctx.fill()
+        
+        // Reset shadow for text
+        ctx.shadowBlur = 0
         ctx.shadowOffsetX = 0
         ctx.shadowOffsetY = 0
-
-        // Draw thick rectangle border
-        ctx.strokeStyle = color
-        ctx.lineWidth = 6
-        ctx.strokeRect(x, y, width, height)
         
-        // Reset shadow for fill
-        ctx.shadowBlur = 0
-
-        // Draw semi-transparent fill
-        ctx.fillStyle = color + "40" // 25% opacity
-        ctx.fillRect(x, y, width, height)
-
-        // Draw corner markers (more visible)
-        const cornerSize = Math.min(width, height) * 0.15
-        ctx.fillStyle = color
-        // Top-left corner
-        ctx.fillRect(x - 3, y - 3, cornerSize, 6)
-        ctx.fillRect(x - 3, y - 3, 6, cornerSize)
-        // Top-right corner
-        ctx.fillRect(x + width - cornerSize + 3, y - 3, cornerSize, 6)
-        ctx.fillRect(x + width - 3, y - 3, 6, cornerSize)
-        // Bottom-left corner
-        ctx.fillRect(x - 3, y + height - 3, cornerSize, 6)
-        ctx.fillRect(x - 3, y + height - cornerSize + 3, 6, cornerSize)
-        // Bottom-right corner
-        ctx.fillRect(x + width - cornerSize + 3, y + height - 3, cornerSize, 6)
-        ctx.fillRect(x + width - 3, y + height - cornerSize + 3, 6, cornerSize)
-
-        // Draw label background - PLUS GRAND ET VISIBLE
-        const labelText = `${zone.label.toUpperCase()}`
-        const severityText = zone.severity === "grave" ? "GRAVE" : zone.severity === "modere" ? "MODERE" : "LEGER"
-        ctx.font = "bold 18px Arial"
-        const textWidth = ctx.measureText(labelText).width
-        const severityWidth = ctx.measureText(severityText).width
-        
-        // Background pill
-        ctx.fillStyle = color
-        ctx.beginPath()
-        const labelY = y - 35
-        const labelHeight = 30
-        const labelPadding = 12
-        const totalWidth = textWidth + severityWidth + labelPadding * 3 + 10
-        ctx.roundRect(x, labelY, totalWidth, labelHeight, 6)
-        ctx.fill()
-
-        // Label text (white)
-        ctx.fillStyle = "#ffffff"
+        // DRAW LABEL with red background
+        const labelText = zone.label.toUpperCase()
         ctx.font = "bold 16px Arial"
-        ctx.fillText(labelText, x + labelPadding, labelY + 20)
+        const textMetrics = ctx.measureText(labelText)
+        const textWidth = textMetrics.width
+        const padding = 10
+        const labelHeight = 32
+        const labelWidth = textWidth + padding * 2
         
-        // Severity badge
-        ctx.fillStyle = "#00000066"
-        ctx.beginPath()
-        ctx.roundRect(x + textWidth + labelPadding + 8, labelY + 4, severityWidth + 10, 22, 4)
-        ctx.fill()
-        ctx.fillStyle = "#ffffff"
-        ctx.font = "bold 12px Arial"
-        ctx.fillText(severityText, x + textWidth + labelPadding + 13, labelY + 19)
-        
-        // Number indicator
-        ctx.fillStyle = "#ffffff"
-        ctx.beginPath()
-        ctx.arc(x + width - 15, y + 15, 12, 0, Math.PI * 2)
-        ctx.fill()
+        // Label background (red)
         ctx.fillStyle = color
-        ctx.font = "bold 14px Arial"
-        ctx.fillText(String(index + 1), x + width - 19, y + 20)
+        ctx.beginPath()
+        if (ctx.roundRect) {
+          ctx.roundRect(labelX, labelY, labelWidth, labelHeight, 4)
+        } else {
+          ctx.rect(labelX, labelY, labelWidth, labelHeight)
+        }
+        ctx.fill()
+        
+        // White border
+        ctx.strokeStyle = "#ffffff"
+        ctx.lineWidth = 2
+        ctx.stroke()
+        
+        // Label text (white, bold)
+        ctx.fillStyle = "#ffffff"
+        ctx.font = "bold 15px Arial"
+        ctx.fillText(labelText, labelX + padding, labelY + 22)
+        
+        // Small circle at target point
+        ctx.beginPath()
+        ctx.arc(targetX, targetY, 8, 0, Math.PI * 2)
+        ctx.fillStyle = color
+        ctx.fill()
+        ctx.strokeStyle = "#ffffff"
+        ctx.lineWidth = 3
+        ctx.stroke()
       })
 
       resolve(canvas.toDataURL("image/jpeg", 0.9))

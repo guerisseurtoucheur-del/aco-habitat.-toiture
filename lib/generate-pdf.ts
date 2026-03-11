@@ -164,7 +164,7 @@ async function buildPDF(
 
   // ═══════════════════════════════════════
   // PAGE 1: Header + Image + Scores
-  // ══════���════════════════════════════════
+  // ══════�����════════════════════════════════
 
   // Header bar
   doc.setFillColor(24, 24, 27) // zinc-900
@@ -734,6 +734,70 @@ async function buildPDF(
     const charpenteLines = doc.splitTextToSize(charpenteText, contentW - 8)
     doc.text(charpenteLines, margin + 4, y + 12)
     y += 24
+  }
+
+  // ═══════════════════════════════════════
+  // TRAITEMENT HYDROFUGE SECTION
+  // ═══════════════════════════════════════
+  if (diagnostic.traitementHydrofuge?.necessaire) {
+    checkNewPage(70)
+    y += 6
+    drawLine(y)
+    y += 6
+    
+    // Header with icon
+    const urgenceColor: [number, number, number] = diagnostic.traitementHydrofuge.urgence === "haute" ? [220, 38, 38] :
+                        diagnostic.traitementHydrofuge.urgence === "moyenne" ? [249, 115, 22] : [34, 197, 94]
+    
+    doc.setFillColor(urgenceColor[0], urgenceColor[1], urgenceColor[2])
+    doc.roundedRect(margin, y, contentW, 8, 2, 2, "F")
+    addText("TRAITEMENT HYDROFUGE RECOMMANDE", margin + 4, y + 5.5, 10, "bold", [255, 255, 255])
+    
+    const urgenceLabel = diagnostic.traitementHydrofuge.urgence === "haute" ? "URGENT" :
+                        diagnostic.traitementHydrofuge.urgence === "moyenne" ? "CONSEILLE" : "PREVENTIF"
+    addText(urgenceLabel, margin + contentW - 25, y + 5.5, 8, "bold", [255, 255, 255])
+    y += 12
+    
+    // Info box
+    doc.setFillColor(240, 249, 255) // light blue
+    doc.roundedRect(margin, y, contentW, 55, 2, 2, "F")
+    doc.setDrawColor(59, 130, 246)
+    doc.setLineWidth(0.4)
+    doc.roundedRect(margin, y, contentW, 55, 2, 2, "S")
+    
+    // Raisons
+    addText("Pourquoi ce traitement est recommande :", margin + 4, y + 7, 8, "bold", [30, 64, 175])
+    let reasonY = y + 12
+    if (diagnostic.traitementHydrofuge.raisons) {
+      diagnostic.traitementHydrofuge.raisons.slice(0, 3).forEach((raison) => {
+        addText(`• ${raison}`, margin + 6, reasonY, 7, "normal", [60, 60, 60])
+        reasonY += 5
+      })
+    }
+    
+    // Benefices
+    addText("Benefices du traitement :", margin + contentW / 2 + 4, y + 7, 8, "bold", [34, 197, 94])
+    let benefitY = y + 12
+    if (diagnostic.traitementHydrofuge.benefices) {
+      diagnostic.traitementHydrofuge.benefices.slice(0, 3).forEach((benefice) => {
+        addText(`✓ ${benefice}`, margin + contentW / 2 + 6, benefitY, 7, "normal", [34, 120, 60])
+        benefitY += 5
+      })
+    }
+    
+    // Cout estime
+    if (diagnostic.traitementHydrofuge.coutEstime) {
+      addText("Cout estime :", margin + 4, y + 40, 8, "bold", [50, 50, 50])
+      addText(diagnostic.traitementHydrofuge.coutEstime, margin + 35, y + 40, 9, "bold", [30, 64, 175])
+    }
+    
+    // Process description
+    doc.setFontSize(6)
+    doc.setFont("helvetica", "italic")
+    doc.setTextColor(100, 100, 100)
+    doc.text("Le traitement comprend : 1. Nettoyage haute pression  2. Application anti-mousse  3. Hydrofuge incolore", margin + 4, y + 50)
+    
+    y += 60
   }
 
   // ═══════════════════════════════════════

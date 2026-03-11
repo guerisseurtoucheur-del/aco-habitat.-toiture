@@ -14,6 +14,7 @@ import {
   Loader2,
   Brain,
   CheckCircle2,
+  Check,
   AlertTriangle,
   XCircle,
   ChevronRight,
@@ -1965,6 +1966,92 @@ onClick={async () => {
                 </div>
               )}
             </div>
+
+            {/* Traitement Hydrofuge Recommande */}
+            {diagnostic.traitementHydrofuge?.necessaire && (
+              <div className={`relative overflow-hidden rounded-2xl border-2 p-8 ${
+                diagnostic.traitementHydrofuge.urgence === "haute" 
+                  ? "border-red-500/40 bg-gradient-to-br from-red-500/10 via-orange-500/5 to-transparent"
+                  : diagnostic.traitementHydrofuge.urgence === "moyenne"
+                  ? "border-orange-500/40 bg-gradient-to-br from-orange-500/10 via-amber-500/5 to-transparent"
+                  : "border-green-500/40 bg-gradient-to-br from-green-500/10 via-emerald-500/5 to-transparent"
+              }`}>
+                <div className={`absolute right-4 top-4 flex h-12 w-12 items-center justify-center rounded-full ${
+                  diagnostic.traitementHydrofuge.urgence === "haute" ? "bg-red-500/15" :
+                  diagnostic.traitementHydrofuge.urgence === "moyenne" ? "bg-orange-500/15" : "bg-green-500/15"
+                }`}>
+                  <Droplets className={`h-6 w-6 ${
+                    diagnostic.traitementHydrofuge.urgence === "haute" ? "text-red-400" :
+                    diagnostic.traitementHydrofuge.urgence === "moyenne" ? "text-orange-400" : "text-green-400"
+                  }`} />
+                </div>
+                
+                <div className={`inline-flex items-center gap-2 rounded-full border px-3 py-1 text-[10px] font-bold uppercase tracking-wider ${
+                  diagnostic.traitementHydrofuge.urgence === "haute" 
+                    ? "border-red-500/30 bg-red-500/10 text-red-400"
+                    : diagnostic.traitementHydrofuge.urgence === "moyenne"
+                    ? "border-orange-500/30 bg-orange-500/10 text-orange-400"
+                    : "border-green-500/30 bg-green-500/10 text-green-400"
+                }`}>
+                  {diagnostic.traitementHydrofuge.urgence === "haute" ? "Traitement Urgent" :
+                   diagnostic.traitementHydrofuge.urgence === "moyenne" ? "Traitement Conseille" : "Traitement Preventif"}
+                </div>
+                
+                <h3 className="mt-4 text-xl font-bold text-foreground" style={{ fontFamily: "var(--font-heading)" }}>
+                  Nettoyage + Hydrofuge Recommande
+                </h3>
+                
+                <p className="mt-2 max-w-xl text-sm leading-relaxed text-muted-foreground">
+                  Vos tuiles presentent des signes de porosite et/ou de colonisation vegetale. 
+                  Un traitement hydrofuge permettra d'<strong className="text-foreground">impermeabiliser votre toiture</strong> et 
+                  de <strong className="text-foreground">prolonger sa duree de vie de 10-15 ans</strong>.
+                </p>
+                
+                {/* Raisons et Benefices */}
+                <div className="mt-4 grid gap-4 sm:grid-cols-2">
+                  {diagnostic.traitementHydrofuge.raisons && diagnostic.traitementHydrofuge.raisons.length > 0 && (
+                    <div className="rounded-lg bg-background/50 p-4">
+                      <h4 className="text-sm font-semibold text-foreground mb-2">Pourquoi ce traitement :</h4>
+                      <ul className="space-y-1">
+                        {diagnostic.traitementHydrofuge.raisons.map((raison, i) => (
+                          <li key={i} className="flex items-start gap-2 text-xs text-muted-foreground">
+                            <AlertTriangle className="h-3 w-3 text-orange-400 mt-0.5 flex-shrink-0" />
+                            {raison}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                  
+                  {diagnostic.traitementHydrofuge.benefices && diagnostic.traitementHydrofuge.benefices.length > 0 && (
+                    <div className="rounded-lg bg-background/50 p-4">
+                      <h4 className="text-sm font-semibold text-foreground mb-2">Benefices :</h4>
+                      <ul className="space-y-1">
+                        {diagnostic.traitementHydrofuge.benefices.map((benefice, i) => (
+                          <li key={i} className="flex items-start gap-2 text-xs text-muted-foreground">
+                            <Check className="h-3 w-3 text-green-400 mt-0.5 flex-shrink-0" />
+                            {benefice}
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
+                
+                {/* Cout estime */}
+                {diagnostic.traitementHydrofuge.coutEstime && (
+                  <div className="mt-4 flex items-center gap-3 rounded-lg bg-primary/10 p-3">
+                    <span className="text-sm text-muted-foreground">Cout estime :</span>
+                    <span className="text-lg font-bold text-primary">{diagnostic.traitementHydrofuge.coutEstime}</span>
+                    <span className="text-xs text-muted-foreground">(nettoyage + hydrofuge)</span>
+                  </div>
+                )}
+                
+                <p className="mt-4 text-xs text-muted-foreground italic">
+                  Le traitement comprend : 1. Nettoyage haute pression 2. Application anti-mousse 3. Hydrofuge incolore
+                </p>
+              </div>
+            )}
 
             {/* Cross-selling charpente - si score structure bas */}
             {diagnostic.structure && diagnostic.structure.score < 60 && (
