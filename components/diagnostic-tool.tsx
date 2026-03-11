@@ -3,7 +3,11 @@
 import { useState, useRef, useCallback, useEffect } from "react"
 import dynamic from "next/dynamic"
 import { WeatherDiagnosticWidget } from "@/components/weather-diagnostic-widget"
+import { PhotoUploadAnnotator, generateAnnotatedImageDataUrl } from "@/components/photo-upload-annotator"
+import type { AnalyzedPhoto } from "@/components/photo-upload-annotator"
 import type { GeorisquesData } from "@/lib/georisques"
+import type { WeatherHistory } from "@/lib/weather-history"
+import type { AnnotatedPhoto as PDFAnnotatedPhoto } from "@/lib/generate-pdf"
 import {
   MapPin,
   Search,
@@ -476,6 +480,8 @@ export function DiagnosticTool() {
   const [formattedAddress, setFormattedAddress] = useState("")
   const [diagnostic, setDiagnostic] = useState<DiagnosticResult | null>(null)
   const [georisques, setGeorisques] = useState<GeorisquesData | null>(null)
+  const [weatherHistory, setWeatherHistory] = useState<WeatherHistory | null>(null)
+  const [clientPhotos, setClientPhotos] = useState<AnalyzedPhoto[]>([])
   const [error, setError] = useState<string | null>(null)
   const [uploadMode, setUploadMode] = useState(false)
   const [clientName, setClientName] = useState("")
@@ -668,6 +674,18 @@ export function DiagnosticTool() {
       setGeorisques(diagData.georisques || null)
       setStep("results")
 
+      // Fetch weather history (non-blocking)
+      if (capture?.center) {
+        fetch(`/api/weather-history?lat=${capture.center.lat}&lng=${capture.center.lng}&days=30`)
+          .then(res => res.json())
+          .then(data => {
+            if (data && !data.error) {
+              setWeatherHistory(data)
+            }
+          })
+          .catch(() => {})
+      }
+
       // Scroll to results
       setTimeout(() => {
         resultsRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })
@@ -698,10 +716,10 @@ export function DiagnosticTool() {
           console.log("[v0] DB save:", r.status, t)
         }).catch((e) => console.log("[v0] DB save error:", e))
 
-        // 2. Auto-download PDF (separate, non-blocking)
+        // 2. Auto-download PDF (separate, non-blocking) - photos will be added when user uploads them
         import("@/lib/generate-pdf").then(async ({ generateDiagnosticPDF }) => {
           const clientInfo = { name: clientName, phone: clientPhone, email: clientEmail }
-          await generateDiagnosticPDF(finalDiag, capturedImage || "", formattedAddress, mapMeasurements, clientInfo, diagData.georisques)
+          await generateDiagnosticPDF(finalDiag, capturedImage || "", formattedAddress, mapMeasurements, clientInfo, diagData.georisques, null, null)
         }).catch(() => {})
 
         // Email is now sent manually via button in results section
@@ -1841,6 +1859,105 @@ onClick={async () => {
 
             {/* Weather widget */}
             <WeatherDiagnosticWidget address={formattedAddress} score={diagnostic.scoreGlobal} />
+
+            {/* Weather History Section */}
+            {weatherHistory && weatherHistory.events && weatherHistory.events.length > 0 && (
+              <div className="rounded-2xl border border-blue-500/30 bg-gradient-to-br from-blue-500/10 via-cyan-500/5 to-transparent p-6">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-500/15">
+                    <Cloud className="h-5 w-5 text-blue-400" />
+                  </div>
+                  <div>
+                    <h3 className="text-lg font-bold text-foreground">Historique Meteo - 30 jours</h3>
+                    <p className="text-xs text-muted-foreground">Evenements pouvant affecter votre toiture</p>
+                  </div>
+                </div>
+                <p className="text-sm text-muted-foreground mb-4">{weatherHistory.summary}</p>
+                <div className="space-y-2">
+                  {weatherHistory.events.slice(0, 5).map((event, idx) => (
+                    <div key={idx} className="flex items-center gap-3 rounded-lg bg-background/50 p-2">
+                      <div className={`h-2 w-2 rounded-full ${
+                        event.severity === "extreme" ? "bg-red-500" :
+                        event.severity === "fort" ? "bg-orange-500" : "bg-yellow-500"
+                      }`} />
+                      <span className="text-xs text-muted-foreground">
+                        {new Date(event.date).toLocaleDateString("fr-FR", { day: "2-digit", month: "short" })}
+                      </span>
+                      <span className="text-sm text-foreground">{event.description}</span>
+                      <span className={`text-xs font-medium ml-auto ${
+                        event.severity === "extreme" ? "text-red-400" :
+                        event.severity === "fort" ? "text-orange-400" : "text-yellow-400"
+                      }`}>
+                        {event.severity.toUpperCase()}
+                      </span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Photo Upload Section */}
+            <div className="space-y-4">
+              <PhotoUploadAnnotator
+                maxPhotos={3}
+                onPhotosChange={(photos) => setClientPhotos(photos)}
+              />
+              
+              {/* Regenerate PDF button when photos are uploaded */}
+              {clientPhotos.length > 0 && clientPhotos.some(p => p.analysis) && (
+                <div className="flex flex-col sm:flex-row gap-3">
+                  <button
+                    onClick={async () => {
+                      try {
+                        // Generate annotated images for PDF
+                        const annotatedForPDF: PDFAnnotatedPhoto[] = []
+                        for (const photo of clientPhotos) {
+                          if (photo.analysis) {
+                            try {
+                              const annotatedDataUrl = await generateAnnotatedImageDataUrl(
+                                photo.preview,
+                                photo.analysis.damageZones
+                              )
+                              annotatedForPDF.push({
+                                imageDataUrl: annotatedDataUrl,
+                                damageZones: photo.analysis.damageZones,
+                                overallCondition: photo.analysis.overallCondition,
+                                summary: photo.analysis.summary,
+                              })
+                            } catch (e) {
+                              console.log("[v0] Failed to generate annotated image:", e)
+                            }
+                          }
+                        }
+                        
+                        // Regenerate PDF with photos and weather
+                        const { generateDiagnosticPDF } = await import("@/lib/generate-pdf")
+                        const clientInfo = { name: clientName, phone: clientPhone, email: clientEmail }
+                        await generateDiagnosticPDF(
+                          diagnostic,
+                          capturedImage || "",
+                          formattedAddress,
+                          mapMeasurements,
+                          clientInfo,
+                          georisques,
+                          weatherHistory,
+                          annotatedForPDF.length > 0 ? annotatedForPDF : null
+                        )
+                      } catch (e) {
+                        console.log("[v0] PDF generation error:", e)
+                      }
+                    }}
+                    className="flex items-center justify-center gap-2 rounded-lg bg-primary px-6 py-3 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90"
+                  >
+                    <Download className="h-4 w-4" />
+                    Telecharger PDF avec photos
+                  </button>
+                  <p className="text-xs text-muted-foreground self-center">
+                    {clientPhotos.filter(p => p.analysis).length} photo(s) analysee(s) - Le PDF inclura l'historique meteo et vos photos annotees
+                  </p>
+                </div>
+              )}
+            </div>
 
             {/* Cross-selling charpente - si score structure bas */}
             {diagnostic.structure && diagnostic.structure.score < 60 && (
