@@ -164,7 +164,7 @@ async function buildPDF(
 
   // ═══════════════════════════════════════
   // PAGE 1: Header + Image + Scores
-  // ═══════════════════════════════════════
+  // ══════���════════════════════════════════
 
   // Header bar
   doc.setFillColor(24, 24, 27) // zinc-900
@@ -924,6 +924,147 @@ async function buildPDF(
 
   addText("ACO-HABITAT - Plateforme independante non affiliee a des prestataires de travaux.", margin + 4, y + 28, 6, "bold", [120, 80, 20])
   addText("Trouvez un couvreur pres de chez vous sur diag.aco-habitat.fr - CGU completes sur diag.aco-habitat.fr/mentions-legales", margin + 4, y + 34, 6, "normal", [120, 80, 20])
+
+  // ═══════════════════════════════════════
+  // FACTURE / INVOICE SECTION
+  // ═══════════════════════════════════════
+  doc.addPage()
+  y = margin
+  
+  // Invoice header
+  doc.setFillColor(30, 64, 175) // blue-800
+  doc.rect(0, 0, pageW, 35, "F")
+  
+  addText("FACTURE", margin, 15, 18, "bold", [255, 255, 255])
+  addText("ACO-HABITAT - Diagnostic Toiture par IA", margin, 25, 9, "normal", [200, 200, 255])
+  
+  const invoiceNumber = `FA-${new Date().getFullYear()}${String(new Date().getMonth() + 1).padStart(2, '0')}${String(new Date().getDate()).padStart(2, '0')}-${Math.random().toString(36).substring(2, 8).toUpperCase()}`
+  const invoiceDate = new Date().toLocaleDateString("fr-FR", { day: "2-digit", month: "long", year: "numeric" })
+  
+  addText(`N° ${invoiceNumber}`, pageW - margin - 50, 15, 8, "bold", [255, 255, 255])
+  addText(`Date : ${invoiceDate}`, pageW - margin - 50, 22, 7, "normal", [200, 200, 255])
+  
+  y = 45
+  
+  // Company info
+  doc.setFillColor(248, 250, 252)
+  doc.roundedRect(margin, y, contentW / 2 - 5, 35, 2, 2, "F")
+  
+  addText("EMETTEUR", margin + 4, y + 6, 7, "bold", [100, 100, 100])
+  addText("ACO-HABITAT", margin + 4, y + 13, 9, "bold", [30, 30, 30])
+  addText("Expert toiture depuis 2006", margin + 4, y + 19, 7, "normal", [80, 80, 80])
+  addText("02 33 31 19 79", margin + 4, y + 25, 7, "normal", [80, 80, 80])
+  addText("aco.habitat@orange.fr", margin + 4, y + 31, 7, "normal", [80, 80, 80])
+  
+  // Client info
+  doc.setFillColor(248, 250, 252)
+  doc.roundedRect(margin + contentW / 2 + 5, y, contentW / 2 - 5, 35, 2, 2, "F")
+  
+  addText("CLIENT", margin + contentW / 2 + 9, y + 6, 7, "bold", [100, 100, 100])
+  if (clientInfo?.name) {
+    addText(clientInfo.name, margin + contentW / 2 + 9, y + 13, 9, "bold", [30, 30, 30])
+  }
+  if (clientInfo?.email) {
+    addText(clientInfo.email, margin + contentW / 2 + 9, y + 19, 7, "normal", [80, 80, 80])
+  }
+  if (clientInfo?.phone) {
+    addText(clientInfo.phone, margin + contentW / 2 + 9, y + 25, 7, "normal", [80, 80, 80])
+  }
+  addText(address || "Adresse non specifiee", margin + contentW / 2 + 9, y + 31, 6, "normal", [80, 80, 80])
+  
+  y += 45
+  
+  // Invoice table header
+  doc.setFillColor(30, 64, 175)
+  doc.rect(margin, y, contentW, 8, "F")
+  
+  addText("DESIGNATION", margin + 4, y + 5.5, 7, "bold", [255, 255, 255])
+  addText("QTE", margin + contentW - 60, y + 5.5, 7, "bold", [255, 255, 255])
+  addText("P.U. HT", margin + contentW - 45, y + 5.5, 7, "bold", [255, 255, 255])
+  addText("TOTAL HT", margin + contentW - 22, y + 5.5, 7, "bold", [255, 255, 255])
+  
+  y += 8
+  
+  // Invoice line
+  doc.setFillColor(255, 255, 255)
+  doc.rect(margin, y, contentW, 12, "F")
+  doc.setDrawColor(230, 230, 230)
+  doc.setLineWidth(0.3)
+  doc.rect(margin, y, contentW, 12, "S")
+  
+  addText("Diagnostic toiture par intelligence artificielle", margin + 4, y + 5, 8, "normal", [30, 30, 30])
+  addText("- Analyse satellite/photo de la couverture", margin + 4, y + 10, 6, "normal", [100, 100, 100])
+  addText("1", margin + contentW - 58, y + 7, 8, "normal", [30, 30, 30])
+  addText("49,92 EUR", margin + contentW - 48, y + 7, 8, "normal", [30, 30, 30])
+  addText("49,92 EUR", margin + contentW - 25, y + 7, 8, "normal", [30, 30, 30])
+  
+  y += 12
+  
+  // Second line - PDF report
+  doc.setFillColor(248, 250, 252)
+  doc.rect(margin, y, contentW, 10, "F")
+  doc.setDrawColor(230, 230, 230)
+  doc.rect(margin, y, contentW, 10, "S")
+  
+  addText("Rapport PDF detaille avec recommandations", margin + 4, y + 6, 8, "normal", [30, 30, 30])
+  addText("1", margin + contentW - 58, y + 6, 8, "normal", [30, 30, 30])
+  addText("Inclus", margin + contentW - 45, y + 6, 8, "normal", [100, 100, 100])
+  addText("-", margin + contentW - 20, y + 6, 8, "normal", [100, 100, 100])
+  
+  y += 10
+  
+  // Third line - Georisques
+  doc.setFillColor(255, 255, 255)
+  doc.rect(margin, y, contentW, 10, "F")
+  doc.setDrawColor(230, 230, 230)
+  doc.rect(margin, y, contentW, 10, "S")
+  
+  addText("Donnees Georisques (risques naturels)", margin + 4, y + 6, 8, "normal", [30, 30, 30])
+  addText("1", margin + contentW - 58, y + 6, 8, "normal", [30, 30, 30])
+  addText("Inclus", margin + contentW - 45, y + 6, 8, "normal", [100, 100, 100])
+  addText("-", margin + contentW - 20, y + 6, 8, "normal", [100, 100, 100])
+  
+  y += 15
+  
+  // Totals
+  doc.setFillColor(248, 250, 252)
+  doc.roundedRect(margin + contentW - 70, y, 70, 35, 2, 2, "F")
+  
+  addText("Total HT", margin + contentW - 66, y + 8, 8, "normal", [80, 80, 80])
+  addText("49,92 EUR", margin + contentW - 25, y + 8, 8, "bold", [30, 30, 30])
+  
+  addText("TVA 20%", margin + contentW - 66, y + 16, 8, "normal", [80, 80, 80])
+  addText("9,98 EUR", margin + contentW - 25, y + 16, 8, "normal", [30, 30, 30])
+  
+  doc.setFillColor(30, 64, 175)
+  doc.roundedRect(margin + contentW - 70, y + 22, 70, 11, 0, 0, "F")
+  addText("TOTAL TTC", margin + contentW - 66, y + 29, 8, "bold", [255, 255, 255])
+  addText("59,90 EUR", margin + contentW - 25, y + 29, 9, "bold", [255, 255, 255])
+  
+  y += 45
+  
+  // Payment info
+  doc.setFillColor(240, 253, 244) // green-50
+  doc.roundedRect(margin, y, contentW, 20, 2, 2, "F")
+  doc.setDrawColor(34, 197, 94)
+  doc.setLineWidth(0.4)
+  doc.roundedRect(margin, y, contentW, 20, 2, 2, "S")
+  
+  addText("PAIEMENT EFFECTUE", margin + 4, y + 7, 8, "bold", [22, 163, 74])
+  addText("Paiement par carte bancaire via Stripe - Transaction securisee", margin + 4, y + 14, 7, "normal", [34, 120, 60])
+  addText(`Date de paiement : ${invoiceDate}`, margin + contentW - 60, y + 14, 7, "normal", [34, 120, 60])
+  
+  y += 30
+  
+  // Legal mentions
+  addText("Mentions legales", margin, y, 7, "bold", [100, 100, 100])
+  y += 5
+  doc.setFontSize(6)
+  doc.setFont("helvetica", "normal")
+  doc.setTextColor(120, 120, 120)
+  const invoiceLegal = "ACO-HABITAT - Diagnostic immobilier. TVA non applicable, art. 293 B du CGI (auto-entrepreneur) ou TVA 20% selon statut. En cas de litige, le tribunal competent sera celui du siege social. Delai de retractation : 14 jours a compter de la date d'achat conformement a l'article L221-18 du Code de la consommation. Contact : aco.habitat@orange.fr | 02 33 31 19 79"
+  const invoiceLegalLines = doc.splitTextToSize(invoiceLegal, contentW)
+  doc.text(invoiceLegalLines, margin, y)
 
   // ═══════════════════════════════════════
   // Footer on every page

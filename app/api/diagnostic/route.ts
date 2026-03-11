@@ -68,12 +68,28 @@ ${measurementContext}${boundsContext}
 ## GRILLE D'ANALYSE PROFESSIONNELLE
 
 ### 1. IDENTIFICATION DU TYPE DE COUVERTURE
-Identifie avec precision :
-- **Tuiles terre cuite** : canal (sud), romane, mecanique a emboitement, plate (nord), girondine
-- **Ardoises** : naturelle (bleutee, rectangulaire) ou fibrociment (grise, ondulee - ATTENTION amiante si avant 1997)
-- **Metal** : zinc (joint debout, tasseaux), bac acier (nervure trapezoidale), cuivre, acier galvanise
-- **Membrane** : EPDM (noir), PVC (gris), bitume (noir granuleux) - toits plats
-- **Autres** : chaume, shingle/bardeau bitume, tuiles beton, lauzes
+Identifie avec precision - IMPORTANT : ne confonds JAMAIS tuiles et ardoises :
+
+**ARDOISES** (rectangulaires, plates, pose a clous/crochets) :
+- Ardoise naturelle : couleur bleu-gris fonce a noir, surface lisse mate, rectangulaire, bords nets
+- Ardoise fibrociment : grise, peut etre ondulee (ATTENTION amiante si avant 1997)
+- Pose caracteristique : recouvrement en ecailles, rangees horizontales regulieres
+
+**TUILES** (forme bombee ou ondulee, pose a emboitement) :
+- Tuiles canal : forme demi-cylindre, typique du sud, couleur ocre/rouge
+- Tuiles romanes : bombees avec nervure, rouges/orangees
+- Tuiles mecaniques : emboitement visible, forme ondulee reguliere
+- Tuiles plates : petites, carrees, typique nord de la France - NE PAS CONFONDRE avec ardoises (les tuiles plates sont terre cuite, couleur rouge/brun)
+
+**Metal** : zinc (joint debout, tasseaux), bac acier (nervure trapezoidale), cuivre, acier galvanise
+**Membrane** : EPDM (noir), PVC (gris), bitume (noir granuleux) - toits plats
+**Autres** : chaume, shingle/bardeau bitume, tuiles beton, lauzes
+
+CRITERES DE DISTINCTION ARDOISE vs TUILE :
+- Couleur : ardoise = bleu-gris-noir | tuile = rouge-ocre-brun
+- Forme : ardoise = plate rectangulaire | tuile = bombee ou ondulee
+- Texture : ardoise = lisse mate | tuile = granuleuse ou vernie
+
 Indique ton niveau de certitude (certain / probable / difficile a determiner)
 
 ### 2. ETAT STRUCTUREL (score /100)
