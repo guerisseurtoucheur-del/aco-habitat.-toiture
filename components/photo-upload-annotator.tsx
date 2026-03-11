@@ -1,12 +1,28 @@
 "use client"
 
+// ============================================
+// PHOTO UPLOAD ANNOTATOR COMPONENT
+// Last updated: 2026-03-11 15:12
+// NOTE: Using native HTML input/label elements
+// ============================================
+
 import { useState, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Camera, Upload, X, Loader2, AlertTriangle, CheckCircle, MapPin, User, Phone, Mail, Home } from "lucide-react"
-// IMPORTANT: Input and Label components removed - using native HTML elements instead
-// This file was last fixed on 2026-03-11 to resolve module not found errors
+import { 
+  Camera, 
+  Upload, 
+  X, 
+  Loader2, 
+  AlertTriangle, 
+  CheckCircle, 
+  MapPin, 
+  User, 
+  Phone, 
+  Mail, 
+  Home 
+} from "lucide-react"
 
 export interface DamageZone {
   id: string
