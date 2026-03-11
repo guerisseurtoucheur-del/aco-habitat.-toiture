@@ -351,36 +351,90 @@ export async function generateAnnotatedImageDataUrl(
       // Draw the original image
       ctx.drawImage(img, 0, 0)
 
-      // Draw damage zones
+      // Draw damage zones - PLUS VISIBLE
       damageZones.forEach((zone, index) => {
         const x = (zone.position.x - zone.position.width / 2) / 100 * img.width
         const y = (zone.position.y - zone.position.height / 2) / 100 * img.height
         const width = zone.position.width / 100 * img.width
         const height = zone.position.height / 100 * img.height
 
-        // Set color based on severity
+        // Set color based on severity - ROUGE VIF pour tous les dommages
         const color = zone.severity === "grave" ? "#dc2626" :
                      zone.severity === "modere" ? "#f97316" : "#eab308"
 
-        // Draw rectangle
+        // Draw outer glow effect
+        ctx.shadowColor = color
+        ctx.shadowBlur = 15
+        ctx.shadowOffsetX = 0
+        ctx.shadowOffsetY = 0
+
+        // Draw thick rectangle border
         ctx.strokeStyle = color
-        ctx.lineWidth = 3
+        ctx.lineWidth = 6
         ctx.strokeRect(x, y, width, height)
+        
+        // Reset shadow for fill
+        ctx.shadowBlur = 0
 
         // Draw semi-transparent fill
-        ctx.fillStyle = color + "33" // 20% opacity
+        ctx.fillStyle = color + "40" // 25% opacity
         ctx.fillRect(x, y, width, height)
 
-        // Draw label background
-        ctx.fillStyle = "#000000dd"
-        const labelText = `${index + 1}. ${zone.label}`
-        ctx.font = "bold 14px Arial"
-        const textWidth = ctx.measureText(labelText).width
-        ctx.fillRect(x, y - 22, textWidth + 10, 20)
+        // Draw corner markers (more visible)
+        const cornerSize = Math.min(width, height) * 0.15
+        ctx.fillStyle = color
+        // Top-left corner
+        ctx.fillRect(x - 3, y - 3, cornerSize, 6)
+        ctx.fillRect(x - 3, y - 3, 6, cornerSize)
+        // Top-right corner
+        ctx.fillRect(x + width - cornerSize + 3, y - 3, cornerSize, 6)
+        ctx.fillRect(x + width - 3, y - 3, 6, cornerSize)
+        // Bottom-left corner
+        ctx.fillRect(x - 3, y + height - 3, cornerSize, 6)
+        ctx.fillRect(x - 3, y + height - cornerSize + 3, 6, cornerSize)
+        // Bottom-right corner
+        ctx.fillRect(x + width - cornerSize + 3, y + height - 3, cornerSize, 6)
+        ctx.fillRect(x + width - 3, y + height - cornerSize + 3, 6, cornerSize)
 
-        // Draw label text
+        // Draw label background - PLUS GRAND ET VISIBLE
+        const labelText = `${zone.label.toUpperCase()}`
+        const severityText = zone.severity === "grave" ? "GRAVE" : zone.severity === "modere" ? "MODERE" : "LEGER"
+        ctx.font = "bold 18px Arial"
+        const textWidth = ctx.measureText(labelText).width
+        const severityWidth = ctx.measureText(severityText).width
+        
+        // Background pill
+        ctx.fillStyle = color
+        ctx.beginPath()
+        const labelY = y - 35
+        const labelHeight = 30
+        const labelPadding = 12
+        const totalWidth = textWidth + severityWidth + labelPadding * 3 + 10
+        ctx.roundRect(x, labelY, totalWidth, labelHeight, 6)
+        ctx.fill()
+
+        // Label text (white)
         ctx.fillStyle = "#ffffff"
-        ctx.fillText(labelText, x + 5, y - 7)
+        ctx.font = "bold 16px Arial"
+        ctx.fillText(labelText, x + labelPadding, labelY + 20)
+        
+        // Severity badge
+        ctx.fillStyle = "#00000066"
+        ctx.beginPath()
+        ctx.roundRect(x + textWidth + labelPadding + 8, labelY + 4, severityWidth + 10, 22, 4)
+        ctx.fill()
+        ctx.fillStyle = "#ffffff"
+        ctx.font = "bold 12px Arial"
+        ctx.fillText(severityText, x + textWidth + labelPadding + 13, labelY + 19)
+        
+        // Number indicator
+        ctx.fillStyle = "#ffffff"
+        ctx.beginPath()
+        ctx.arc(x + width - 15, y + 15, 12, 0, Math.PI * 2)
+        ctx.fill()
+        ctx.fillStyle = color
+        ctx.font = "bold 14px Arial"
+        ctx.fillText(String(index + 1), x + width - 19, y + 20)
       })
 
       resolve(canvas.toDataURL("image/jpeg", 0.9))

@@ -102,25 +102,26 @@ function ScannerOverlay({ phase }: { phase: "scanning" | "analyzing" }) {
         </>
       )}
 
-      {/* Radar circle overlay */}
+      {/* Radar circle overlay - ROUGE ET PLUS GRAND */}
       {phase === "analyzing" && (
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-          {/* Concentric circles */}
-          {[120, 80, 40].map((size) => (
+          {/* Concentric circles - PLUS GRANDS */}
+          {[280, 200, 120, 60].map((size) => (
             <div
               key={size}
-              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border"
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full border-2"
               style={{
                 width: size,
                 height: size,
-                borderColor: "rgba(59,130,246,0.2)",
+                borderColor: "rgba(239,68,68,0.4)",
+                boxShadow: size === 280 ? "0 0 30px 5px rgba(239,68,68,0.2)" : "none",
               }}
             />
           ))}
-          {/* Rotating sweep */}
+          {/* Rotating sweep - ROUGE */}
           <div
             className="animate-radar-sweep absolute top-1/2 left-1/2"
-            style={{ width: 140, height: 140 }}
+            style={{ width: 300, height: 300 }}
           >
             <div
               style={{
@@ -130,14 +131,20 @@ function ScannerOverlay({ phase }: { phase: "scanning" | "analyzing" }) {
                 width: "50%",
                 height: "50%",
                 transformOrigin: "0% 100%",
-                background: "conic-gradient(from 0deg, transparent, rgba(59,130,246,0.3))",
+                background: "conic-gradient(from 0deg, transparent, rgba(239,68,68,0.5))",
                 borderRadius: "0 100% 0 0",
               }}
             />
           </div>
-          {/* Center dot */}
+          {/* Center dot - ROUGE ET PLUS GRAND */}
           <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2">
-            <div className="h-2 w-2 rounded-full bg-primary shadow-[0_0_10px_4px_rgba(59,130,246,0.4)]" />
+            <div className="h-6 w-6 rounded-full bg-red-500 shadow-[0_0_30px_10px_rgba(239,68,68,0.6)]" />
+          </div>
+          {/* Label ANALYSE */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 translate-y-20">
+            <div className="rounded-lg bg-red-500/90 px-4 py-2 text-center shadow-lg">
+              <span className="font-mono text-sm font-bold text-white tracking-wider">ANALYSE MULTI-SPECTRALE</span>
+            </div>
           </div>
         </div>
       )}
