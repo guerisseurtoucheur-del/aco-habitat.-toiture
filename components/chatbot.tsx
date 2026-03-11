@@ -46,15 +46,15 @@ export function Chatbot() {
 
   return (
     <>
-      {/* Speech bubble with question */}
+      {/* Speech bubble with question - CACHE SUR MOBILE, visible sur desktop seulement */}
       {!isOpen && (
         <div 
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-20 right-5 z-50 max-w-[220px] cursor-pointer animate-in fade-in slide-in-from-bottom-2 duration-500"
+          className="fixed bottom-20 right-5 z-50 max-w-[200px] cursor-pointer animate-in fade-in slide-in-from-bottom-2 duration-500 hidden sm:block"
         >
-          <div className="rounded-xl bg-card border border-border px-4 py-3 shadow-lg hover:shadow-xl transition-shadow">
-            <p className="text-sm font-medium text-foreground">Une question sur votre toiture ?</p>
-            <p className="text-xs text-muted-foreground mt-1">Je peux vous aider !</p>
+          <div className="rounded-xl bg-card border border-border px-3 py-2 shadow-lg hover:shadow-xl transition-shadow">
+            <p className="text-xs font-medium text-foreground">Une question sur votre toiture ?</p>
+            <p className="text-[10px] text-muted-foreground mt-0.5">Je peux vous aider !</p>
           </div>
           {/* Triangle pointer */}
           <div className="absolute -bottom-2 right-6 h-0 w-0 border-l-[8px] border-r-[8px] border-t-[8px] border-l-transparent border-r-transparent border-t-card drop-shadow-sm" />
@@ -62,17 +62,17 @@ export function Chatbot() {
         </div>
       )}
 
-      {/* Floating button */}
+      {/* Floating button - plus petit sur mobile */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`fixed bottom-5 right-5 z-50 flex h-14 w-14 items-center justify-center rounded-full shadow-lg transition-all duration-300 ${
+        className={`fixed z-50 flex items-center justify-center rounded-full shadow-lg transition-all duration-300 ${
           isOpen
             ? "scale-0 opacity-0"
             : "scale-100 bg-primary opacity-100 hover:bg-primary/90 hover:shadow-xl hover:shadow-primary/25"
-        }`}
+        } bottom-3 right-3 h-11 w-11 sm:bottom-5 sm:right-5 sm:h-14 sm:w-14`}
         aria-label="Ouvrir le chat"
       >
-        <MessageSquare size={24} className="text-primary-foreground" />
+        <MessageSquare className="h-5 w-5 sm:h-6 sm:w-6 text-primary-foreground" />
       </button>
 
 
