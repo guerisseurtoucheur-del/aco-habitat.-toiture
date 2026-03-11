@@ -4,7 +4,7 @@ import { useState, useRef, useCallback, useEffect } from "react"
 import dynamic from "next/dynamic"
 import { WeatherDiagnosticWidget } from "@/components/weather-diagnostic-widget"
 import { PhotoUploadAnnotator, generateAnnotatedImageDataUrl } from "@/components/photo-upload-annotator"
-import type { AnalyzedPhoto } from "@/components/photo-upload-annotator"
+import type { AnalyzedPhoto, ClientInfo } from "@/components/photo-upload-annotator"
 import type { GeorisquesData } from "@/lib/georisques"
 import type { WeatherHistory } from "@/lib/weather-history"
 import type { AnnotatedPhoto as PDFAnnotatedPhoto } from "@/lib/generate-pdf"
@@ -490,6 +490,7 @@ export function DiagnosticTool() {
   const [georisques, setGeorisques] = useState<GeorisquesData | null>(null)
   const [weatherHistory, setWeatherHistory] = useState<WeatherHistory | null>(null)
   const [clientPhotos, setClientPhotos] = useState<AnalyzedPhoto[]>([])
+  const [photoClientInfo, setPhotoClientInfo] = useState<ClientInfo | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [uploadMode, setUploadMode] = useState(false)
   const [clientName, setClientName] = useState("")
@@ -1906,10 +1907,12 @@ onClick={async () => {
 
             {/* Photo Upload Section */}
             <div className="space-y-4">
-              <PhotoUploadAnnotator
-                maxPhotos={3}
-                onPhotosChange={(photos) => setClientPhotos(photos)}
-              />
+<PhotoUploadAnnotator
+  maxPhotos={3}
+  onPhotosChange={(photos) => setClientPhotos(photos)}
+  onClientInfoChange={(info) => setPhotoClientInfo(info)}
+  showClientForm={true}
+  />
               
               {/* Regenerate PDF button when photos are uploaded */}
               {clientPhotos.length > 0 && clientPhotos.some(p => p.analysis) && (

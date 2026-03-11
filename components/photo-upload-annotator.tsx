@@ -4,7 +4,9 @@ import { useState, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Camera, Upload, X, Loader2, AlertTriangle, CheckCircle } from "lucide-react"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import { Camera, Upload, X, Loader2, AlertTriangle, CheckCircle, MapPin, User, Phone, Mail, Home } from "lucide-react"
 
 export interface DamageZone {
   id: string
@@ -18,6 +20,16 @@ export interface DamageZone {
     width: number
     height: number
   }
+}
+
+export interface ClientInfo {
+  nom: string
+  prenom: string
+  telephone: string
+  email: string
+  adresse: string
+  codePostal: string
+  ville: string
 }
 
 export interface AnalyzedPhoto {
@@ -37,14 +49,38 @@ export interface AnalyzedPhoto {
 interface PhotoUploadAnnotatorProps {
   maxPhotos?: number
   onPhotosChange: (photos: AnalyzedPhoto[]) => void
+  onClientInfoChange?: (clientInfo: ClientInfo) => void
+  showClientForm?: boolean
 }
 
 export function PhotoUploadAnnotator({
   maxPhotos = 3,
   onPhotosChange,
+  onClientInfoChange,
+  showClientForm = true,
 }: PhotoUploadAnnotatorProps) {
   const [photos, setPhotos] = useState<AnalyzedPhoto[]>([])
+  const [clientInfo, setClientInfo] = useState<ClientInfo>({
+    nom: "",
+    prenom: "",
+    telephone: "",
+    email: "",
+    adresse: "",
+    codePostal: "",
+    ville: "",
+  })
+  const [showForm, setShowForm] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  
+  const handleClientInfoChange = (field: keyof ClientInfo, value: string) => {
+    const updated = { ...clientInfo, [field]: value }
+    setClientInfo(updated)
+    onClientInfoChange?.(updated)
+  }
+  
+  const isClientInfoComplete = () => {
+    return clientInfo.nom && clientInfo.telephone && clientInfo.adresse && clientInfo.codePostal && clientInfo.ville
+  }
 
   const handleFileSelect = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files
@@ -187,6 +223,159 @@ export function PhotoUploadAnnotator({
         </p>
       </CardHeader>
       <CardContent className="space-y-4">
+        
+        {/* Formulaire coordonnees client */}
+        {showClientForm && (
+          <div className="rounded-lg border border-primary/30 bg-primary/5 p-4">
+            <button
+              type="button"
+              onClick={() => setShowForm(!showForm)}
+              className="flex w-full items-center justify-between"
+            >
+              <div className="flex items-center gap-2">
+                <User className="h-5 w-5 text-primary" />
+                <span className="font-semibold text-foreground">Vos coordonnees</span>
+                {isClientInfoComplete() && (
+                  <CheckCircle className="h-4 w-4 text-green-500" />
+                )}
+              </div>
+              <span className="text-xs text-primary">{showForm ? "Masquer" : "Remplir"}</span>
+            </button>
+            
+            {!showForm && !isClientInfoComplete() && (
+              <p className="mt-2 text-xs text-muted-foreground">
+                Renseignez vos coordonnees pour recevoir le diagnostic complet par email
+              </p>
+            )}
+            
+            {showForm && (
+              <div className="mt-4 space-y-4">
+                {/* Nom et Prenom */}
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="nom" className="text-sm text-foreground">
+                      Nom <span className="text-red-500">*</span>
+                    </Label>
+                    <div className="relative">
+                      <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                      <Input
+                        id="nom"
+                        type="text"
+                        placeholder="Votre nom"
+                        value={clientInfo.nom}
+                        onChange={(e) => handleClientInfoChange("nom", e.target.value)}
+                        className="pl-10"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="prenom" className="text-sm text-foreground">Prenom</Label>
+                    <Input
+                      id="prenom"
+                      type="text"
+                      placeholder="Votre prenom"
+                      value={clientInfo.prenom}
+                      onChange={(e) => handleClientInfoChange("prenom", e.target.value)}
+                    />
+                  </div>
+                </div>
+                
+                {/* Telephone et Email */}
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="telephone" className="text-sm text-foreground">
+                      Telephone <span className="text-red-500">*</span>
+                    </Label>
+                    <div className="relative">
+                      <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                      <Input
+                        id="telephone"
+                        type="tel"
+                        placeholder="06 12 34 56 78"
+                        value={clientInfo.telephone}
+                        onChange={(e) => handleClientInfoChange("telephone", e.target.value)}
+                        className="pl-10"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="email" className="text-sm text-foreground">Email</Label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                      <Input
+                        id="email"
+                        type="email"
+                        placeholder="email@exemple.fr"
+                        value={clientInfo.email}
+                        onChange={(e) => handleClientInfoChange("email", e.target.value)}
+                        className="pl-10"
+                      />
+                    </div>
+                  </div>
+                </div>
+                
+                {/* Adresse */}
+                <div className="space-y-2">
+                  <Label htmlFor="adresse" className="text-sm text-foreground">
+                    Adresse <span className="text-red-500">*</span>
+                  </Label>
+                  <div className="relative">
+                    <Home className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                    <Input
+                      id="adresse"
+                      type="text"
+                      placeholder="12 rue de la Toiture"
+                      value={clientInfo.adresse}
+                      onChange={(e) => handleClientInfoChange("adresse", e.target.value)}
+                      className="pl-10"
+                    />
+                  </div>
+                </div>
+                
+                {/* Code postal et Ville */}
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="space-y-2">
+                    <Label htmlFor="codePostal" className="text-sm text-foreground">
+                      Code postal <span className="text-red-500">*</span>
+                    </Label>
+                    <div className="relative">
+                      <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+                      <Input
+                        id="codePostal"
+                        type="text"
+                        placeholder="75001"
+                        maxLength={5}
+                        value={clientInfo.codePostal}
+                        onChange={(e) => handleClientInfoChange("codePostal", e.target.value)}
+                        className="pl-10"
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="ville" className="text-sm text-foreground">
+                      Ville <span className="text-red-500">*</span>
+                    </Label>
+                    <Input
+                      id="ville"
+                      type="text"
+                      placeholder="Paris"
+                      value={clientInfo.ville}
+                      onChange={(e) => handleClientInfoChange("ville", e.target.value)}
+                    />
+                  </div>
+                </div>
+                
+                {isClientInfoComplete() && (
+                  <div className="flex items-center gap-2 rounded-lg bg-green-500/10 p-2 text-sm text-green-600">
+                    <CheckCircle className="h-4 w-4" />
+                    Coordonnees completes - Vous recevrez le diagnostic par email
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
+        
         {/* Upload zone */}
         {photos.length < maxPhotos && (
           <div
