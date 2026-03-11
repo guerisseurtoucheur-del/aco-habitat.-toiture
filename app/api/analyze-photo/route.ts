@@ -124,7 +124,6 @@ Si tu ne detectes aucun dommage visible, retourne un tableau damageZones vide av
         },
       ],
       system: systemPrompt,
-      maxTokens: 2000,
     })
 
     // Parse the JSON response
