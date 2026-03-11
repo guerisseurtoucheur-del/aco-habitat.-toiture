@@ -4,8 +4,6 @@ import { useState, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { Camera, Upload, X, Loader2, AlertTriangle, CheckCircle, MapPin, User, Phone, Mail, Home } from "lucide-react"
 
 export interface DamageZone {
@@ -253,29 +251,30 @@ export function PhotoUploadAnnotator({
                 {/* Nom et Prenom */}
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
-                    <Label htmlFor="nom" className="text-sm text-foreground">
+                    <label htmlFor="nom" className="text-sm font-medium text-foreground">
                       Nom <span className="text-red-500">*</span>
-                    </Label>
+                    </label>
                     <div className="relative">
                       <User className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                      <Input
+                      <input
                         id="nom"
                         type="text"
                         placeholder="Votre nom"
                         value={clientInfo.nom}
                         onChange={(e) => handleClientInfoChange("nom", e.target.value)}
-                        className="pl-10"
+                        className="w-full rounded-md border border-border bg-background px-3 py-2 pl-10 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                       />
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="prenom" className="text-sm text-foreground">Prenom</Label>
-                    <Input
+                    <label htmlFor="prenom" className="text-sm font-medium text-foreground">Prenom</label>
+                    <input
                       id="prenom"
                       type="text"
                       placeholder="Votre prenom"
                       value={clientInfo.prenom}
                       onChange={(e) => handleClientInfoChange("prenom", e.target.value)}
+                      className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                     />
                   </div>
                 </div>
@@ -283,32 +282,32 @@ export function PhotoUploadAnnotator({
                 {/* Telephone et Email */}
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
-                    <Label htmlFor="telephone" className="text-sm text-foreground">
+                    <label htmlFor="telephone" className="text-sm font-medium text-foreground">
                       Telephone <span className="text-red-500">*</span>
-                    </Label>
+                    </label>
                     <div className="relative">
                       <Phone className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                      <Input
+                      <input
                         id="telephone"
                         type="tel"
                         placeholder="06 12 34 56 78"
                         value={clientInfo.telephone}
                         onChange={(e) => handleClientInfoChange("telephone", e.target.value)}
-                        className="pl-10"
+                        className="w-full rounded-md border border-border bg-background px-3 py-2 pl-10 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                       />
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="email" className="text-sm text-foreground">Email</Label>
+                    <label htmlFor="email" className="text-sm font-medium text-foreground">Email</label>
                     <div className="relative">
                       <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                      <Input
+                      <input
                         id="email"
                         type="email"
                         placeholder="email@exemple.fr"
                         value={clientInfo.email}
                         onChange={(e) => handleClientInfoChange("email", e.target.value)}
-                        className="pl-10"
+                        className="w-full rounded-md border border-border bg-background px-3 py-2 pl-10 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                       />
                     </div>
                   </div>
@@ -316,18 +315,18 @@ export function PhotoUploadAnnotator({
                 
                 {/* Adresse */}
                 <div className="space-y-2">
-                  <Label htmlFor="adresse" className="text-sm text-foreground">
+                  <label htmlFor="adresse" className="text-sm font-medium text-foreground">
                     Adresse <span className="text-red-500">*</span>
-                  </Label>
+                  </label>
                   <div className="relative">
                     <Home className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                    <Input
+                    <input
                       id="adresse"
                       type="text"
                       placeholder="12 rue de la Toiture"
                       value={clientInfo.adresse}
                       onChange={(e) => handleClientInfoChange("adresse", e.target.value)}
-                      className="pl-10"
+                      className="w-full rounded-md border border-border bg-background px-3 py-2 pl-10 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                     />
                   </div>
                 </div>
@@ -335,32 +334,33 @@ export function PhotoUploadAnnotator({
                 {/* Code postal et Ville */}
                 <div className="grid gap-4 sm:grid-cols-2">
                   <div className="space-y-2">
-                    <Label htmlFor="codePostal" className="text-sm text-foreground">
+                    <label htmlFor="codePostal" className="text-sm font-medium text-foreground">
                       Code postal <span className="text-red-500">*</span>
-                    </Label>
+                    </label>
                     <div className="relative">
                       <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                      <Input
+                      <input
                         id="codePostal"
                         type="text"
                         placeholder="75001"
                         maxLength={5}
                         value={clientInfo.codePostal}
                         onChange={(e) => handleClientInfoChange("codePostal", e.target.value)}
-                        className="pl-10"
+                        className="w-full rounded-md border border-border bg-background px-3 py-2 pl-10 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                       />
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <Label htmlFor="ville" className="text-sm text-foreground">
+                    <label htmlFor="ville" className="text-sm font-medium text-foreground">
                       Ville <span className="text-red-500">*</span>
-                    </Label>
-                    <Input
+                    </label>
+                    <input
                       id="ville"
                       type="text"
                       placeholder="Paris"
                       value={clientInfo.ville}
                       onChange={(e) => handleClientInfoChange("ville", e.target.value)}
+                      className="w-full rounded-md border border-border bg-background px-3 py-2 text-sm placeholder:text-muted-foreground focus:outline-none focus:ring-2 focus:ring-primary"
                     />
                   </div>
                 </div>
