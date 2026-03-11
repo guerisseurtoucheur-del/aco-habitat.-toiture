@@ -97,6 +97,7 @@ export function Navbar() {
               height={44}
               className="object-cover"
               priority
+              sizes="44px"
             />
             <div className="absolute inset-0 rounded-full ring-1 ring-primary/20 group-hover:ring-primary/40 transition-all" />
           </div>
