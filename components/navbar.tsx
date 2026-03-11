@@ -10,6 +10,7 @@ const navLinks = [
   { href: "#methode", label: "Comment ca marche" },
   { href: "#tarifs", label: "Tarifs" },
   { href: "#immobilier", label: "Immobilier" },
+  { href: "/blog", label: "Blog" },
   { href: "#faq", label: "FAQ" },
   { href: "#couvreurs", label: "Trouver un couvreur" },
 ]
