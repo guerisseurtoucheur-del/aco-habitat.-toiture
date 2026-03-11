@@ -2,8 +2,8 @@
 
 // ============================================
 // PHOTO UPLOAD ANNOTATOR COMPONENT
-// Last updated: 2026-03-11 15:12
-// NOTE: Using native HTML input/label elements
+// Last updated: 2026-03-11 16:03
+// FIXED: Removed Input/Label imports - using native HTML elements
 // ============================================
 
 import { useState, useRef } from "react"
