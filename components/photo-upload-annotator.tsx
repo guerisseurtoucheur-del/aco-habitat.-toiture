@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { Camera, Upload, X, Loader2, AlertTriangle, CheckCircle, MapPin, User, Phone, Mail, Home } from "lucide-react"
+// NOTE: Input and Label removed - using native HTML elements instead
 
 export interface DamageZone {
   id: string
