@@ -164,7 +164,7 @@ async function buildPDF(
 
   // ═══════════════════════════════════════
   // PAGE 1: Header + Image + Scores
-  // ══════�����════════════════════════════════
+  // ══════�������════════════════════════════════
 
   // Header bar
   doc.setFillColor(24, 24, 27) // zinc-900
@@ -179,39 +179,58 @@ async function buildPDF(
   addText("RAPPORT DE DIAGNOSTIC TOITURE", margin, y, 18, "bold", [24, 24, 27])
   y += 8
 
-  // Address + Date
-  const dateStr = new Date().toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })
+  // Date et Heure complets
+  const now = new Date()
+  const joursSemaine = ["Dimanche", "Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi"]
+  const jourNom = joursSemaine[now.getDay()]
+  const dateStr = now.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" })
+  const heureStr = now.toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" })
+  const dateTimeComplet = `${jourNom} ${dateStr} a ${heureStr}`
+  
+  // Address line
   addText(address || "Adresse non renseignee", margin, y, 9, "normal", [100, 100, 100])
-  addText(`Diagnostic du ${dateStr}`, pageW - margin - 55, y, 9, "normal", [100, 100, 100])
+  y += 5
+  // Date/Time line
+  addText(`Diagnostic realise le ${dateTimeComplet}`, margin, y, 8, "normal", [120, 120, 120])
   y += 4
   drawLine(y)
   y += 6
 
-  // Client info block
+  // Client info block - AMELIORE avec adresse complete
   if (clientInfo && (clientInfo.name || clientInfo.phone || clientInfo.email)) {
     doc.setFillColor(240, 249, 255)
-    doc.roundedRect(margin, y, contentW, 14, 2, 2, "F")
+    doc.roundedRect(margin, y, contentW, 22, 2, 2, "F")
+    doc.setDrawColor(59, 130, 246)
+    doc.setLineWidth(0.3)
+    doc.roundedRect(margin, y, contentW, 22, 2, 2, "S")
+    
+    // Premiere ligne : Nom et telephone
     let clientX = margin + 4
     if (clientInfo.name) {
       addText("Client :", clientX, y + 5, 7, "bold", [50, 50, 50])
       clientX += 14
-      addText(clientInfo.name, clientX, y + 5, 7, "normal", [80, 80, 80])
-      clientX += doc.getStringUnitWidth(clientInfo.name) * 7 * 0.35 + 8
+      addText(clientInfo.name, clientX, y + 5, 8, "bold", [30, 30, 30])
+      clientX += doc.getStringUnitWidth(clientInfo.name) * 8 * 0.35 + 12
     }
     if (clientInfo.phone) {
       addText("Tel :", clientX, y + 5, 7, "bold", [50, 50, 50])
       clientX += 9
       addText(clientInfo.phone, clientX, y + 5, 7, "normal", [80, 80, 80])
-      clientX += doc.getStringUnitWidth(clientInfo.phone) * 7 * 0.35 + 8
+      clientX += doc.getStringUnitWidth(clientInfo.phone) * 7 * 0.35 + 12
     }
     if (clientInfo.email) {
       addText("Email :", clientX, y + 5, 7, "bold", [50, 50, 50])
       clientX += 13
       addText(clientInfo.email, clientX, y + 5, 7, "normal", [80, 80, 80])
     }
-    y += 10
+    
+    // Deuxieme ligne : Adresse complete (si disponible dans address ou dans un champ separe)
+    addText("Adresse du bien :", margin + 4, y + 13, 7, "bold", [50, 50, 50])
+    addText(address || "Non renseignee", margin + 38, y + 13, 7, "normal", [80, 80, 80])
+    
+    y += 18
     addText("Coordonnees du demandeur", margin + 4, y, 5, "normal", [150, 150, 150])
-    y += 6
+    y += 8
   } else {
     y += 2
   }
