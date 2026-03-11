@@ -496,6 +496,9 @@ export function DiagnosticTool() {
   const [clientName, setClientName] = useState("")
   const [clientPhone, setClientPhone] = useState("")
   const [clientEmail, setClientEmail] = useState("")
+  const [clientAddress, setClientAddress] = useState("")
+  const [clientPostalCode, setClientPostalCode] = useState("")
+  const [clientCity, setClientCity] = useState("")
   const [acceptedDisclaimer, setAcceptedDisclaimer] = useState(false)
   const [emailSent, setEmailSent] = useState(false)
   const [sendingEmail, setSendingEmail] = useState(false)
@@ -1221,6 +1224,59 @@ setCapturedImage(null)
                     required
                   />
                 </div>
+                
+                {/* Adresse postale */}
+                <div className="mt-3 border-t border-border/50 pt-3">
+                  <p className="mb-2 text-xs font-semibold text-foreground">Adresse postale du bien</p>
+                  <div className="space-y-3">
+                    <div>
+                      <label htmlFor="client-address" className="mb-1 block text-[11px] font-medium text-muted-foreground">
+                        Adresse *
+                      </label>
+                      <input
+                        id="client-address"
+                        type="text"
+                        value={clientAddress}
+                        onChange={(e) => setClientAddress(e.target.value)}
+                        placeholder="12 rue de la Toiture"
+                        className="h-10 w-full rounded-lg border border-border bg-background px-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                        required
+                      />
+                    </div>
+                    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                      <div>
+                        <label htmlFor="client-postal" className="mb-1 block text-[11px] font-medium text-muted-foreground">
+                          Code postal *
+                        </label>
+                        <input
+                          id="client-postal"
+                          type="text"
+                          value={clientPostalCode}
+                          onChange={(e) => setClientPostalCode(e.target.value)}
+                          placeholder="75001"
+                          maxLength={5}
+                          className="h-10 w-full rounded-lg border border-border bg-background px-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                          required
+                        />
+                      </div>
+                      <div>
+                        <label htmlFor="client-city" className="mb-1 block text-[11px] font-medium text-muted-foreground">
+                          Ville *
+                        </label>
+                        <input
+                          id="client-city"
+                          type="text"
+                          value={clientCity}
+                          onChange={(e) => setClientCity(e.target.value)}
+                          placeholder="Paris"
+                          className="h-10 w-full rounded-lg border border-border bg-background px-3 text-sm text-foreground placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
+                          required
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                
                 <p className="text-[10px] text-muted-foreground">
                   Le rapport PDF sera envoye a cette adresse. Vos coordonnees restent confidentielles.
                 </p>
@@ -1781,7 +1837,7 @@ onClick={async () => {
   capturedImage || "",
   formattedAddress,
   mapMeasurements,
-  { name: clientName, phone: clientPhone, email: clientEmail },
+  { name: clientName, phone: clientPhone, email: clientEmail, address: clientAddress && clientPostalCode && clientCity ? `${clientAddress}, ${clientPostalCode} ${clientCity}` : address },
   georisques
   )
   }}
@@ -1943,7 +1999,10 @@ onClick={async () => {
                         
                         // Regenerate PDF with photos and weather
                         const { generateDiagnosticPDF } = await import("@/lib/generate-pdf")
-                        const clientInfo = { name: clientName, phone: clientPhone, email: clientEmail }
+const fullAddress = clientAddress && clientPostalCode && clientCity 
+        ? `${clientAddress}, ${clientPostalCode} ${clientCity}` 
+        : address
+      const clientInfo = { name: clientName, phone: clientPhone, email: clientEmail, address: fullAddress }
                         await generateDiagnosticPDF(
                           diagnostic,
                           capturedImage || "",

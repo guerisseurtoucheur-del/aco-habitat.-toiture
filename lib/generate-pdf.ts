@@ -102,7 +102,7 @@ async function buildPDF(
   capturedImage: string,
   address: string,
   measurements: { type: string; value: number }[],
-  clientInfo?: { name?: string; phone?: string; email?: string },
+  clientInfo?: { name?: string; phone?: string; email?: string; address?: string },
   georisques?: GeorisquesData | null,
   weatherHistory?: WeatherHistory | null,
   annotatedPhotos?: AnnotatedPhoto[] | null
@@ -224,9 +224,10 @@ async function buildPDF(
       addText(clientInfo.email, clientX, y + 5, 7, "normal", [80, 80, 80])
     }
     
-    // Deuxieme ligne : Adresse complete (si disponible dans address ou dans un champ separe)
+    // Deuxieme ligne : Adresse complete (priorite a l'adresse client si renseignee)
     addText("Adresse du bien :", margin + 4, y + 13, 7, "bold", [50, 50, 50])
-    addText(address || "Non renseignee", margin + 38, y + 13, 7, "normal", [80, 80, 80])
+    const displayAddress = clientInfo.address || address || "Non renseignee"
+    addText(displayAddress, margin + 38, y + 13, 7, "normal", [80, 80, 80])
     
     y += 18
     addText("Coordonnees du demandeur", margin + 4, y, 5, "normal", [150, 150, 150])
@@ -1175,7 +1176,7 @@ export async function generateDiagnosticPDF(
   capturedImage: string,
   address: string,
   measurements: { type: string; value: number }[],
-  clientInfo?: { name?: string; phone?: string; email?: string },
+  clientInfo?: { name?: string; phone?: string; email?: string; address?: string },
   georisques?: GeorisquesData | null,
   weatherHistory?: WeatherHistory | null,
   annotatedPhotos?: AnnotatedPhoto[] | null
@@ -1191,7 +1192,7 @@ export async function generateDiagnosticPDFBase64(
   capturedImage: string,
   address: string,
   measurements: { type: string; value: number }[],
-  clientInfo?: { name?: string; phone?: string; email?: string },
+  clientInfo?: { name?: string; phone?: string; email?: string; address?: string },
   georisques?: GeorisquesData | null,
   weatherHistory?: WeatherHistory | null,
   annotatedPhotos?: AnnotatedPhoto[] | null
