@@ -181,65 +181,7 @@ export default function RootLayout({
             }),
           }}
         />
-        <script
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{
-            __html: JSON.stringify({
-              "@context": "https://schema.org",
-              "@type": "FAQPage",
-              mainEntity: [
-                {
-                  "@type": "Question",
-                  name: "Comment fonctionne le diagnostic IA de toiture ?",
-                  acceptedAnswer: {
-                    "@type": "Answer",
-                    text: "Notre intelligence artificielle analyse votre photo satellite ou aerienne en superposant trois calques de diagnostic : vegetal (mousse, lichen), structure (tuiles cassees, deplacees) et etancheite (traces d'humidite, infiltrations). Le resultat est disponible en moins de 30 secondes.",
-                  },
-                },
-                {
-                  "@type": "Question",
-                  name: "Quelle photo dois-je utiliser pour le diagnostic ?",
-                  acceptedAnswer: {
-                    "@type": "Answer",
-                    text: "Vous pouvez utiliser une capture d'ecran de Google Maps en vue satellite, une photo prise par drone, ou toute photo aerienne de votre toiture. Plus l'image est nette et recente, plus le diagnostic sera precis.",
-                  },
-                },
-                {
-                  "@type": "Question",
-                  name: "Combien coute un diagnostic ?",
-                  acceptedAnswer: {
-                    "@type": "Answer",
-                    text: "Un diagnostic complet coute 59,90 EUR. Vous recevez instantanement un rapport PDF detaille avec les zones problematiques identifiees, les scores par categorie et des recommandations.",
-                  },
-                },
-                {
-                  "@type": "Question",
-                  name: "Quelle est la precision du diagnostic IA ?",
-                  acceptedAnswer: {
-                    "@type": "Answer",
-                    text: "Notre IA analyse votre toiture sur 4 axes : vegetal (mousse, lichen), structure (tuiles cassees, deplacees), etancheite (infiltrations) et thermique (deperditions). La precision depend de la qualite de l'image fournie.",
-                  },
-                },
-                {
-                  "@type": "Question",
-                  name: "Puis-je utiliser ma propre photo ?",
-                  acceptedAnswer: {
-                    "@type": "Answer",
-                    text: "Oui, vous pouvez utiliser une photo drone, une photo prise depuis le sol avec votre smartphone, ou une capture Google Maps. Plus l'image est nette et recente, plus le diagnostic sera precis.",
-                  },
-                },
-                {
-                  "@type": "Question",
-                  name: "Comment trouver un couvreur apres le diagnostic ?",
-                  acceptedAnswer: {
-                    "@type": "Answer",
-                    text: "Notre annuaire de couvreurs partenaires vous permet de trouver un professionnel qualifie pres de chez vous. Vous pouvez lui transmettre directement votre rapport PDF pour obtenir un devis precis.",
-                  },
-                },
-              ],
-            }),
-          }}
-        />
+        {/* FAQPage schema is handled by individual pages via StructuredData component */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -260,9 +202,8 @@ export default function RootLayout({
                 url: "https://diag.aco-habitat.fr/#diagnostic",
               },
               brand: {
-                "@type": "Organization",
+                "@type": "Brand",
                 name: "ACO-HABITAT",
-                url: "https://diag.aco-habitat.fr",
               },
               aggregateRating: {
                 "@type": "AggregateRating",
