@@ -220,7 +220,7 @@ function formatContent(content: string): string {
   
   // Wrap table rows
   if (html.includes('<tr>')) {
-    html = html.replace(/(<tr>.*?<\/tr>\s*)+/gs, '<table class="w-full border-collapse border my-4">$&</table>')
+    html = html.replace(/(<tr>[^]*?<\/tr>\s*)+/g, '<table class="w-full border-collapse border my-4">$&</table>')
   }
 
   return html
