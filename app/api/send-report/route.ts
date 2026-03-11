@@ -51,16 +51,30 @@ export async function POST(req: Request) {
               les zones problematiques detectees et nos recommandations.
             </p>
 
-            <div style="background: #1a1500; border: 1px solid #d97706; border-radius: 8px; padding: 16px; margin: 20px 0;">
-              <p style="color: #fbbf24; font-weight: bold; margin: 0 0 5px; font-size: 14px;">Diagnostic charpente par IA</p>
-              <p style="color: #ccc; margin: 0 0 12px; font-size: 13px; line-height: 1.5;">
-                Completez votre analyse avec un diagnostic charpente pour une vision complete 
-                de l'etat de votre couverture et de sa structure porteuse.
-              </p>
-              <a href="https://aco-habitat.fr" 
-                 style="display: inline-block; padding: 10px 24px; background: #d97706; color: #000; font-weight: bold; text-decoration: none; border-radius: 6px; font-size: 13px;">
-                Analyser ma charpente sur aco-habitat.fr
-              </a>
+            <div style="margin: 20px 0;">
+              <p style="color: #fff; font-weight: bold; margin: 0 0 15px; font-size: 15px;">Nos autres diagnostics IA</p>
+              
+              <div style="background: #0a1a1a; border: 1px solid #06b6d4; border-radius: 8px; padding: 14px; margin-bottom: 10px;">
+                <p style="color: #22d3ee; font-weight: bold; margin: 0 0 5px; font-size: 14px;">Diagnostic Humidite IA</p>
+                <p style="color: #aaa; margin: 0 0 10px; font-size: 12px; line-height: 1.4;">
+                  Analysez les problemes d'humidite de votre maison : remontees capillaires, condensation, infiltrations.
+                </p>
+                <a href="https://humidite.aco-habitat.fr" 
+                   style="display: inline-block; padding: 8px 20px; background: #06b6d4; color: #000; font-weight: bold; text-decoration: none; border-radius: 6px; font-size: 12px;">
+                  humidite.aco-habitat.fr
+                </a>
+              </div>
+              
+              <div style="background: #1a1500; border: 1px solid #d97706; border-radius: 8px; padding: 14px;">
+                <p style="color: #fbbf24; font-weight: bold; margin: 0 0 5px; font-size: 14px;">Diagnostic Charpente & Bois IA</p>
+                <p style="color: #aaa; margin: 0 0 10px; font-size: 12px; line-height: 1.4;">
+                  Detectez les problemes de charpente : merule, insectes xylophages, etat du bois.
+                </p>
+                <a href="https://traitement-bois.fr" 
+                   style="display: inline-block; padding: 8px 20px; background: #d97706; color: #000; font-weight: bold; text-decoration: none; border-radius: 6px; font-size: 12px;">
+                  traitement-bois.fr
+                </a>
+              </div>
             </div>
 
             <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
