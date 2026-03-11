@@ -675,9 +675,9 @@ export function DiagnosticTool() {
       setStep("results")
 
       // Fetch weather history (non-blocking)
-      const capture = pendingCaptureRef.current
-      if (capture?.center) {
-        fetch(`/api/weather-history?lat=${capture.center.lat}&lng=${capture.center.lng}&days=30`)
+      const weatherCapture = pendingCaptureRef.current
+      if (weatherCapture?.center) {
+        fetch(`/api/weather-history?lat=${weatherCapture.center.lat}&lng=${weatherCapture.center.lng}&days=30`)
           .then(res => res.json())
           .then(data => {
             if (data && !data.error) {
