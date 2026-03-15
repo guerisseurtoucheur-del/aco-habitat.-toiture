@@ -121,9 +121,9 @@ export async function GET(req: Request) {
                     Completez votre diagnostic toiture avec une <strong style="color: #fbbf24;">analyse charpente par IA</strong> 
                     pour une vision complete de votre couverture.
                   </p>
-                  <a href="https://aco-habitat.fr" 
+                  <a href="https://traitement-bois.fr" 
                      style="display: inline-block; padding: 10px 24px; background: #d97706; color: #000; font-weight: bold; text-decoration: none; border-radius: 6px; font-size: 13px;">
-                    Diagnostic charpente sur aco-habitat.fr
+                    Diagnostic charpente sur traitement-bois.fr
                   </a>
                 </div>
 
