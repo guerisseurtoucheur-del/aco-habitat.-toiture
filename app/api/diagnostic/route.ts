@@ -5,7 +5,8 @@ import { fetchGeorisques, getCodeInseeFromAddress, type GeorisquesData } from "@
 export const maxDuration = 60
 
 export async function POST(req: Request) {
-  const { image, address, measurements, bounds, zoom } = await req.json()
+  try {
+    const { image, address, measurements, bounds, zoom } = await req.json()
 
   // Fetch Georisques data in parallel if address is provided
   let georisquesData: GeorisquesData | null = null
@@ -252,7 +253,14 @@ ${address ? `Adresse du bien : ${address}` : ""}`,
   })
 
   return Response.json({ 
-    diagnostic: output,
-    georisques: georisquesData
-  })
+      diagnostic: output,
+      georisques: georisquesData
+    })
+  } catch (error) {
+    console.error("Erreur API diagnostic:", error)
+    return Response.json({ 
+      error: "Erreur lors de l'analyse", 
+      details: error instanceof Error ? error.message : "Erreur inconnue" 
+    }, { status: 500 })
+  }
 }
