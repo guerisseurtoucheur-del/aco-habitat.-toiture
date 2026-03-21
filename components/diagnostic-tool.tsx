@@ -484,6 +484,7 @@ export function DiagnosticTool() {
   const dropdownRef = useRef<HTMLDivElement>(null)
   const [mapCenter, setMapCenter] = useState<{ lat: number; lng: number } | null>(null)
   const [capturedImage, setCapturedImage] = useState<string | null>(null)
+  const [photoDate, setPhotoDate] = useState<string | null>(null)
   const [mapMeasurements, setMapMeasurements] = useState<MapMeasurement[]>([])
   const [formattedAddress, setFormattedAddress] = useState("")
   const [diagnostic, setDiagnostic] = useState<DiagnosticResult | null>(null)
@@ -649,6 +650,7 @@ export function DiagnosticTool() {
   // Handle map capture -> go to payment
   const handleMapCapture = useCallback((data: MapCaptureData) => {
     setCapturedImage(data.imageBase64)
+    setPhotoDate(data.photoDate || null)
     setMapMeasurements(data.measurements)
     pendingCaptureRef.current = data
     setStep("payment")
@@ -731,7 +733,7 @@ export function DiagnosticTool() {
         // 2. Auto-download PDF (separate, non-blocking) - photos will be added when user uploads them
         import("@/lib/generate-pdf").then(async ({ generateDiagnosticPDF }) => {
           const clientInfo = { name: clientName, phone: clientPhone, email: clientEmail }
-          await generateDiagnosticPDF(finalDiag, capturedImage || "", formattedAddress, mapMeasurements, clientInfo, diagData.georisques, null, null)
+          await generateDiagnosticPDF(finalDiag, capturedImage || "", formattedAddress, mapMeasurements, clientInfo, diagData.georisques, null, null, photoDate)
         }).catch(() => {})
 
         // Email is now sent manually via button in results section
@@ -1838,7 +1840,10 @@ onClick={async () => {
   formattedAddress,
   mapMeasurements,
   { name: clientName, phone: clientPhone, email: clientEmail, address: clientAddress && clientPostalCode && clientCity ? `${clientAddress}, ${clientPostalCode} ${clientCity}` : address },
-  georisques
+  georisques,
+  null,
+  null,
+  photoDate
   )
   }}
                   className="group relative inline-flex items-center gap-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 px-8 py-4 text-base font-bold text-white shadow-lg shadow-cyan-500/25 transition-all hover:shadow-xl hover:shadow-cyan-500/30"
@@ -1874,7 +1879,11 @@ onClick={async () => {
                               capturedImage || "",
                               formattedAddress,
                               mapMeasurements,
-                              { name: clientName, phone: clientPhone, email: clientEmail }
+                              { name: clientName, phone: clientPhone, email: clientEmail },
+                              georisques,
+                              null,
+                              null,
+                              photoDate
                             )
                             const res = await fetch("/api/send-report", {
                               method: "POST",
@@ -2011,7 +2020,8 @@ const fullAddress = clientAddress && clientPostalCode && clientCity
                           clientInfo,
                           georisques,
                           weatherHistory,
-                          annotatedForPDF.length > 0 ? annotatedForPDF : null
+                          annotatedForPDF.length > 0 ? annotatedForPDF : null,
+                          photoDate
                         )
                       } catch (e) {
                         console.log("[v0] PDF generation error:", e)
