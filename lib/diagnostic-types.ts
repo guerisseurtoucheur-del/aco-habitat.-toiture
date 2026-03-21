@@ -90,7 +90,7 @@ export const diagnosticSchema = z.object({
     coutEstime: z
       .string()
       .describe("Estimation du cout du traitement nettoyage + hydrofuge en euros (ex: '15-25 EUR/m2' ou '1500-3000 EUR pour cette surface')"),
-  }).optional(),
+  }).nullable(),
   thermique: z.object({
     scoreIsolation: z
       .number()
