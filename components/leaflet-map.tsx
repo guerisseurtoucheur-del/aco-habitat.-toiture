@@ -73,7 +73,8 @@ export type MapCaptureData = {
   center: { lat: number; lng: number }
   zoom: number
   measurements: MapMeasurement[]
-}
+  photoDate?: string | null
+  }
 
 type LayerMode = "satellite" | "plan" | "cadastre"
 
@@ -406,6 +407,7 @@ export default function LeafletMap({
         center: { lat: captureCenter.lat, lng: captureCenter.lng },
         zoom: map.getZoom(),
         measurements,
+        photoDate: data.photoDate || null,
       })
     } catch (err) {
       console.error("Capture failed:", err)

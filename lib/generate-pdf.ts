@@ -105,7 +105,8 @@ async function buildPDF(
   clientInfo?: { name?: string; phone?: string; email?: string; address?: string },
   georisques?: GeorisquesData | null,
   weatherHistory?: WeatherHistory | null,
-  annotatedPhotos?: AnnotatedPhoto[] | null
+  annotatedPhotos?: AnnotatedPhoto[] | null,
+  photoDate?: string | null
 ) {
   const doc = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" })
   const pageW = doc.internal.pageSize.getWidth()
@@ -164,7 +165,7 @@ async function buildPDF(
 
   // ═══════════════════════════════════════
   // PAGE 1: Header + Image + Scores
-  // ══════�������════════════════════════════════
+  // ���═════�������════════════════════════════════
 
   // Header bar
   doc.setFillColor(24, 24, 27) // zinc-900
@@ -246,7 +247,11 @@ async function buildPDF(
     doc.setLineWidth(0.5)
     doc.rect(margin, y, imgW, imgH)
     y += imgH + 3
-    addText("Vue aerienne - Capture satellite IGN / Photo de la toiture", margin, y, 6, "normal", [150, 150, 150])
+    // Legende avec date de prise de vue si disponible
+    const photoCaption = photoDate 
+      ? `Vue aerienne IGN - Prise de vue : ${photoDate}`
+      : "Vue aerienne - Capture satellite IGN / Photo de la toiture"
+    addText(photoCaption, margin, y, 6, "normal", [150, 150, 150])
     y += 8
   } catch {
     y += 5
@@ -1179,9 +1184,10 @@ export async function generateDiagnosticPDF(
   clientInfo?: { name?: string; phone?: string; email?: string; address?: string },
   georisques?: GeorisquesData | null,
   weatherHistory?: WeatherHistory | null,
-  annotatedPhotos?: AnnotatedPhoto[] | null
+  annotatedPhotos?: AnnotatedPhoto[] | null,
+  photoDate?: string | null
 ) {
-  const doc = await buildPDF(diagnostic, capturedImage, address, measurements, clientInfo, georisques, weatherHistory, annotatedPhotos)
+  const doc = await buildPDF(diagnostic, capturedImage, address, measurements, clientInfo, georisques, weatherHistory, annotatedPhotos, photoDate)
   const fileName = `diagnostic-toiture-aco-habitat-${new Date().toISOString().slice(0, 10)}.pdf`
   doc.save(fileName)
 }
@@ -1195,9 +1201,10 @@ export async function generateDiagnosticPDFBase64(
   clientInfo?: { name?: string; phone?: string; email?: string; address?: string },
   georisques?: GeorisquesData | null,
   weatherHistory?: WeatherHistory | null,
-  annotatedPhotos?: AnnotatedPhoto[] | null
+  annotatedPhotos?: AnnotatedPhoto[] | null,
+  photoDate?: string | null
 ): Promise<string> {
-  const doc = await buildPDF(diagnostic, capturedImage, address, measurements, clientInfo, georisques, weatherHistory, annotatedPhotos)
+  const doc = await buildPDF(diagnostic, capturedImage, address, measurements, clientInfo, georisques, weatherHistory, annotatedPhotos, photoDate)
   const arrayBuffer = doc.output("arraybuffer")
   const uint8 = new Uint8Array(arrayBuffer)
   let binary = ""
