@@ -8,7 +8,7 @@ export async function POST(req: Request) {
   try {
     const { image, address, measurements, bounds, zoom } = await req.json()
 
-  // Fetch Georisques data in parallel if address is provided
+    // Fetch Georisques data in parallel if address is provided
   let georisquesData: GeorisquesData | null = null
   if (address) {
     try {
