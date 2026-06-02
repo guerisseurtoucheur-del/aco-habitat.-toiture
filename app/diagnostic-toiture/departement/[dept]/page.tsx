@@ -40,7 +40,7 @@ export async function generateMetadata({
   }
 
   const title = `Diagnostic Toiture ${deptData.name} (${deptData.code}) | Analyse IA | ACO-HABITAT`
-  const description = `Diagnostic toiture par IA dans le ${deptData.name} (${deptData.code}). Analyse des toitures ${deptData.mainRoofTypes.slice(0, 2).join(" et ")} adaptees au climat ${deptData.climate}. Problemes frequents : ${deptData.specificProblems.slice(0, 2).join(", ")}. Rapport PDF a 59,90 EUR.`
+  const description = `Diagnostic toiture par IA dans le ${deptData.name} (${deptData.code}). Analyse des toitures ${deptData.mainRoofTypes.slice(0, 2).join(" et ")} adaptees au climat ${deptData.climate}. Problemes frequents : ${deptData.specificProblems.slice(0, 2).join(", ")}. Rapport PDF a 19 EUR.`
 
   return {
     title,
@@ -112,7 +112,7 @@ export default async function DepartmentPage({
         },
         "offers": {
           "@type": "Offer",
-          "price": "59.90",
+          "price": "19",
           "priceCurrency": "EUR",
           "description": "Diagnostic toiture complet par IA avec rapport PDF"
         }
@@ -179,7 +179,7 @@ export default async function DepartmentPage({
                 <div className="mt-8 flex flex-wrap gap-4">
                   <Button asChild size="lg" className="gap-2">
                     <Link href="/#diagnostic">
-                      Diagnostic IA - 59,90 EUR
+                      Diagnostic IA - 19 EUR
                       <ArrowRight size={16} />
                     </Link>
                   </Button>
@@ -416,7 +416,7 @@ export default async function DepartmentPage({
             </p>
             <Button asChild size="lg" className="gap-2 px-8">
               <Link href="/#diagnostic">
-                Lancer mon diagnostic - 59,90 EUR
+                Lancer mon diagnostic - 19 EUR
                 <ArrowRight size={16} />
               </Link>
             </Button>

@@ -165,7 +165,7 @@ function CityStructuredData({ city }: { city: typeof citiesData[string] }) {
         },
         "offers": {
           "@type": "Offer",
-          "price": "59.90",
+          "price": "19",
           "priceCurrency": "EUR",
           "availability": "https://schema.org/InStock"
         }
@@ -251,7 +251,7 @@ function CityStructuredData({ city }: { city: typeof citiesData[string] }) {
           "@type": "Offer",
           "url": `https://diag.aco-habitat.fr/diagnostic-toiture/${city.slug}`,
           "priceCurrency": "EUR",
-          "price": "59.90",
+          "price": "19",
           "priceValidUntil": "2027-12-31",
           "availability": "https://schema.org/InStock",
           "seller": {
@@ -399,7 +399,7 @@ export default async function CityPage({ params }: PageProps) {
                   </Button>
                   <Button asChild variant="outline" size="lg">
                     <Link href="/#tarifs">
-                      Voir les tarifs - 59,90 EUR
+                      Voir les tarifs - 19 EUR
                     </Link>
                   </Button>
                 </div>
@@ -590,7 +590,7 @@ export default async function CityPage({ params }: PageProps) {
                   <CardTitle className="text-base">Diagnostic IA</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-2xl font-bold text-primary">59,90 EUR</p>
+                  <p className="text-2xl font-bold text-primary">19 EUR</p>
                   <p className="text-xs text-muted-foreground">Rapport PDF en 30 secondes</p>
                 </CardContent>
               </Card>
@@ -828,7 +828,7 @@ export default async function CityPage({ params }: PageProps) {
             <div className="flex flex-col justify-center gap-4 sm:flex-row">
               <Button asChild size="lg" className="gap-2">
                 <Link href="/#diagnostic">
-                  Analyser ma toiture - 59,90 EUR
+                  Analyser ma toiture - 19 EUR
                   <ArrowRight className="h-4 w-4" />
                 </Link>
               </Button>

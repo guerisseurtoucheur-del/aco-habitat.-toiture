@@ -67,7 +67,7 @@ export function Footer() {
               Pret a analyser votre toiture ?
             </h3>
             <p className="mt-3 text-base text-muted-foreground">
-              Diagnostic IA complet pour seulement 59,90{"\u20AC"}. Resultat en 30 secondes.
+              Diagnostic IA complet pour seulement 19{"\u20AC"}. Resultat en 30 secondes.
             </p>
             <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <a
@@ -75,7 +75,7 @@ export function Footer() {
                 className="group flex items-center gap-2 rounded-xl bg-primary px-8 py-4 text-sm font-semibold text-primary-foreground transition-all hover:shadow-lg hover:shadow-primary/25"
               >
                 <Zap size={16} className="transition-transform group-hover:scale-110" />
-                Analyser ma toiture - 59,90 EUR
+                Analyser ma toiture - 19 EUR
               </a>
               <a
                 href="#couvreurs"
@@ -182,7 +182,7 @@ export function Footer() {
               <div className="flex items-center gap-3 rounded-xl border border-primary/20 bg-primary/5 px-4 py-3">
                 <Zap size={16} className="text-primary" />
                 <div className="flex flex-col">
-                  <span className="text-xs font-semibold text-foreground">59,90 EUR par diagnostic</span>
+                  <span className="text-xs font-semibold text-foreground">19 EUR par diagnostic</span>
                   <span className="text-[10px] text-muted-foreground">Rapport PDF complet inclus</span>
                 </div>
               </div>

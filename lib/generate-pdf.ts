@@ -163,7 +163,7 @@ async function buildPDF(
     return false
   }
 
-  // ═══════════════════════════════════════
+  // ══════════════��════════════════════════
   // PAGE 1: Header + Image + Scores
   // ���═════�������════════════════════════════════
 
@@ -173,7 +173,7 @@ async function buildPDF(
   addText("ACO-HABITAT", margin, 12, 16, "bold", [255, 255, 255])
   addText("DIAGNOSTIC TOITURE PAR IA", margin, 19, 7, "normal", [160, 160, 170])
   addText("aco-habitat.fr", pageW - margin - 27, 12, 8, "bold", [255, 255, 255])
-  addText("59,90 EUR par diagnostic", pageW - margin - 35, 19, 7, "normal", [160, 160, 170])
+  addText("19 EUR par diagnostic", pageW - margin - 30, 19, 7, "normal", [160, 160, 170])
   y = 36
 
   // Title
@@ -1123,12 +1123,12 @@ async function buildPDF(
   addText("49,92 EUR", margin + contentW - 25, y + 8, 8, "bold", [30, 30, 30])
   
   addText("TVA 20%", margin + contentW - 66, y + 16, 8, "normal", [80, 80, 80])
-  addText("9,98 EUR", margin + contentW - 25, y + 16, 8, "normal", [30, 30, 30])
+  addText("3,17 EUR", margin + contentW - 25, y + 16, 8, "normal", [30, 30, 30])
   
   doc.setFillColor(30, 64, 175)
   doc.roundedRect(margin + contentW - 70, y + 22, 70, 11, 0, 0, "F")
   addText("TOTAL TTC", margin + contentW - 66, y + 29, 8, "bold", [255, 255, 255])
-  addText("59,90 EUR", margin + contentW - 25, y + 29, 9, "bold", [255, 255, 255])
+  addText("19 EUR", margin + contentW - 20, y + 29, 9, "bold", [255, 255, 255])
   
   y += 45
   

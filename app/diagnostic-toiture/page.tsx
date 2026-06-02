@@ -18,7 +18,7 @@ import {
 
 export const metadata: Metadata = {
   title: "Diagnostic Toiture France | Toutes les Villes et Regions | ACO-HABITAT",
-  description: "Diagnostic toiture par IA dans toute la France. Trouvez votre ville ou region pour une analyse adaptee a votre climat local. Plus de 100 villes couvertes. Rapport PDF a 59,90 EUR.",
+  description: "Diagnostic toiture par IA dans toute la France. Trouvez votre ville ou region pour une analyse adaptee a votre climat local. Plus de 100 villes couvertes. Rapport PDF a 19 EUR.",
   keywords: [
     "diagnostic toiture France",
     "analyse toiture IA",
@@ -94,7 +94,7 @@ export default function DiagnosticToiturePage() {
               <div className="flex flex-col justify-center gap-3 sm:flex-row">
                 <Button asChild size="lg" className="gap-2">
                   <Link href="/#diagnostic">
-                    Analyser ma toiture - 59,90 EUR
+                    Analyser ma toiture - 19 EUR
                     <ArrowRight className="h-4 w-4" />
                   </Link>
                 </Button>
@@ -126,7 +126,7 @@ export default function DiagnosticToiturePage() {
                 <p className="text-sm text-muted-foreground">Analyse IA</p>
               </div>
               <div className="text-center">
-                <p className="text-3xl font-bold text-primary">59,90 EUR</p>
+                <p className="text-3xl font-bold text-primary">19 EUR</p>
                 <p className="text-sm text-muted-foreground">Rapport PDF</p>
               </div>
             </div>
@@ -239,7 +239,7 @@ export default function DiagnosticToiturePage() {
             <div className="flex flex-col justify-center gap-4 sm:flex-row">
               <Button asChild size="lg" className="gap-2">
                 <Link href="/#diagnostic">
-                  Analyser ma toiture - 59,90 EUR
+                  Analyser ma toiture - 19 EUR
                   <ArrowRight className="h-4 w-4" />
                 </Link>
               </Button>
