@@ -17,7 +17,7 @@ const faqs = [
   {
     question: "Combien coute le diagnostic en ligne ?",
     answer:
-      "Le diagnostic IA en ligne coute 59,90\u20AC. Vous recevez instantanement un rapport detaille avec les zones problematiques identifiees, une analyse thermique, un score d'isolation et des recommandations d'intervention. Le devis d'intervention qui suit est gratuit et sans engagement.",
+      "Le diagnostic IA en ligne coute 19\u20AC. Vous recevez instantanement un rapport detaille avec les zones problematiques identifiees, une analyse thermique, un score d'isolation et des recommandations d'intervention. Le devis d'intervention qui suit est gratuit et sans engagement.",
   },
   {
     question: "Que contient le rapport PDF ?",
@@ -27,7 +27,7 @@ const faqs = [
   {
     question: "Comment trouver un couvreur apres le diagnostic ?",
     answer:
-      "Le cout depend de la nature et de l'etendue des travaux identifies lors du diagnostic. Le diagnostic IA coute 59,90\u20AC et le devis d'intervention est gratuit et detaille. Nos prix sont transparents et competitifs.",
+      "Le cout depend de la nature et de l'etendue des travaux identifies lors du diagnostic. Le diagnostic IA coute 19\u20AC et le devis d'intervention est gratuit et detaille. Nos prix sont transparents et competitifs.",
   },
   {
     question: "Le diagnostic est-il disponible partout en France ?",

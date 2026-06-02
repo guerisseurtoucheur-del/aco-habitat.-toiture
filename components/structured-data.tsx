@@ -8,7 +8,7 @@ export function StructuredData() {
     telephone: "+33233311979",
     email: "aco.habitat@orange.fr",
     description:
-      "Expert couvreur France entiere. Diagnostic toiture par intelligence artificielle a 59,90\u20AC. Demoussage, reparation, renovation, charpente et isolation. Devis d'intervention gratuit.",
+      "Expert couvreur France entiere. Diagnostic toiture par intelligence artificielle a 19\u20AC. Demoussage, reparation, renovation, charpente et isolation. Devis d'intervention gratuit.",
     image: "https://diag.aco-habitat.fr/og-image.jpg",
     logo: "https://diag.aco-habitat.fr/icon-512.png",
     priceRange: "$$",
@@ -38,7 +38,7 @@ export function StructuredData() {
             "@type": "Service",
             name: "Diagnostic Toiture IA",
             description:
-              "Analyse de votre toiture par intelligence artificielle via image satellite pour 59,90\u20AC. Detection des problemes de vegetation, structure, etancheite et thermique en 30 secondes.",
+              "Analyse de votre toiture par intelligence artificielle via image satellite pour 19\u20AC. Detection des problemes de vegetation, structure, etancheite et thermique en 30 secondes.",
           },
         },
         {
@@ -114,7 +114,7 @@ export function StructuredData() {
         name: "Combien coute le diagnostic en ligne ?",
         acceptedAnswer: {
           "@type": "Answer",
-          text: "Le diagnostic IA en ligne coute 59,90\u20AC. Vous recevez instantanement un rapport detaille avec les zones problematiques identifiees, une analyse thermique, un score d'isolation et des recommandations d'intervention. Le devis d'intervention qui suit est gratuit et sans engagement.",
+          text: "Le diagnostic IA en ligne coute 19\u20AC. Vous recevez instantanement un rapport detaille avec les zones problematiques identifiees, une analyse thermique, un score d'isolation et des recommandations d'intervention. Le devis d'intervention qui suit est gratuit et sans engagement.",
         },
       },
       {
@@ -130,7 +130,7 @@ export function StructuredData() {
         name: "Combien coute une intervention de reparation ?",
         acceptedAnswer: {
           "@type": "Answer",
-          text: "Le cout depend de la nature et de l'etendue des travaux identifies lors du diagnostic. Le diagnostic IA coute 59,90\u20AC et le devis d'intervention est gratuit et detaille. Nos prix sont transparents et competitifs.",
+          text: "Le cout depend de la nature et de l'etendue des travaux identifies lors du diagnostic. Le diagnostic IA coute 19\u20AC et le devis d'intervention est gratuit et detaille. Nos prix sont transparents et competitifs.",
         },
       },
       {
@@ -150,7 +150,7 @@ export function StructuredData() {
     name: "ACO-HABITAT Diagnostic Toiture",
     url: "https://diag.aco-habitat.fr",
     description:
-      "Diagnostic de votre toiture par intelligence artificielle pour 59,90\u20AC. Analyse satellite en 30 secondes.",
+      "Diagnostic de votre toiture par intelligence artificielle pour 19\u20AC. Analyse satellite en 30 secondes.",
     publisher: {
       "@type": "Organization",
       name: "ACO-HABITAT",

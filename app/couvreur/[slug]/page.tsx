@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   if (!dept) return {}
 
   const title = `Couvreur ${dept.nom} (${dept.code}) - Diagnostic Toiture IA | ACO-HABITAT`
-  const description = `Expert couvreur dans le ${dept.nom} (${dept.code}). Diagnostic toiture par IA a 59,90\u20AC. Intervention a ${dept.prefecture}, ${dept.villesPrincipales.slice(0, 3).join(", ")}. Demoussage, reparation, renovation. Devis gratuit.`
+  const description = `Expert couvreur dans le ${dept.nom} (${dept.code}). Diagnostic toiture par IA a 19\u20AC. Intervention a ${dept.prefecture}, ${dept.villesPrincipales.slice(0, 3).join(", ")}. Demoussage, reparation, renovation. Devis gratuit.`
 
   return {
     title,
@@ -136,7 +136,7 @@ export default async function DepartmentPage({ params }: { params: Promise<{ slu
                 href="/#diagnostic"
                 className="group flex items-center gap-2 rounded-xl bg-primary px-8 py-4 text-base font-semibold text-primary-foreground transition-all hover:shadow-xl hover:shadow-primary/20"
               >
-                Diagnostic IA - 59,90{"\u20AC"}
+                Diagnostic IA - 19{"\u20AC"}
                 <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
               </Link>
               <a
@@ -311,7 +311,7 @@ export default async function DepartmentPage({ params }: { params: Promise<{ slu
                   href="/#diagnostic"
                   className="group flex items-center gap-2 rounded-xl bg-primary px-8 py-4 text-base font-semibold text-primary-foreground transition-all hover:shadow-xl hover:shadow-primary/20"
                 >
-                  Diagnostic IA - 59,90{"\u20AC"}
+                  Diagnostic IA - 19{"\u20AC"}
                   <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
                 </Link>
                 <a

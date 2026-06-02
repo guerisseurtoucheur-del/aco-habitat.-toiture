@@ -24,7 +24,7 @@ export const regionsData: Record<string, RegionData> = {
     mainRoofTypes: ["Zinc", "Ardoise", "Tuiles plates"],
     mainProblems: ["Mousse", "Pollution", "Infiltrations zinc"],
     seoContent: {
-      metaTitle: "Diagnostic Toiture Ile-de-France | Paris & Region | 59,90 EUR",
+      metaTitle: "Diagnostic Toiture Ile-de-France | Paris & Region | 19 EUR",
       metaDescription: "Diagnostic toiture par IA en Ile-de-France. Specialiste zinc parisien, ardoise, tuiles. Analyse mousse, infiltrations. Rapport PDF en 30 secondes.",
       h1: "Diagnostic Toiture en Ile-de-France par Intelligence Artificielle",
       introText: "Notre IA analyse les toitures d'Ile-de-France : zinc haussmannien parisien, ardoises des maisons de banlieue, tuiles des pavillons. Detection precise des problemes lies au climat francilien et a la pollution urbaine."
@@ -38,7 +38,7 @@ export const regionsData: Record<string, RegionData> = {
     mainRoofTypes: ["Tuiles canal", "Ardoise", "Lauzes", "Tuiles mecaniques"],
     mainProblems: ["Grele", "Neige", "Gel intense"],
     seoContent: {
-      metaTitle: "Diagnostic Toiture Auvergne-Rhone-Alpes | Lyon, Grenoble | 59,90 EUR",
+      metaTitle: "Diagnostic Toiture Auvergne-Rhone-Alpes | Lyon, Grenoble | 19 EUR",
       metaDescription: "Diagnostic toiture par IA en Auvergne-Rhone-Alpes. Expert grele, neige, gel alpin. Tuiles, ardoises, lauzes. Rapport PDF instantane.",
       h1: "Diagnostic Toiture en Auvergne-Rhone-Alpes par Intelligence Artificielle",
       introText: "Notre IA analyse les toitures de la region Auvergne-Rhone-Alpes, des tuiles canal lyonnaises aux lauzes auvergnates. Specialiste des contraintes alpines : neige, gel intense, orages de grele du couloir rhodanien."
@@ -52,7 +52,7 @@ export const regionsData: Record<string, RegionData> = {
     mainRoofTypes: ["Tuiles canal", "Tuiles romanes", "Toiture-terrasse"],
     mainProblems: ["Mistral", "Degradation UV", "Sel marin"],
     seoContent: {
-      metaTitle: "Diagnostic Toiture PACA | Marseille, Nice, Toulon | 59,90 EUR",
+      metaTitle: "Diagnostic Toiture PACA | Marseille, Nice, Toulon | 19 EUR",
       metaDescription: "Diagnostic toiture par IA en PACA. Expert mistral, UV mediterraneen, sel marin. Tuiles provencales. Rapport PDF en 30 secondes.",
       h1: "Diagnostic Toiture en PACA par Intelligence Artificielle",
       introText: "Notre IA analyse les toitures provencales et de la Cote d'Azur. Specialiste des tuiles canal mediterraneennes, resistance au mistral, degradation UV et impact du sel marin sur les toitures du littoral."
@@ -66,7 +66,7 @@ export const regionsData: Record<string, RegionData> = {
     mainRoofTypes: ["Tuiles canal", "Tuiles romanes", "Ardoise (Pyrenees)"],
     mainProblems: ["Grele", "Episodes cevenols", "Tramontane/Vent d'autan"],
     seoContent: {
-      metaTitle: "Diagnostic Toiture Occitanie | Toulouse, Montpellier | 59,90 EUR",
+      metaTitle: "Diagnostic Toiture Occitanie | Toulouse, Montpellier | 19 EUR",
       metaDescription: "Diagnostic toiture par IA en Occitanie. Expert grele, episodes cevenols, vent d'autan. Tuiles canal. Rapport PDF instantane.",
       h1: "Diagnostic Toiture en Occitanie par Intelligence Artificielle",
       introText: "Notre IA analyse les toitures d'Occitanie, de la Ville Rose toulousaine aux rivieres mediterraneennes. Specialiste des risques locaux : couloir de grele, episodes cevenols, vent d'autan et tramontane."
@@ -80,7 +80,7 @@ export const regionsData: Record<string, RegionData> = {
     mainRoofTypes: ["Tuiles canal", "Ardoise", "Tuiles mecaniques"],
     mainProblems: ["Tempetes atlantiques", "Mousse", "Humidite"],
     seoContent: {
-      metaTitle: "Diagnostic Toiture Nouvelle-Aquitaine | Bordeaux | 59,90 EUR",
+      metaTitle: "Diagnostic Toiture Nouvelle-Aquitaine | Bordeaux | 19 EUR",
       metaDescription: "Diagnostic toiture par IA en Nouvelle-Aquitaine. Expert tempetes atlantiques, mousse, humidite. Tuiles et ardoises. Rapport PDF instantane.",
       h1: "Diagnostic Toiture en Nouvelle-Aquitaine par Intelligence Artificielle",
       introText: "Notre IA analyse les toitures de Nouvelle-Aquitaine, de Bordeaux au Pays Basque. Specialiste de la resistance aux tempetes atlantiques, detection de la mousse et des infiltrations liees au climat oceanique humide."
@@ -94,7 +94,7 @@ export const regionsData: Record<string, RegionData> = {
     mainRoofTypes: ["Ardoise", "Zinc", "Tuiles"],
     mainProblems: ["Mousse", "Humidite", "Vents d'ouest"],
     seoContent: {
-      metaTitle: "Diagnostic Toiture Pays de la Loire | Nantes, Angers | 59,90 EUR",
+      metaTitle: "Diagnostic Toiture Pays de la Loire | Nantes, Angers | 19 EUR",
       metaDescription: "Diagnostic toiture par IA en Pays de la Loire. Specialiste ardoise d'Anjou, mousse, humidite. Rapport PDF en 30 secondes.",
       h1: "Diagnostic Toiture en Pays de la Loire par Intelligence Artificielle",
       introText: "Notre IA analyse les toitures des Pays de la Loire, region de l'ardoise d'Anjou. Specialiste de la detection de mousse, des infiltrations liees a l'humidite oceanique et de la resistance aux vents d'ouest."
@@ -108,7 +108,7 @@ export const regionsData: Record<string, RegionData> = {
     mainRoofTypes: ["Ardoise", "Zinc", "Chaume (traditionnel)"],
     mainProblems: ["Mousse intense", "Tempetes", "Sel marin"],
     seoContent: {
-      metaTitle: "Diagnostic Toiture Bretagne | Rennes, Brest | 59,90 EUR",
+      metaTitle: "Diagnostic Toiture Bretagne | Rennes, Brest | 19 EUR",
       metaDescription: "Diagnostic toiture par IA en Bretagne. Expert ardoise, mousse, tempetes atlantiques. Patrimoine breton. Rapport PDF instantane.",
       h1: "Diagnostic Toiture en Bretagne par Intelligence Artificielle",
       introText: "Notre IA analyse les toitures bretonnes en ardoise et zinc. Specialiste de la mousse omnipresente, des degats de tempetes atlantiques et de l'impact du sel marin sur les toitures du littoral."
@@ -122,7 +122,7 @@ export const regionsData: Record<string, RegionData> = {
     mainRoofTypes: ["Ardoise", "Chaume", "Zinc", "Tuiles"],
     mainProblems: ["Humidite permanente", "Mousse", "Tempetes"],
     seoContent: {
-      metaTitle: "Diagnostic Toiture Normandie | Rouen, Caen, Le Havre | 59,90 EUR",
+      metaTitle: "Diagnostic Toiture Normandie | Rouen, Caen, Le Havre | 19 EUR",
       metaDescription: "Diagnostic toiture par IA en Normandie. Expert ardoise, colombages, humidite. Patrimoine Perret (Le Havre). Rapport PDF instantane.",
       h1: "Diagnostic Toiture en Normandie par Intelligence Artificielle",
       introText: "Notre IA analyse les toitures normandes : ardoise, maisons a colombages, patrimoine Perret du Havre. Specialiste de l'humidite permanente, de la mousse et des tempetes de la Manche."
@@ -136,7 +136,7 @@ export const regionsData: Record<string, RegionData> = {
     mainRoofTypes: ["Tuiles plates", "Ardoise", "Zinc"],
     mainProblems: ["Gel/degel", "Neige", "Mousse", "Pollution"],
     seoContent: {
-      metaTitle: "Diagnostic Toiture Hauts-de-France | Lille, Amiens | 59,90 EUR",
+      metaTitle: "Diagnostic Toiture Hauts-de-France | Lille, Amiens | 19 EUR",
       metaDescription: "Diagnostic toiture par IA en Hauts-de-France. Expert gel, neige, architecture flamande. Tuiles et ardoises. Rapport PDF instantane.",
       h1: "Diagnostic Toiture dans les Hauts-de-France par Intelligence Artificielle",
       introText: "Notre IA analyse les toitures des Hauts-de-France, de l'architecture flamande lilloise aux maisons picardes. Specialiste de la resistance au gel, a la neige et a la pollution residuelle du bassin minier."
@@ -150,7 +150,7 @@ export const regionsData: Record<string, RegionData> = {
     mainRoofTypes: ["Tuiles queue de castor", "Ardoise", "Tuiles plates"],
     mainProblems: ["Gel severe", "Neige", "Humidite"],
     seoContent: {
-      metaTitle: "Diagnostic Toiture Grand Est | Strasbourg, Reims, Metz | 59,90 EUR",
+      metaTitle: "Diagnostic Toiture Grand Est | Strasbourg, Reims, Metz | 19 EUR",
       metaDescription: "Diagnostic toiture par IA dans le Grand Est. Expert tuiles alsaciennes, gel, neige. Patrimoine colombages. Rapport PDF instantane.",
       h1: "Diagnostic Toiture dans le Grand Est par Intelligence Artificielle",
       introText: "Notre IA analyse les toitures du Grand Est, des tuiles queue de castor alsaciennes aux ardoises champenoises. Specialiste des hivers rigoureux : gel severe, neige abondante, cycles de temperature extremes."
@@ -164,7 +164,7 @@ export const regionsData: Record<string, RegionData> = {
     mainRoofTypes: ["Tuiles vernissees", "Tuiles plates", "Ardoise", "Lauzes"],
     mainProblems: ["Grele (vignoble)", "Gel", "Mousse"],
     seoContent: {
-      metaTitle: "Diagnostic Toiture Bourgogne-Franche-Comte | Dijon, Besancon | 59,90 EUR",
+      metaTitle: "Diagnostic Toiture Bourgogne-Franche-Comte | Dijon, Besancon | 19 EUR",
       metaDescription: "Diagnostic toiture par IA en Bourgogne. Expert tuiles vernissees polychromes, grele, gel. Patrimoine viticole. Rapport PDF instantane.",
       h1: "Diagnostic Toiture en Bourgogne-Franche-Comte par Intelligence Artificielle",
       introText: "Notre IA analyse les toitures bourguignonnes et comtoises : celebres tuiles vernissees polychromes, ardoise, lauzes du Jura. Specialiste de la grele du couloir viticole et des hivers continentaux."
@@ -178,7 +178,7 @@ export const regionsData: Record<string, RegionData> = {
     mainRoofTypes: ["Ardoise", "Tuiles plates", "Tuiles mecaniques"],
     mainProblems: ["Mousse", "Humidite", "Orages"],
     seoContent: {
-      metaTitle: "Diagnostic Toiture Centre-Val de Loire | Tours, Orleans | 59,90 EUR",
+      metaTitle: "Diagnostic Toiture Centre-Val de Loire | Tours, Orleans | 19 EUR",
       metaDescription: "Diagnostic toiture par IA en Centre-Val de Loire. Expert ardoise, chateaux de la Loire, mousse. Rapport PDF en 30 secondes.",
       h1: "Diagnostic Toiture en Centre-Val de Loire par Intelligence Artificielle",
       introText: "Notre IA analyse les toitures du Centre-Val de Loire, region des chateaux de la Loire. Specialiste de l'ardoise ligérienne, detection de la mousse et des problemes lies au climat doux et humide."
@@ -192,7 +192,7 @@ export const regionsData: Record<string, RegionData> = {
     mainRoofTypes: ["Lauzes", "Tuiles canal", "Toiture-terrasse"],
     mainProblems: ["Vents violents", "Secheresse", "Sel marin"],
     seoContent: {
-      metaTitle: "Diagnostic Toiture Corse | Ajaccio, Bastia | 59,90 EUR",
+      metaTitle: "Diagnostic Toiture Corse | Ajaccio, Bastia | 19 EUR",
       metaDescription: "Diagnostic toiture par IA en Corse. Expert lauzes, tuiles, vents violents, sel marin. Patrimoine insulaire. Rapport PDF instantane.",
       h1: "Diagnostic Toiture en Corse par Intelligence Artificielle",
       introText: "Notre IA analyse les toitures corses traditionnelles en lauzes et tuiles. Specialiste des contraintes insulaires : vents violents, secheresse estivale, impact du sel marin sur le littoral."

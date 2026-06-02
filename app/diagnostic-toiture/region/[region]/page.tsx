@@ -41,7 +41,7 @@ export async function generateMetadata({
   }
 
   const title = `Diagnostic Toiture ${regionData.name} | Analyse IA en 30s | ACO-HABITAT`
-  const description = `Diagnostic toiture par IA en ${regionData.name}. Analyse des toitures ${regionData.mainRoofTypes.slice(0, 3).join(", ")} adaptees au climat ${regionData.climate}. ${regionData.departments.length} departements couverts. Rapport PDF detaille a 59,90 EUR.`
+  const description = `Diagnostic toiture par IA en ${regionData.name}. Analyse des toitures ${regionData.mainRoofTypes.slice(0, 3).join(", ")} adaptees au climat ${regionData.climate}. ${regionData.departments.length} departements couverts. Rapport PDF detaille a 19 EUR.`
 
   return {
     title,
@@ -111,7 +111,7 @@ export default async function RegionPage({
         },
         "offers": {
           "@type": "Offer",
-          "price": "59.90",
+          "price": "19",
           "priceCurrency": "EUR",
           "availability": "https://schema.org/InStock"
         },
@@ -135,7 +135,7 @@ export default async function RegionPage({
           "@type": "Offer",
           "url": `https://diag.aco-habitat.fr/diagnostic-toiture/region/${regionData.slug}`,
           "priceCurrency": "EUR",
-          "price": "59.90",
+          "price": "19",
           "priceValidUntil": "2027-12-31",
           "availability": "https://schema.org/InStock"
         },
@@ -192,7 +192,7 @@ export default async function RegionPage({
             "name": `Combien coute un diagnostic toiture en ${regionData.name} ?`,
             "acceptedAnswer": {
               "@type": "Answer",
-              "text": `Notre diagnostic toiture par IA en ${regionData.name} coute 59,90 EUR. Vous recevez un rapport PDF complet analysant votre toiture en moins de 30 secondes.`
+              "text": `Notre diagnostic toiture par IA en ${regionData.name} coute 19 EUR. Vous recevez un rapport PDF complet analysant votre toiture en moins de 30 secondes.`
             }
           }
         ]
@@ -247,7 +247,7 @@ export default async function RegionPage({
                 <div className="flex flex-col gap-3 sm:flex-row">
                   <Button asChild size="lg" className="gap-2">
                     <Link href="/#diagnostic">
-                      Analyser ma toiture - 59,90 EUR
+                      Analyser ma toiture - 19 EUR
                       <ArrowRight className="h-4 w-4" />
                     </Link>
                   </Button>
@@ -443,7 +443,7 @@ export default async function RegionPage({
                 </CardHeader>
                 <CardContent>
                   <p className="text-muted-foreground">
-                    Notre diagnostic toiture par IA en {regionData.name} coute 59,90 EUR. 
+                    Notre diagnostic toiture par IA en {regionData.name} coute 19 EUR. 
                     Vous recevez un rapport PDF complet analysant votre toiture en moins de 30 secondes, 
                     avec des recommandations adaptees au climat {regionData.climate} de votre region.
                   </p>
@@ -518,7 +518,7 @@ export default async function RegionPage({
             <div className="flex flex-col justify-center gap-4 sm:flex-row">
               <Button asChild size="lg" className="gap-2">
                 <Link href="/#diagnostic">
-                  Analyser ma toiture - 59,90 EUR
+                  Analyser ma toiture - 19 EUR
                   <ArrowRight className="h-4 w-4" />
                 </Link>
               </Button>

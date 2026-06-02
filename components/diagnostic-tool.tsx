@@ -873,7 +873,7 @@ setCapturedImage(null)
           </h2>
           <p className="text-lg leading-relaxed text-muted-foreground">
             Entrez votre adresse ou uploadez une photo (drone, smartphone).
-            Analyse complete par IA en 30 secondes. Rapport PDF inclus. 59,90 EUR.
+            Analyse complete par IA en 30 secondes. Rapport PDF inclus. 19 EUR.
           </p>
         </div>
 
@@ -1850,7 +1850,7 @@ onClick={async () => {
                 >
                   <Download size={20} />
                   Generer mon rapport PDF complet
-                  <span className="ml-1 rounded-md bg-white/20 px-2 py-0.5 text-[10px] font-semibold">59,90{"\u20AC"}</span>
+                  <span className="ml-1 rounded-md bg-white/20 px-2 py-0.5 text-[10px] font-semibold">19{"\u20AC"}</span>
                 </button>
                 {emailSent ? (
                   <p className="mt-4 flex items-center justify-center gap-1.5 text-xs font-medium text-green-400">

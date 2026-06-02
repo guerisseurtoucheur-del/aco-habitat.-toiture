@@ -133,7 +133,7 @@ export const citiesData: Record<string, CityData> = {
       { question: "Comment detecter une infiltration sur une toiture parisienne ?", answer: "Les signes d'infiltration incluent : taches d'humidite au plafond, peinture qui cloque, odeur de moisi dans les combles. Notre diagnostic IA par photo satellite detecte les zones a risque avant l'apparition des degats interieurs." }
     ],
     seoContent: {
-      metaTitle: "Diagnostic Toiture Paris | Analyse IA en 30s | 59,90 EUR",
+      metaTitle: "Diagnostic Toiture Paris | Analyse IA en 30s | 19 EUR",
       metaDescription: "Diagnostic toiture par IA a Paris. Analyse des toitures zinc, ardoise et tuiles. Detection mousse, fissures, infiltrations. Rapport PDF instantane.",
       h1: "Diagnostic Toiture a Paris par Intelligence Artificielle",
       introText: "Obtenez un diagnostic complet de votre toiture parisienne en 30 secondes. Notre IA analyse les specificites des toitures de la capitale : zinc haussmannien, ardoises historiques, tuiles de Bourgogne. Detection precise des problemes lies au climat parisien et a la pollution urbaine.",
@@ -196,7 +196,7 @@ export const citiesData: Record<string, CityData> = {
       { question: "Faut-il deneiger sa toiture a Lyon ?", answer: "Avec seulement 8 jours de neige par an en moyenne, le deneigement est rarement necessaire a Lyon. En cas de forte accumulation, verifiez la resistance de votre charpente (charge maximale : 100-150 kg/m2 selon les toitures)." }
     ],
     seoContent: {
-      metaTitle: "Diagnostic Toiture Lyon | Analyse IA Grele & Tuiles | 59,90 EUR",
+      metaTitle: "Diagnostic Toiture Lyon | Analyse IA Grele & Tuiles | 19 EUR",
       metaDescription: "Diagnostic toiture par IA a Lyon. Specialiste tuiles canal, detection degats de grele, mousse. Analyse rapide pour le Rhone. Rapport PDF en 30 secondes.",
       h1: "Diagnostic Toiture a Lyon par Intelligence Artificielle",
       introText: "Analysez votre toiture lyonnaise en 30 secondes avec notre IA specialisee. Detection des degats de grele, evaluation de l'etat des tuiles canal et mecaniques, reperage de la mousse et des infiltrations specifiques au climat rhodanien.",
@@ -259,7 +259,7 @@ export const citiesData: Record<string, CityData> = {
       { question: "Quelle pente de toit pour une maison a Marseille ?", answer: "En region marseillaise, une pente de 25 a 35% est traditionnelle pour les tuiles canal. Cette faible pente limite la prise au vent du mistral. Les toitures-terrasses sont egalement adaptees au climat sec." }
     ],
     seoContent: {
-      metaTitle: "Diagnostic Toiture Marseille | Expert Mistral & Tuiles | 59,90 EUR",
+      metaTitle: "Diagnostic Toiture Marseille | Expert Mistral & Tuiles | 19 EUR",
       metaDescription: "Diagnostic toiture par IA a Marseille. Analyse tuiles canal, resistance au mistral, detection degradations UV et sel marin. Rapport PDF en 30 secondes.",
       h1: "Diagnostic Toiture a Marseille par Intelligence Artificielle",
       introText: "Analysez votre toiture marseillaise en 30 secondes avec notre IA. Specialiste des toitures provencales exposees au mistral et au soleil mediterraneen. Detection des tuiles soulevees, de la degradation UV et de l'impact du sel marin.",
@@ -322,7 +322,7 @@ export const citiesData: Record<string, CityData> = {
       { question: "Comment choisir des tuiles resistantes a la grele a Toulouse ?", answer: "Optez pour des tuiles certifiees 'grelon' (norme NF EN 1304) avec une resistance aux chocs d'au moins 1,5 joule. Les tuiles epaisses (15-20mm) et les tuiles beton sont plus resistantes que les tuiles terre cuite fines." }
     ],
     seoContent: {
-      metaTitle: "Diagnostic Toiture Toulouse | Expert Grele & Vent d'Autan | 59,90 EUR",
+      metaTitle: "Diagnostic Toiture Toulouse | Expert Grele & Vent d'Autan | 19 EUR",
       metaDescription: "Diagnostic toiture par IA a Toulouse. Detection degats de grele, resistance au vent d'autan, analyse tuiles canal. Rapport PDF en 30 secondes.",
       h1: "Diagnostic Toiture a Toulouse par Intelligence Artificielle",
       introText: "Obtenez un diagnostic complet de votre toiture toulousaine en 30 secondes. Notre IA est specialisee dans l'analyse des toitures de la Ville Rose : tuiles canal terre cuite, resistance a la grele et au vent d'autan, detection des infiltrations.",
@@ -385,7 +385,7 @@ export const citiesData: Record<string, CityData> = {
       { question: "Quelles sont les contraintes architecturales a Nice ?", answer: "Dans le Vieux-Nice et les secteurs proteges, les tuiles canal traditionnelles sont obligatoires. Les couleurs doivent respecter la palette locale (ocre, terre cuite). Le Plan Local d'Urbanisme definit les regles par quartier." }
     ],
     seoContent: {
-      metaTitle: "Diagnostic Toiture Nice | Expert Mediterranee & UV | 59,90 EUR",
+      metaTitle: "Diagnostic Toiture Nice | Expert Mediterranee & UV | 19 EUR",
       metaDescription: "Diagnostic toiture par IA a Nice. Analyse tuiles canal, degradation UV, impact sel marin. Specialiste Cote d'Azur. Rapport PDF instantane.",
       h1: "Diagnostic Toiture a Nice par Intelligence Artificielle",
       introText: "Analysez votre toiture niçoise en 30 secondes avec notre IA. Specialiste des toitures de la Cote d'Azur exposees au soleil mediterraneen et a l'air marin. Detection des degradations UV, de la corrosion saline et des infiltrations.",
@@ -448,7 +448,7 @@ export const citiesData: Record<string, CityData> = {
       { question: "Quelle est la duree de vie d'une toiture en ardoise a Nantes ?", answer: "Une toiture en ardoise naturelle d'Anjou dure 80 a 100 ans a Nantes. L'ardoise synthetique (fibro-ciment) dure 30-40 ans. L'entretien regulier (demoussage, verification des crochets) prolonge la duree de vie." }
     ],
     seoContent: {
-      metaTitle: "Diagnostic Toiture Nantes | Expert Ardoise & Climat Oceanique | 59,90 EUR",
+      metaTitle: "Diagnostic Toiture Nantes | Expert Ardoise & Climat Oceanique | 19 EUR",
       metaDescription: "Diagnostic toiture par IA a Nantes. Specialiste ardoise d'Anjou, detection mousse, analyse resistance au vent. Rapport PDF en 30 secondes.",
       h1: "Diagnostic Toiture a Nantes par Intelligence Artificielle",
       introText: "Obtenez un diagnostic complet de votre toiture nantaise en 30 secondes. Notre IA est experte des toitures en ardoise typiques de la region : detection de la mousse, verification des fixations face au vent, reperage des infiltrations.",
@@ -511,7 +511,7 @@ export const citiesData: Record<string, CityData> = {
       { question: "Faut-il renforcer les gouttieres a Bordeaux ?", answer: "Oui, avec 944mm de pluie annuelle (record des grandes villes), les gouttieres doivent etre surdimensionnees. Prevoyez des descentes de 100mm minimum et un nettoyage bisannuel. Les gardes-feuilles evitent les bouchons." }
     ],
     seoContent: {
-      metaTitle: "Diagnostic Toiture Bordeaux | Expert Tempetes & Humidite | 59,90 EUR",
+      metaTitle: "Diagnostic Toiture Bordeaux | Expert Tempetes & Humidite | 19 EUR",
       metaDescription: "Diagnostic toiture par IA a Bordeaux. Detection mousse, analyse resistance tempetes, tuiles et ardoises. Rapport PDF en 30 secondes.",
       h1: "Diagnostic Toiture a Bordeaux par Intelligence Artificielle",
       introText: "Analysez votre toiture bordelaise en 30 secondes avec notre IA. Specialiste des toitures exposees au climat oceanique : detection de la mousse, evaluation de la resistance aux tempetes atlantiques, analyse des tuiles et ardoises.",
@@ -574,7 +574,7 @@ export const citiesData: Record<string, CityData> = {
       { question: "Quelles sont les particularites des toitures flamandes ?", answer: "L'architecture flamande du Vieux-Lille presente des pignons a redents (en escalier) couverts d'ardoise. Ces toitures complexes necessitent un entretien expert. Les reglements imposent la conservation de ce patrimoine." }
     ],
     seoContent: {
-      metaTitle: "Diagnostic Toiture Lille | Expert Gel & Climat Nordique | 59,90 EUR",
+      metaTitle: "Diagnostic Toiture Lille | Expert Gel & Climat Nordique | 19 EUR",
       metaDescription: "Diagnostic toiture par IA a Lille. Analyse resistance gel/neige, detection mousse, tuiles et ardoises du Nord. Rapport PDF en 30 secondes.",
       h1: "Diagnostic Toiture a Lille par Intelligence Artificielle",
       introText: "Obtenez un diagnostic complet de votre toiture lilloise en 30 secondes. Notre IA est specialisee dans les toitures du Nord exposees au gel, a la neige et a l'humidite : detection des fissures, evaluation de l'etat des tuiles et ardoises.",
@@ -637,7 +637,7 @@ export const citiesData: Record<string, CityData> = {
       { question: "Les toitures a colombages necessitent-elles un entretien special ?", answer: "Oui, les maisons a colombages ont des toitures complexes avec de nombreuses pénétrations. Les jonctions bois/toiture sont sensibles aux infiltrations. Un controle annuel et le traitement du bois sont recommandes." }
     ],
     seoContent: {
-      metaTitle: "Diagnostic Toiture Strasbourg | Expert Gel & Tuiles Alsaciennes | 59,90 EUR",
+      metaTitle: "Diagnostic Toiture Strasbourg | Expert Gel & Tuiles Alsaciennes | 19 EUR",
       metaDescription: "Diagnostic toiture par IA a Strasbourg. Specialiste tuiles queue de castor, resistance gel/neige, maisons a colombages. Rapport PDF instantane.",
       h1: "Diagnostic Toiture a Strasbourg par Intelligence Artificielle",
       introText: "Analysez votre toiture strasbourgeoise en 30 secondes avec notre IA. Specialiste des toitures alsaciennes exposees aux hivers rigoureux : tuiles queue de castor, maisons a colombages, resistance au gel et a la neige.",
@@ -700,7 +700,7 @@ export const citiesData: Record<string, CityData> = {
       { question: "Comment preparer sa toiture aux episodes cevenols ?", answer: "Verifiez l'etat des gouttieres et descentes (dimensionnement genereux), nettoyez regulierement les debris, assurez-vous que l'etancheite est parfaite. Notre diagnostic IA detecte les points faibles avant les intemperies." }
     ],
     seoContent: {
-      metaTitle: "Diagnostic Toiture Montpellier | Expert Cevenol & Tramontane | 59,90 EUR",
+      metaTitle: "Diagnostic Toiture Montpellier | Expert Cevenol & Tramontane | 19 EUR",
       metaDescription: "Diagnostic toiture par IA a Montpellier. Analyse resistance episodes cevenols, tramontane, tuiles canal mediterraneennes. Rapport PDF instantane.",
       h1: "Diagnostic Toiture a Montpellier par Intelligence Artificielle",
       introText: "Obtenez un diagnostic complet de votre toiture montpellieraine en 30 secondes. Notre IA analyse les specificites mediterraneennes : resistance aux episodes cevenols, tenue face a la tramontane, etat des tuiles canal.",
@@ -763,7 +763,7 @@ export const citiesData: Record<string, CityData> = {
       { question: "Quelle est la duree de vie d'une toiture ardoise a Rennes ?", answer: "Une toiture en ardoise naturelle bien entretenue dure 70 a 100 ans en Bretagne. L'ardoise synthetique dure 30-40 ans. L'entretien regulier (demoussage, verification des crochets) est essentiel face au climat humide." }
     ],
     seoContent: {
-      metaTitle: "Diagnostic Toiture Rennes | Expert Ardoise & Climat Breton | 59,90 EUR",
+      metaTitle: "Diagnostic Toiture Rennes | Expert Ardoise & Climat Breton | 19 EUR",
       metaDescription: "Diagnostic toiture par IA a Rennes. Specialiste ardoise bretonne, detection mousse, analyse resistance humidite. Rapport PDF en 30 secondes.",
       h1: "Diagnostic Toiture a Rennes par Intelligence Artificielle",
       introText: "Analysez votre toiture rennaise en 30 secondes avec notre IA. Specialiste des toitures en ardoise typiques de Bretagne : detection de la mousse et du lichen, verification des fixations, evaluation de l'etancheite.",
@@ -826,7 +826,7 @@ export const citiesData: Record<string, CityData> = {
       { question: "Quelle pente de toit pour la region grenobloise ?", answer: "En zone de neige, une pente minimale de 35-45% est recommandée pour evacuer naturellement la neige. Les toits plats necessitent un calcul de charge et un deneigement eventuel." }
     ],
     seoContent: {
-      metaTitle: "Diagnostic Toiture Grenoble | Expert Neige & Climat Alpin | 59,90 EUR",
+      metaTitle: "Diagnostic Toiture Grenoble | Expert Neige & Climat Alpin | 19 EUR",
       metaDescription: "Diagnostic toiture par IA a Grenoble. Analyse resistance neige et gel, tuiles alpines, ardoises. Specialiste montagne. Rapport PDF instantane.",
       h1: "Diagnostic Toiture a Grenoble par Intelligence Artificielle",
       introText: "Obtenez un diagnostic complet de votre toiture grenobloise en 30 secondes. Notre IA est specialisee dans les contraintes alpines : resistance a la neige, au gel intense, aux orages de montagne. Analyse des tuiles, ardoises et lauzes.",
@@ -889,7 +889,7 @@ export const citiesData: Record<string, CityData> = {
       { question: "Comment entretenir une toiture vernissee ?", answer: "Les tuiles vernissees necessitent peu d'entretien : leur surface lisse empeche la mousse de s'accrocher. Un simple rinçage a l'eau tous les 5 ans suffit. Evitez les traitements chimiques qui pourraient ternir le vernis." }
     ],
     seoContent: {
-      metaTitle: "Diagnostic Toiture Dijon | Expert Tuiles Vernissees & Grele | 59,90 EUR",
+      metaTitle: "Diagnostic Toiture Dijon | Expert Tuiles Vernissees & Grele | 19 EUR",
       metaDescription: "Diagnostic toiture par IA a Dijon. Specialiste tuiles vernissees bourguignonnes, detection degats grele, analyse patrimoine. Rapport PDF instantane.",
       h1: "Diagnostic Toiture a Dijon par Intelligence Artificielle",
       introText: "Analysez votre toiture dijonnaise en 30 secondes avec notre IA. Specialiste des toitures bourguignonnes : tuiles vernissees polychromes, resistance a la grele du vignoble, evaluation du patrimoine architectural unique.",
@@ -952,7 +952,7 @@ export const citiesData: Record<string, CityData> = {
       { question: "Faut-il traiter la mousse sur les ardoises a Angers ?", answer: "Oui, le climat humide favorise la mousse. Un traitement anti-mousse tous les 3-5 ans preserve l'etancheite et l'esthetique. Attention : jamais de nettoyage haute pression sur l'ardoise, cela l'endommage irreversiblement." }
     ],
     seoContent: {
-      metaTitle: "Diagnostic Toiture Angers | Expert Ardoise d'Anjou | 59,90 EUR",
+      metaTitle: "Diagnostic Toiture Angers | Expert Ardoise d'Anjou | 19 EUR",
       metaDescription: "Diagnostic toiture par IA a Angers. Specialiste ardoise de Trelaze, detection mousse, evaluation patrimoniale. Capitale de l'ardoise. Rapport PDF instantane.",
       h1: "Diagnostic Toiture a Angers par Intelligence Artificielle",
       introText: "Analysez votre toiture angevine en 30 secondes avec notre IA. Specialiste de l'ardoise d'Anjou, materiau emblematique de la region. Detection de la mousse, evaluation de l'etat des ardoises, verification des fixations.",
@@ -1015,7 +1015,7 @@ export const citiesData: Record<string, CityData> = {
       { question: "Peut-on installer des panneaux solaires a Toulon ?", answer: "Toulon est ideale pour le solaire avec son ensoleillement record. Verifiez cependant la resistance de votre charpente (charge supplementaire de 15-20 kg/m2) et les reglements d'urbanisme dans les secteurs proteges." }
     ],
     seoContent: {
-      metaTitle: "Diagnostic Toiture Toulon | Expert Mistral & Climat Maritime | 59,90 EUR",
+      metaTitle: "Diagnostic Toiture Toulon | Expert Mistral & Climat Maritime | 19 EUR",
       metaDescription: "Diagnostic toiture par IA a Toulon. Analyse resistance mistral, impact sel marin, degradation UV. Record ensoleillement. Rapport PDF instantane.",
       h1: "Diagnostic Toiture a Toulon par Intelligence Artificielle",
       introText: "Obtenez un diagnostic complet de votre toiture toulonnaise en 30 secondes. Notre IA analyse les contraintes specifiques de la rade : mistral violent, air marin corrosif, ensoleillement record de France.",
@@ -1078,7 +1078,7 @@ export const citiesData: Record<string, CityData> = {
       { question: "Peut-on remplacer l'ardoise par un autre materiau a Rouen ?", answer: "Dans le centre historique et les secteurs proteges, l'ardoise naturelle est obligatoire. Ailleurs, d'autres materiaux sont possibles sous conditions. Consultez le PLU de Rouen avant tout projet de renovation." }
     ],
     seoContent: {
-      metaTitle: "Diagnostic Toiture Rouen | Expert Ardoise & Climat Normand | 59,90 EUR",
+      metaTitle: "Diagnostic Toiture Rouen | Expert Ardoise & Climat Normand | 19 EUR",
       metaDescription: "Diagnostic toiture par IA a Rouen. Specialiste ardoise, colombages, humidite normande. Detection mousse et infiltrations. Rapport PDF instantane.",
       h1: "Diagnostic Toiture a Rouen par Intelligence Artificielle",
       introText: "Analysez votre toiture rouennaise en 30 secondes avec notre IA. Specialiste du patrimoine normand : ardoises, maisons a colombages, resistance a l'humidite. Detection precise des problemes lies au climat humide.",
@@ -1141,7 +1141,7 @@ export const citiesData: Record<string, CityData> = {
       { question: "Peut-on remplacer les lauzes par un autre materiau ?", answer: "Dans les secteurs proteges, le remplacement des lauzes est encadre. L'ardoise epaisse peut parfois etre autorisee comme alternative moins couteuse. Consultez l'Architecte des Batiments de France pour les monuments classes." }
     ],
     seoContent: {
-      metaTitle: "Diagnostic Toiture Clermont-Ferrand | Expert Lauzes & Climat Auvergnat | 59,90 EUR",
+      metaTitle: "Diagnostic Toiture Clermont-Ferrand | Expert Lauzes & Climat Auvergnat | 19 EUR",
       metaDescription: "Diagnostic toiture par IA a Clermont-Ferrand. Specialiste lauzes, ardoise, resistance gel d'altitude. Patrimoine auvergnat. Rapport PDF instantane.",
       h1: "Diagnostic Toiture a Clermont-Ferrand par Intelligence Artificielle",
       introText: "Obtenez un diagnostic complet de votre toiture clermontoise en 30 secondes. Notre IA connait les specificites auvergnates : toitures en lauzes, resistance au gel d'altitude, patrimoine volcanique unique.",
@@ -1204,7 +1204,7 @@ export const citiesData: Record<string, CityData> = {
       { question: "Comment entretenir une toiture-terrasse au Havre ?", answer: "Inspectez l'etancheité bi-annuellement, eliminez les debris et vegetaux, verifiez les evacuation d'eau. Dans le patrimoine Perret, les travaux sont soumis a autorisation. Privilegiez des membranes resistantes aux UV et au sel marin." }
     ],
     seoContent: {
-      metaTitle: "Diagnostic Toiture Le Havre | Expert Perret & Climat Maritime | 59,90 EUR",
+      metaTitle: "Diagnostic Toiture Le Havre | Expert Perret & Climat Maritime | 19 EUR",
       metaDescription: "Diagnostic toiture par IA au Havre. Specialiste toitures-terrasses Perret (UNESCO), resistance vent maritime, etancheite. Rapport PDF instantane.",
       h1: "Diagnostic Toiture au Havre par Intelligence Artificielle",
       introText: "Analysez votre toiture havraise en 30 secondes avec notre IA. Specialiste des toitures-terrasses du patrimoine Perret (UNESCO) et des toitures exposees aux vents maritimes extremes. Detection des infiltrations et degradations.",
@@ -1267,7 +1267,7 @@ export const citiesData: Record<string, CityData> = {
       { question: "La poussiere de craie affecte-t-elle les toitures ?", answer: "La craie omniprésente en Champagne peut deposer une fine pellicule blanche sur les toitures. Ce depôt n'est pas nocif mais peut ternir l'ardoise. Un rinçage occasionnel restaure l'aspect. La craie peut aussi boucher les gouttieres." }
     ],
     seoContent: {
-      metaTitle: "Diagnostic Toiture Reims | Expert Ardoise & Climat Champenois | 59,90 EUR",
+      metaTitle: "Diagnostic Toiture Reims | Expert Ardoise & Climat Champenois | 19 EUR",
       metaDescription: "Diagnostic toiture par IA a Reims. Specialiste ardoise, tuiles de Champagne, resistance gel. Patrimoine viticole. Rapport PDF instantane.",
       h1: "Diagnostic Toiture a Reims par Intelligence Artificielle",
       introText: "Obtenez un diagnostic complet de votre toiture remoise en 30 secondes. Notre IA connait les specificites champenoises : ardoise sur craie, resistance au gel hivernal, patrimoine des maisons de champagne.",
@@ -1330,7 +1330,7 @@ export const citiesData: Record<string, CityData> = {
       { question: "Faut-il deneiger sa toiture a Saint-Etienne ?", answer: "Avec 20 jours de neige par an, le deneigement peut etre necessaire. Au-dela de 40cm d'accumulation, verifiez la charge supportable. Les toits a faible pente sont plus a risque. Ne montez jamais sur une toiture enneigee sans securite." }
     ],
     seoContent: {
-      metaTitle: "Diagnostic Toiture Saint-Etienne | Expert Gel & Patrimoine Industriel | 59,90 EUR",
+      metaTitle: "Diagnostic Toiture Saint-Etienne | Expert Gel & Patrimoine Industriel | 19 EUR",
       metaDescription: "Diagnostic toiture par IA a Saint-Etienne. Analyse resistance gel/neige, detection amiante, patrimoine industriel. Rapport PDF instantane.",
       h1: "Diagnostic Toiture a Saint-Etienne par Intelligence Artificielle",
       introText: "Analysez votre toiture stephanoise en 30 secondes avec notre IA. Specialiste des contraintes locales : gel intense (60 jours/an), neige abondante, heritage industriel. Detection des problemes specifiques au bassin stephanois.",
