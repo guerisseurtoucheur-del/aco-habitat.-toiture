@@ -18,29 +18,31 @@ const fraunces = Fraunces({
 })
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://diag.aco-habitat.fr"),
+  metadataBase: new URL("https://aco-habitat.fr"),
   title: {
-    default: "Diagnostic Toiture IA 19\u20AC | ACO-HABITAT Expert Couvreur France",
-    template: "%s | ACO-HABITAT Diagnostic Toiture",
+    default: "Traitement du Bois & Charpente | ACO-HABITAT Expert Mérule depuis 2006",
+    template: "%s | ACO-HABITAT Traitement du Bois",
   },
   description:
-    "Analysez l'etat de votre toiture en 30 secondes par intelligence artificielle pour seulement 19\u20AC. Diagnostic vegetal, structurel, etancheite et thermique. Couvreur expert demoussage, infiltration, renovation toiture. Devis d'intervention gratuit partout en France.",
+    "Expert du traitement du bois et de la charpente depuis 2006. Traitement curatif et préventif contre les insectes xylophages (capricorne, vrillette, lyctus), la mérule et les champignons lignivores. Diagnostic gratuit et devis sans engagement. Orne, Sarthe, Mayenne, Eure et Eure-et-Loir.",
   keywords: [
-    "diagnostic toiture IA 19 euros",
-    "diagnostic toiture IA",
-    "analyse toiture satellite",
-    "couvreur France",
-    "expert toiture",
-    "demoussage toiture",
-    "infiltration toiture",
-    "renovation toiture",
-    "reparation toiture",
-    "couvreur Normandie",
-    "couvreur Alencon",
-    "devis toiture gratuit",
-    "ACO-HABITAT",
+    "traitement du bois",
+    "traitement charpente",
+    "traitement mérule",
+    "mérule",
+    "insectes xylophages",
+    "capricorne des maisons",
+    "vrillette",
+    "lyctus",
+    "champignons lignivores",
+    "traitement curatif bois",
+    "traitement préventif bois",
+    "traitement charpente Orne",
+    "traitement mérule Normandie",
+    "ACO-HABITAT Alençon",
+    "diagnostic charpente gratuit",
   ],
-  authors: [{ name: "ACO-HABITAT", url: "https://diag.aco-habitat.fr" }],
+  authors: [{ name: "ACO-HABITAT", url: "https://aco-habitat.fr" }],
   creator: "ACO-HABITAT",
   publisher: "ACO-HABITAT",
   alternates: {
@@ -60,32 +62,32 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "fr_FR",
-    url: "https://diag.aco-habitat.fr",
-    siteName: "ACO-HABITAT Diagnostic Toiture",
-    title: "Diagnostic Toiture IA 19\u20AC en 30s | ACO-HABITAT Expert Couvreur",
+    url: "https://aco-habitat.fr",
+    siteName: "ACO-HABITAT Traitement du Bois",
+    title: "Traitement du Bois & Charpente | ACO-HABITAT Expert Mérule depuis 2006",
     description:
-      "Analysez votre toiture par IA pour 19\u20AC : vue satellite, diagnostic vegetal, structurel, etancheite et thermique. Devis d'intervention gratuit. Couvreur expert France entiere.",
+      "Traitement curatif et préventif contre insectes xylophages, mérule et champignons lignivores. Expert depuis 2006. Diagnostic gratuit et devis sans engagement.",
     images: [
       {
-        url: "/og-image.jpg",
+        url: "/images/charpente-hero.png",
         width: 1200,
         height: 630,
-        alt: "ACO-HABITAT - Diagnostic toiture par intelligence artificielle",
+        alt: "ACO-HABITAT - Traitement du bois et de la charpente",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Diagnostic Toiture IA 19\u20AC | ACO-HABITAT",
+    title: "Traitement du Bois & Charpente | ACO-HABITAT Expert Mérule",
     description:
-      "Analysez votre toiture en 30s par IA pour 19\u20AC. Diagnostic complet : vegetal, structure, etancheite, thermique. Devis d'intervention gratuit.",
-    images: ["/og-image.jpg"],
+      "Traitement curatif et préventif contre insectes xylophages, mérule et champignons lignivores. Expert depuis 2006. Diagnostic gratuit.",
+    images: ["/images/charpente-hero.png"],
   },
   category: "construction",
 }
 
 export const viewport: Viewport = {
-  themeColor: "#060a13",
+  themeColor: "#b04a25",
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,

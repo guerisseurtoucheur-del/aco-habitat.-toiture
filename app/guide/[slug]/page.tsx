@@ -163,7 +163,7 @@ export default async function GuidePage({
                   ACO-HABITAT
                 </span>
                 <span className="text-[10px] font-medium text-muted-foreground tracking-widest uppercase">
-                  Expert Couverture & Charpente
+                  Traitement du bois & charpente
                 </span>
               </div>
             </Link>
@@ -284,7 +284,7 @@ export default async function GuidePage({
                   ACO-HABITAT
                 </p>
                 <p className="text-xs text-muted-foreground">
-                  Expert couverture & charpente - Plus de 500 toitures diagnostiquees
+                  Expert du traitement du bois & charpente depuis 2006 - Insectes xylophages, mérule, champignons
                 </p>
               </div>
             </div>
@@ -386,18 +386,19 @@ export default async function GuidePage({
               className="text-balance text-xl font-bold tracking-tight text-foreground md:text-2xl"
               style={{ fontFamily: "var(--font-heading)" }}
             >
-              Diagnostiquez votre toiture gratuitement
+              Diagnostiquez votre charpente gratuitement
             </h2>
             <p className="mt-3 text-sm text-muted-foreground">
-              Notre IA analyse votre toiture en moins de 30 secondes a partir d{"'"}une photo satellite.
+              Un doute sur des insectes xylophages, de la mérule ou un champignon ? Demandez votre diagnostic
+              gratuit et sans engagement.
             </p>
             <div className="mt-6 flex flex-col items-center justify-center gap-4 sm:flex-row">
               <Link
-                href="/#diagnostic"
+                href="/#devis"
                 className="group flex items-center gap-2 rounded-xl bg-primary px-8 py-4 text-base font-semibold text-primary-foreground transition-all hover:shadow-xl hover:shadow-primary/20"
               >
                 <Zap size={16} className="transition-transform group-hover:scale-110" />
-                Diagnostic IA gratuit
+                Diagnostic gratuit
                 <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
               </Link>
               <a

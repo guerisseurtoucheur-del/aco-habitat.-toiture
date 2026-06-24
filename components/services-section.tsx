@@ -1,55 +1,55 @@
 "use client"
 
 import Link from "next/link"
-import { Hammer, Thermometer, Home, TreePine, HardHat, Search, ArrowUpRight } from "lucide-react"
+import { Bug, Droplets, Home, TreePine, ShieldCheck, Search, ArrowUpRight } from "lucide-react"
 
 const services = [
   {
     icon: Search,
-    title: "Diagnostic IA",
+    title: "Diagnostic charpente",
     slug: "diagnostic-ia",
     description:
-      "Analyse complete de votre toiture par intelligence artificielle a partir d'une simple photo satellite ou drone.",
+      "Inspection complète de vos bois : identification de l'agresseur, étendue de l'attaque et mesure d'humidité. Gratuit et sans engagement.",
     highlight: true,
   },
   {
-    icon: Hammer,
-    title: "Reparation",
+    icon: Bug,
+    title: "Insectes xylophages",
     slug: "reparation-toiture",
     description:
-      "Intervention rapide pour fuites, tuiles cassees, faitage endommage et tous types de reparations urgentes.",
+      "Traitement curatif contre capricornes, vrillettes et lyctus : bûchage, injection sous pression et pulvérisation.",
+    highlight: false,
+  },
+  {
+    icon: Droplets,
+    title: "Mérule & champignons",
+    slug: "renovation-toiture",
+    description:
+      "Traitement des champignons lignivores à la source : suppression de l'humidité, dépose des bois et fongicide.",
     highlight: false,
   },
   {
     icon: Home,
-    title: "Renovation complete",
-    slug: "renovation-toiture",
-    description:
-      "Renovation integrale de couverture : depose, charpente, pose de nouvelles tuiles ou ardoises.",
-    highlight: false,
-  },
-  {
-    icon: Thermometer,
-    title: "Isolation thermique",
-    slug: "isolation-thermique",
-    description:
-      "Isolation de combles et sous-toiture pour reduire votre facture energetique et ameliorer votre confort.",
-    highlight: false,
-  },
-  {
-    icon: TreePine,
-    title: "Demoussage",
-    slug: "demoussage",
-    description:
-      "Nettoyage haute pression, traitement anti-mousse et application d'hydrofuge protecteur longue duree.",
-    highlight: false,
-  },
-  {
-    icon: HardHat,
-    title: "Charpente",
+    title: "Traitement de charpente",
     slug: "charpente",
     description:
-      "Expertise et travaux de charpente : renforcement, remplacement de pieces, traitement curatif du bois.",
+      "Traitement complet de votre charpente attaquée et renforcement des pièces qui ont perdu leur résistance.",
+    highlight: false,
+  },
+  {
+    icon: ShieldCheck,
+    title: "Traitement préventif",
+    slug: "demoussage",
+    description:
+      "Protégez une charpente saine, neuve ou rénovée, contre les insectes et champignons sur le long terme.",
+    highlight: false,
+  },
+  {
+    icon: Droplets,
+    title: "Humidité & assèchement",
+    slug: "isolation-thermique",
+    description:
+      "Traitement des remontées capillaires et de l'humidité, cause numéro un des attaques de bois.",
     highlight: false,
   },
 ]

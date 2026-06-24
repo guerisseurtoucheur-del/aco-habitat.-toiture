@@ -3,13 +3,13 @@
 import { useState, useRef, useEffect } from "react"
 import { useChat } from "@ai-sdk/react"
 import { DefaultChatTransport } from "ai"
-import { MessageSquare, X, Send, Bot, User, ChevronDown, ScanLine } from "lucide-react"
+import { MessageSquare, X, Send, Bot, User, FileText } from "lucide-react"
 
 const SUGGESTED_QUESTIONS = [
-  "Comment fonctionne le diagnostic IA ?",
-  "Ma toiture a 30 ans, dois-je la renover ?",
-  "Quels sont les signes d'une fuite ?",
-  "Combien coute le diagnostic ?",
+  "J'ai des petits trous dans mes poutres, c'est grave ?",
+  "Comment reconnaitre la merule ?",
+  "Quelle difference entre capricorne et vrillette ?",
+  "Comment se passe un traitement de charpente ?",
 ]
 
 const chatTransport = new DefaultChatTransport({
@@ -53,8 +53,8 @@ export function Chatbot() {
           className="fixed bottom-20 right-5 z-50 max-w-[200px] cursor-pointer animate-in fade-in slide-in-from-bottom-2 duration-500 hidden sm:block"
         >
           <div className="rounded-xl bg-card border border-border px-3 py-2 shadow-lg hover:shadow-xl transition-shadow">
-            <p className="text-xs font-medium text-foreground">Une question sur votre toiture ?</p>
-            <p className="text-[10px] text-muted-foreground mt-0.5">Je peux vous aider !</p>
+            <p className="text-xs font-medium text-foreground">Un doute sur votre charpente ?</p>
+            <p className="text-[10px] text-muted-foreground mt-0.5">Expert bois, je vous aide !</p>
           </div>
           {/* Triangle pointer */}
           <div className="absolute -bottom-2 right-6 h-0 w-0 border-l-[8px] border-r-[8px] border-t-[8px] border-l-transparent border-r-transparent border-t-card drop-shadow-sm" />
@@ -92,7 +92,7 @@ export function Chatbot() {
               <Bot size={18} className="text-primary" />
             </div>
             <div>
-              <p className="text-sm font-semibold text-foreground">Assistant Toiture</p>
+              <p className="text-sm font-semibold text-foreground">Expert Traitement du Bois</p>
               <div className="flex items-center gap-1.5">
                 <span className="h-2 w-2 rounded-full bg-emerald-500" />
                 <span className="text-[11px] text-muted-foreground">En ligne</span>
@@ -119,7 +119,7 @@ export function Chatbot() {
                 </div>
                 <div className="max-w-[85%] rounded-2xl rounded-tl-sm bg-secondary px-3.5 py-2.5">
                   <p className="text-[13px] leading-relaxed text-foreground">
-                    Bonjour ! Je suis l{"'"}assistant expert toiture d{"'"}ACO-HABITAT. Posez-moi vos questions sur votre toiture, je suis la pour vous aider.
+                    Bonjour ! Je suis l{"'"}expert traitement du bois d{"'"}ACO-HABITAT, specialiste depuis 2006. Insectes xylophages, merule, champignons, charpente... decrivez-moi ce que vous observez, je vous aide a y voir clair et a obtenir un diagnostic gratuit.
                   </p>
                 </div>
               </div>
@@ -172,26 +172,26 @@ export function Chatbot() {
               >
                 {message.parts.map((part, index) => {
                   if (part.type === "text") {
-                    const hasDiagnosticTag = part.text.includes("[DIAGNOSTIC]")
-                    const cleanText = part.text.replace("[DIAGNOSTIC]", "").trim()
+                    const hasDevisTag = part.text.includes("[DEVIS]")
+                    const cleanText = part.text.replace("[DEVIS]", "").trim()
                     return (
                       <div key={index}>
                         <p className="whitespace-pre-wrap text-[13px] leading-relaxed">
                           {cleanText}
                         </p>
-                        {hasDiagnosticTag && (
+                        {hasDevisTag && (
                           <button
                             onClick={() => {
                               setIsOpen(false)
-                              const el = document.getElementById("diagnostic")
+                              const el = document.getElementById("devis")
                               if (el) {
                                 el.scrollIntoView({ behavior: "smooth" })
                               }
                             }}
                             className="mt-2.5 flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-[12px] font-semibold text-primary-foreground transition-all hover:bg-primary/90 hover:shadow-md"
                           >
-                            <ScanLine size={14} />
-                            Lancer mon diagnostic toiture
+                            <FileText size={14} />
+                            Mon diagnostic gratuit
                           </button>
                         )}
                       </div>
@@ -249,7 +249,7 @@ export function Chatbot() {
             </button>
           </form>
           <p className="mt-2 text-center text-[10px] text-muted-foreground">
-            ACO-HABITAT - Assistant IA Toiture
+            ACO-HABITAT - Expert traitement du bois depuis 2006
           </p>
         </div>
       </div>
