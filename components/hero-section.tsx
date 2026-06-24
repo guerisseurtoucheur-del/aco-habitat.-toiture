@@ -1,226 +1,91 @@
-"use client"
-
 import Image from "next/image"
-import { Scan, Shield, Droplets, ArrowRight, Zap } from "lucide-react"
-import { useEffect, useState } from "react"
-import { WeatherAlertBanner } from "@/components/weather-alert-banner"
-import { WeatherHomeWidget } from "@/components/weather-home-widget"
-
-function AnimatedCounter({ target, suffix = "" }: { target: number; suffix?: string }) {
-  const [count, setCount] = useState(0)
-
-  useEffect(() => {
-    const duration = 2000
-    const steps = 60
-    const increment = target / steps
-    let current = 0
-    const timer = setInterval(() => {
-      current += increment
-      if (current >= target) {
-        setCount(target)
-        clearInterval(timer)
-      } else {
-        setCount(Math.floor(current))
-      }
-    }, duration / steps)
-    return () => clearInterval(timer)
-  }, [target])
-
-  return (
-    <span>
-      {count.toLocaleString("fr-FR")}
-      {suffix}
-    </span>
-  )
-}
-
-function useDiagnosticCount() {
-  const [count, setCount] = useState(147) // fallback
-  useEffect(() => {
-    fetch("/api/diagnostics")
-      .then(r => r.json())
-      .then(d => { if (d.count > 0) setCount(d.count) })
-      .catch(() => {})
-  }, [])
-  return count
-}
+import { Phone, ArrowRight, ShieldCheck, MapPin, Award } from "lucide-react"
 
 export function HeroSection() {
-  const diagCount = useDiagnosticCount()
   return (
-    <section className="relative flex min-h-screen items-center overflow-hidden">
-      {/* Background layers */}
-      <div className="absolute inset-0 z-0">
-        <Image
-          src="/images/hero-roof.jpg"
-          alt="Diagnostic toiture par intelligence artificielle - Vue aerienne satellite d'un toit analyse par ACO-HABITAT expert couvreur"
-          fill
-          className="object-cover opacity-15"
-          priority
-          sizes="100vw"
-          quality={75}
-          placeholder="blur"
-          blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAYEBQYFBAYGBQYHBwYIChAKCgkJChQODwwQFxQYGBcUFhYaHSUfGhsjHBYWICwgIyYnKSopGR8tMC0oMCUoKSj/2wBDAQcHBwoIChMKChMoGhYaKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCgoKCj/wAARCAAIAAoDASIAAhEBAxEB/8QAFgABAQEAAAAAAAAAAAAAAAAAAAUH/8QAIhAAAgEDBAMBAAAAAAAAAAAAAQIDAAQRBRIhMQYTQWH/xAAVAQEBAAAAAAAAAAAAAAAAAAADBP/EABkRAAIDAQAAAAAAAAAAAAAAAAABAgMRIf/aAAwDAQACEQMRAD8A1jUdS0bT9Q+d3t8JJQV2IpYlRkdjJGAPtVv5Dp0niE8OmafGLeaIN6wBt4LDlj9+0pUqtJPTh//Z"
-        />
-        <div className="absolute inset-0 bg-gradient-to-b from-background/80 via-background/90 to-background" />
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--color-glow-blue),_transparent_60%)]" />
-      </div>
-
-      {/* Grid pattern overlay */}
-      <div
-        className="absolute inset-0 z-0 opacity-[0.03]"
-        style={{
-          backgroundImage: `linear-gradient(var(--color-border) 1px, transparent 1px), linear-gradient(90deg, var(--color-border) 1px, transparent 1px)`,
-          backgroundSize: "60px 60px",
-        }}
-      />
-
-      <div className="relative z-10 mx-auto flex w-full max-w-7xl flex-col items-center px-4 pt-24 pb-16 sm:px-6 sm:pt-32 sm:pb-20">
-        {/* Weather Alert Banner */}
-        <div className="mb-6 w-full max-w-3xl">
-          <WeatherAlertBanner />
-        </div>
-
-        {/* Badge */}
-        <div className="animate-fade-up mb-8 inline-flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-5 py-2">
-          <div className="flex h-5 w-5 items-center justify-center rounded-full bg-primary/20">
-            <Scan size={10} className="text-primary" />
+    <section className="relative overflow-hidden bg-background">
+      <div className="mx-auto grid max-w-7xl grid-cols-1 items-center gap-10 px-4 pt-28 pb-16 sm:px-6 sm:pt-36 sm:pb-24 lg:grid-cols-2 lg:gap-12">
+        {/* Left: copy */}
+        <div className="flex flex-col">
+          <div className="animate-fade-up inline-flex w-fit items-center gap-2 rounded-full border border-border bg-card px-4 py-1.5">
+            <Award size={13} className="text-primary" />
+            <span className="text-xs font-medium tracking-wide text-secondary-foreground">
+              Expert traitement du bois depuis 2006
+            </span>
           </div>
-          <span className="text-xs font-medium text-primary tracking-wide">
-            Technologie IA de derniere generation
-          </span>
-        </div>
 
-        {/* Main heading */}
-        <h1 className="animate-fade-up-delay-1 max-w-5xl text-balance text-center text-3xl font-bold leading-[1.1] tracking-tight text-foreground sm:text-4xl md:text-5xl lg:text-7xl"
-          style={{ fontFamily: "var(--font-heading)" }}
-        >
-          Diagnostic toiture par IA
-          <br />
-          <span className="text-gradient">en 30 secondes</span>
-        </h1>
-
-        {/* Subtitle */}
-        <p className="animate-fade-up-delay-2 mt-6 max-w-2xl text-pretty text-center text-base leading-relaxed text-muted-foreground md:text-lg">
-          Uploadez une photo satellite, drone ou smartphone. Notre IA analyse
-          mousse, fissures, etancheite et deperditions thermiques.
-          Recevez un rapport PDF complet instantanement.
-        </p>
-
-        {/* CTAs */}
-        <div className="animate-fade-up-delay-3 mt-10 flex flex-col items-center gap-4 sm:flex-row">
-          <a
-            href="#diagnostic"
-            aria-label="Lancer un diagnostic de votre toiture par intelligence artificielle pour 19 euros"
-            className="group relative flex items-center gap-2 rounded-xl bg-primary px-8 py-4 text-base font-semibold text-primary-foreground transition-all hover:shadow-xl hover:shadow-primary/20"
+          <h1
+            className="animate-fade-up-delay-1 mt-6 text-balance text-4xl font-semibold leading-[1.05] tracking-tight text-foreground sm:text-5xl lg:text-6xl"
+            style={{ fontFamily: "var(--font-heading)" }}
           >
-            Diagnostic IA - 19{"\u20AC"}
-            <ArrowRight size={16} className="transition-transform group-hover:translate-x-1" />
-          </a>
-          <a
-            href="#methode"
-            aria-label="Decouvrir la methode de diagnostic toiture IA ACO-HABITAT"
-            className="group flex items-center gap-2 rounded-xl border border-border bg-secondary/50 px-8 py-4 text-base font-medium text-secondary-foreground transition-all hover:bg-secondary hover:border-border/80"
-          >
-            Comment ca marche
-          </a>
-        </div>
+            Sauvez votre charpente de la{" "}
+            <span className="text-primary italic">mérule</span> et des{" "}
+            <span className="text-primary italic">insectes du bois</span>
+          </h1>
 
-        {/* Price highlight */}
-        <div className="animate-fade-up-delay-3 mt-8 flex flex-col items-center gap-3 text-sm text-muted-foreground sm:mt-12 sm:flex-row sm:gap-6">
-          <div className="flex items-center gap-2 rounded-full border border-primary/20 bg-primary/5 px-4 py-2">
-            <Zap size={14} className="text-primary" />
-            <span className="font-semibold text-foreground">19 EUR</span>
-            <span>par diagnostic</span>
+          <p className="animate-fade-up-delay-2 mt-6 max-w-xl text-pretty text-base leading-relaxed text-muted-foreground sm:text-lg">
+            ACO-HABITAT traite durablement votre charpente : capricornes, vrillettes,
+            lyctus, mérule et champignons lignivores. Inspection sérieuse, traitement
+            certifié et garantie sur nos interventions.
+          </p>
+
+          <div className="animate-fade-up-delay-3 mt-8 flex flex-col gap-3 sm:flex-row">
+            <a
+              href="#devis"
+              className="group flex items-center justify-center gap-2 rounded-xl bg-primary px-7 py-4 text-base font-semibold text-primary-foreground transition-all hover:bg-primary/90"
+            >
+              Demander un devis gratuit
+              <ArrowRight size={17} className="transition-transform group-hover:translate-x-1" />
+            </a>
+            <a
+              href="tel:+33233311979"
+              className="flex items-center justify-center gap-2 rounded-xl border border-border bg-card px-7 py-4 text-base font-semibold text-foreground transition-colors hover:bg-secondary"
+            >
+              <Phone size={17} className="text-primary" />
+              02 33 31 19 79
+            </a>
           </div>
-          <div className="hidden h-4 w-px bg-border sm:block" />
-          <span>Rapport PDF inclus</span>
-        </div>
 
-        {/* Weather widget */}
-        <div className="animate-fade-up-delay-3 mt-10 w-full max-w-sm">
-          <WeatherHomeWidget />
-        </div>
-
-        {/* Stats bar */}
-        <div className="mt-12 w-full max-w-4xl sm:mt-16">
-          <div className="grid grid-cols-3 gap-px rounded-2xl border border-border bg-border overflow-hidden">
-            <div className="flex flex-col items-center gap-1 bg-card px-3 py-5 sm:gap-2 sm:px-6 sm:py-8">
-              <span className="text-xl font-bold text-foreground sm:text-3xl" style={{ fontFamily: "var(--font-heading)" }}>
-                <AnimatedCounter target={diagCount} suffix="+" />
-              </span>
-              <span className="text-[10px] text-muted-foreground sm:text-sm">Diagnostics</span>
-            </div>
-            <div className="flex flex-col items-center gap-1 bg-card px-3 py-5 sm:gap-2 sm:px-6 sm:py-8">
-              <span className="text-xl font-bold text-foreground sm:text-3xl" style={{ fontFamily: "var(--font-heading)" }}>
-                <AnimatedCounter target={98} suffix="%" />
-              </span>
-              <span className="text-[10px] text-muted-foreground sm:text-sm">Precision</span>
-            </div>
-            <div className="flex flex-col items-center gap-1 bg-card px-3 py-5 sm:gap-2 sm:px-6 sm:py-8">
-              <span className="text-xl font-bold text-accent sm:text-3xl" style={{ fontFamily: "var(--font-heading)" }}>
-                {"<"}30s
-              </span>
-              <span className="text-[10px] text-muted-foreground sm:text-sm">Analyse</span>
-            </div>
+          {/* Trust row */}
+          <div className="animate-fade-up-delay-3 mt-10 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm text-secondary-foreground">
+            <span className="flex items-center gap-2">
+              <ShieldCheck size={16} className="text-accent" />
+              Intervention garantie
+            </span>
+            <span className="flex items-center gap-2">
+              <MapPin size={16} className="text-accent" />
+              Orne, Sarthe, Mayenne, Eure, Eure-et-Loir
+            </span>
           </div>
         </div>
 
-        {/* Video toiture */}
-        <div className="mt-8 w-full max-w-4xl overflow-hidden rounded-xl border border-border shadow-2xl shadow-primary/5 sm:mt-12 sm:rounded-2xl">
-          <div className="relative aspect-[4/3] w-full sm:aspect-[16/9]">
-            <video
-              src="https://hebbkx1anhila5yf.public.blob.vercel-storage.com/diag.aco-habitat.satelitte.video-udYSb78QcWnfnkDh3V4kfBnzQAtNyk.MP4"
-              autoPlay
-              muted
-              loop
-              playsInline
-              className="h-full w-full object-cover"
+        {/* Right: image */}
+        <div className="animate-fade-up-delay-2 relative">
+          <div className="relative aspect-[4/5] w-full overflow-hidden rounded-2xl border border-border shadow-2xl shadow-primary/10 sm:aspect-[4/4.2]">
+            <Image
+              src="/images/charpente-hero.png"
+              alt="Charpente en bois traitée par ACO-HABITAT contre la mérule et les insectes xylophages"
+              fill
+              priority
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              className="object-cover"
             />
-            <div className="absolute inset-0 bg-gradient-to-t from-background/80 via-transparent to-transparent" />
-            <div className="absolute bottom-4 left-4 flex items-center gap-2 rounded-lg border border-border/50 bg-background/80 px-3 py-1.5 backdrop-blur-sm">
-              <Scan size={12} className="text-primary" />
-              <span className="text-[11px] font-medium text-foreground">Analyse satellite par IA</span>
-            </div>
-          </div>
-        </div>
-
-        {/* Feature cards */}
-        <div className="mt-10 grid w-full max-w-4xl grid-cols-1 gap-3 sm:mt-16 sm:grid-cols-3 sm:gap-4">
-          <div className="group flex flex-col gap-4 rounded-2xl border border-border bg-card/60 p-6 backdrop-blur-sm transition-all hover:border-vegetal-red/30 hover:bg-card/80">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-vegetal-red/10 transition-colors group-hover:bg-vegetal-red/15">
-              <Scan size={22} className="text-vegetal-red" />
-            </div>
-            <h3 className="text-base font-semibold text-foreground">
-              Calque Vegetal
-            </h3>
-            <p className="text-sm leading-relaxed text-muted-foreground">
-              Detection du lichen et de la mousse sur l{"'"}ensemble de votre couverture
-            </p>
+            <div className="absolute inset-0 bg-gradient-to-t from-foreground/30 via-transparent to-transparent" />
           </div>
 
-          <div className="group flex flex-col gap-4 rounded-2xl border border-border bg-card/60 p-6 backdrop-blur-sm transition-all hover:border-structure-blue/30 hover:bg-card/80">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-structure-blue/10 transition-colors group-hover:bg-structure-blue/15">
-              <Shield size={22} className="text-structure-blue" />
-            </div>
-            <h3 className="text-base font-semibold text-foreground">
-              Calque Structure
-            </h3>
-            <p className="text-sm leading-relaxed text-muted-foreground">
-              Identification des tuiles deplacees, cassees ou manquantes
-            </p>
-          </div>
-
-          <div className="group flex flex-col gap-4 rounded-2xl border border-border bg-card/60 p-6 backdrop-blur-sm transition-all hover:border-etancheite-cyan/30 hover:bg-card/80">
-            <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-etancheite-cyan/10 transition-colors group-hover:bg-etancheite-cyan/15">
-              <Droplets size={22} className="text-etancheite-cyan" />
-            </div>
-            <h3 className="text-base font-semibold text-foreground">
-              Calque Etancheite
-            </h3>
-            <p className="text-sm leading-relaxed text-muted-foreground">
-              Analyse des traces d{"'"}humidite et risques d{"'"}infiltration
-            </p>
+          {/* Floating stat card */}
+          <div className="absolute -bottom-5 -left-3 flex items-center gap-3 rounded-xl border border-border bg-card px-5 py-4 shadow-xl sm:-left-6">
+            <span
+              className="text-3xl font-semibold text-primary"
+              style={{ fontFamily: "var(--font-heading)" }}
+            >
+              18+
+            </span>
+            <span className="text-xs leading-tight text-muted-foreground">
+              années d&apos;expérience
+              <br />
+              en traitement du bois
+            </span>
           </div>
         </div>
       </div>

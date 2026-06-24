@@ -13,14 +13,11 @@ export async function POST(request: Request) {
     }
 
     const serviceLabels: Record<string, string> = {
-      diagnostic: "Diagnostic IA",
-      reparation: "Reparation de toiture",
-      renovation: "Renovation complete",
-      isolation: "Isolation thermique",
-      demoussage: "Demoussage et traitement",
-      charpente: "Charpente",
-      "bilan-energetique": "Bilan Energetique",
-      autre: "Autre",
+      insectes: "Insectes xylophages (capricorne, vrillette, lyctus)",
+      merule: "Merule / champignons lignivores",
+      preventif: "Traitement preventif du bois",
+      charpente: "Charpente / structure bois",
+      autre: "Autre / a determiner",
     }
 
     const htmlContent = `

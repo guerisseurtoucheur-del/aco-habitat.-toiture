@@ -3,22 +3,19 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import Image from "next/image"
-import { Menu, X, Zap, Phone, Mail, Satellite } from "lucide-react"
+import { Menu, X, Phone } from "lucide-react"
 
 const navLinks = [
-  { href: "#diagnostic", label: "Diagnostic IA" },
-  { href: "#methode", label: "Comment ca marche" },
-  { href: "#tarifs", label: "Tarifs" },
-  { href: "#immobilier", label: "Immobilier" },
-  { href: "/blog", label: "Blog" },
-  { href: "#faq", label: "FAQ" },
-  { href: "#couvreurs", label: "Trouver un couvreur" },
+  { href: "/#traitements", label: "Nos traitements" },
+  { href: "/#expertise", label: "Expertise" },
+  { href: "/#methode", label: "Notre methode" },
+  { href: "/#zone", label: "Zone d'intervention" },
+  { href: "/blog", label: "Conseils" },
 ]
 
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false)
   const [scrolled, setScrolled] = useState(false)
-  const [currentTime, setCurrentTime] = useState<string>("")
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20)
@@ -26,71 +23,17 @@ export function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll)
   }, [])
 
-  useEffect(() => {
-    const updateTime = () => {
-      const now = new Date()
-      setCurrentTime(
-        now.toLocaleTimeString("fr-FR", {
-          hour: "2-digit",
-          minute: "2-digit",
-          second: "2-digit",
-          timeZone: "Europe/Paris",
-        })
-      )
-    }
-    updateTime()
-    const interval = setInterval(updateTime, 1000)
-    return () => clearInterval(interval)
-  }, [])
-
   return (
     <header
       className={`fixed top-0 left-0 right-0 z-50 transition-all duration-300 ${
         scrolled
-          ? "border-b border-border/60 bg-background/90 backdrop-blur-xl shadow-lg shadow-background/50"
+          ? "border-b border-border bg-background/90 backdrop-blur-xl"
           : "bg-transparent"
       }`}
     >
-      <div className={`border-b border-border/40 transition-all duration-300 ${scrolled ? "hidden" : ""}`}>
-        <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-2">
-          <div className="flex items-center gap-6">
-            <a
-              href="tel:+33233311979"
-              className="flex items-center gap-2 text-xs text-muted-foreground transition-colors hover:text-foreground"
-            >
-              <Phone size={12} className="text-primary" />
-              <span className="font-medium">02 33 31 19 79</span>
-            </a>
-            <a
-              href="mailto:aco.habitat@orange.fr"
-              className="flex items-center gap-2 text-xs text-muted-foreground transition-colors hover:text-foreground"
-            >
-              <Mail size={12} className="text-primary" />
-              <span className="font-medium">aco.habitat@orange.fr</span>
-            </a>
-          </div>
-          <div className="hidden items-center gap-4 sm:flex">
-            <span className="text-xs text-muted-foreground">
-              Analyse par satellite disponible partout en France
-            </span>
-            {currentTime && (
-              <>
-                <span className="h-3 w-px bg-border" />
-                <span className="flex items-center gap-1.5 text-xs text-muted-foreground">
-                  <Satellite size={11} className="text-primary" />
-                  <span className="font-mono text-[11px] tracking-wider tabular-nums text-primary/80">
-                    {currentTime}
-                  </span>
-                  <span className="text-[9px] text-muted-foreground/60 uppercase tracking-widest">UTC+1</span>
-                </span>
-              </>
-            )}
-          </div>
-        </div>
-      </div>
-      <nav className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
+      <nav className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 sm:px-6 sm:py-4">
         <Link href="/" className="flex items-center gap-3 group">
-          <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full transition-transform group-hover:scale-105">
+          <div className="relative h-11 w-11 shrink-0 overflow-hidden rounded-full ring-1 ring-border transition-transform group-hover:scale-105">
             <Image
               src="/images/logo-aco-habitat.png"
               alt="Logo ACO-HABITAT"
@@ -100,14 +43,13 @@ export function Navbar() {
               priority
               sizes="44px"
             />
-            <div className="absolute inset-0 rounded-full ring-1 ring-primary/20 group-hover:ring-primary/40 transition-all" />
           </div>
           <div className="flex flex-col">
-            <span className="text-base font-bold tracking-tight text-foreground font-sans leading-tight">
+            <span className="text-base font-bold tracking-tight text-foreground leading-tight">
               ACO-HABITAT
             </span>
-            <span className="text-[10px] font-medium text-muted-foreground tracking-widest uppercase">
-              Diagnostic Toiture par IA
+            <span className="text-[10px] font-medium text-muted-foreground tracking-[0.15em] uppercase">
+              Traitement du bois & charpente
             </span>
           </div>
         </Link>
@@ -117,7 +59,7 @@ export function Navbar() {
             <a
               key={link.href}
               href={link.href}
-              className="rounded-lg px-3 py-2 text-sm text-muted-foreground transition-colors hover:text-foreground hover:bg-secondary"
+              className="rounded-lg px-3 py-2 text-sm text-secondary-foreground transition-colors hover:text-foreground hover:bg-secondary"
             >
               {link.label}
             </a>
@@ -126,17 +68,17 @@ export function Navbar() {
 
         <div className="hidden lg:flex items-center gap-3">
           <a
-            href="#tarifs"
-            className="rounded-lg border border-border px-4 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-secondary"
+            href="tel:+33233311979"
+            className="flex items-center gap-2 rounded-lg border border-border px-4 py-2.5 text-sm font-semibold text-foreground transition-colors hover:bg-secondary"
           >
-            Voir les tarifs
+            <Phone size={14} className="text-primary" />
+            02 33 31 19 79
           </a>
           <a
-            href="#diagnostic"
-            className="group relative flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-medium text-primary-foreground transition-all hover:shadow-lg hover:shadow-primary/25"
+            href="/#devis"
+            className="rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90"
           >
-            <Zap size={14} className="transition-transform group-hover:scale-110" />
-            Diagnostic 19{"\u20AC"}
+            Devis gratuit
           </a>
         </div>
 
@@ -150,33 +92,32 @@ export function Navbar() {
       </nav>
 
       {mobileOpen && (
-        <div className="border-t border-border bg-background/98 backdrop-blur-xl px-6 pb-6 lg:hidden">
+        <div className="border-t border-border bg-background/98 backdrop-blur-xl px-4 pb-6 lg:hidden">
           <div className="flex flex-col gap-1 pt-4">
             {navLinks.map((link) => (
               <a
                 key={link.href}
                 href={link.href}
                 onClick={() => setMobileOpen(false)}
-                className="rounded-lg px-4 py-3 text-sm text-muted-foreground transition-colors hover:text-foreground hover:bg-secondary"
+                className="rounded-lg px-4 py-3 text-sm text-secondary-foreground transition-colors hover:text-foreground hover:bg-secondary"
               >
                 {link.label}
               </a>
             ))}
             <div className="mt-4 flex flex-col gap-3">
               <a
-                href="#tarifs"
-                onClick={() => setMobileOpen(false)}
-                className="rounded-lg border border-border px-4 py-3 text-center text-sm font-medium text-foreground"
+                href="tel:+33233311979"
+                className="flex items-center justify-center gap-2 rounded-lg border border-border px-4 py-3 text-sm font-semibold text-foreground"
               >
-                Voir les tarifs
+                <Phone size={15} className="text-primary" />
+                02 33 31 19 79
               </a>
               <a
-                href="#diagnostic"
+                href="/#devis"
                 onClick={() => setMobileOpen(false)}
-                className="flex items-center justify-center gap-2 rounded-lg bg-primary px-5 py-3 text-sm font-medium text-primary-foreground"
+                className="rounded-lg bg-primary px-5 py-3 text-center text-sm font-semibold text-primary-foreground"
               >
-                <Zap size={14} />
-                Diagnostic 19{"\u20AC"}
+                Demander un devis gratuit
               </a>
             </div>
           </div>

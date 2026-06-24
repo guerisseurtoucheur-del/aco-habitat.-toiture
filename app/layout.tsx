@@ -1,18 +1,18 @@
 import type { Metadata, Viewport } from "next"
-import { Inter, Space_Grotesk } from "next/font/google"
+import { Inter, Fraunces } from "next/font/google"
 import "./globals.css"
 import { ChatbotWrapper } from "@/components/chatbot-wrapper"
 
-const _inter = Inter({
+const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
   display: "swap",
   preload: true,
 })
 
-const _spaceGrotesk = Space_Grotesk({
+const fraunces = Fraunces({
   subsets: ["latin"],
-  variable: "--font-space-grotesk",
+  variable: "--font-fraunces",
   display: "swap",
   preload: true,
 })
@@ -99,7 +99,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="fr" suppressHydrationWarning data-scroll-behavior="smooth">
+    <html lang="fr" suppressHydrationWarning data-scroll-behavior="smooth" className={`${inter.variable} ${fraunces.variable} bg-background`}>
       <head>
         {/* Preconnect to critical third-party origins */}
         <link rel="preconnect" href="https://fonts.googleapis.com" />
