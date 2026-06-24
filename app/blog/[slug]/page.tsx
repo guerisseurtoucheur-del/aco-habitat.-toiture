@@ -33,7 +33,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: `${article.title} | Blog ACO-HABITAT`,
     description: article.description,
-    keywords: [article.category, "toiture", "renovation", "diagnostic"],
+    keywords: [article.category, "traitement du bois", "charpente", "mérule", "insectes xylophages", "diagnostic"],
     authors: [{ name: article.author }],
     openGraph: {
       title: article.title,
@@ -132,12 +132,13 @@ export default async function ArticlePage({ params }: Props) {
             <Card className="mt-12 bg-primary/5 border-primary/20">
               <CardContent className="p-6 sm:p-8 text-center">
                 <h3 className="text-xl font-semibold text-foreground mb-2">
-                  Evaluez l'etat de votre toiture
+                  Évaluez l&apos;état de votre charpente
                 </h3>
                 <p className="text-muted-foreground mb-4">
-                  Notre diagnostic IA analyse votre toiture en 30 secondes et detecte les problemes potentiels.
+                  Un doute sur des insectes xylophages, de la mérule ou un champignon ? Demandez un diagnostic
+                  gratuit et sans engagement.
                 </p>
-                <Link href="/#diagnostic">
+                <Link href="/#devis">
                   <Button size="lg" className="gap-2">
                     Faire un diagnostic gratuit
                     <ArrowRight className="h-4 w-4" />
