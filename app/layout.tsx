@@ -18,7 +18,7 @@ const fraunces = Fraunces({
 })
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://aco-habitat.fr"),
+  metadataBase: new URL("https://diag.aco-habitat.fr"),
   title: {
     default: "Traitement du Bois & Charpente | ACO-HABITAT Expert Mérule depuis 2006",
     template: "%s | ACO-HABITAT Traitement du Bois",
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
     "ACO-HABITAT Alençon",
     "diagnostic charpente gratuit",
   ],
-  authors: [{ name: "ACO-HABITAT", url: "https://aco-habitat.fr" }],
+  authors: [{ name: "ACO-HABITAT", url: "https://diag.aco-habitat.fr" }],
   creator: "ACO-HABITAT",
   publisher: "ACO-HABITAT",
   alternates: {
@@ -62,7 +62,7 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     locale: "fr_FR",
-    url: "https://aco-habitat.fr",
+    url: "https://diag.aco-habitat.fr",
     siteName: "ACO-HABITAT Traitement du Bois",
     title: "Traitement du Bois & Charpente | ACO-HABITAT Expert Mérule depuis 2006",
     description:
@@ -113,12 +113,12 @@ export default function RootLayout({
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "Organization",
-              "@id": "https://aco-habitat.fr/#organization",
+              "@id": "https://diag.aco-habitat.fr/#organization",
               name: "ACO-HABITAT",
               alternateName: "ACO-HABITAT Traitement du Bois & Charpente",
-              url: "https://aco-habitat.fr",
-              logo: "https://aco-habitat.fr/images/logo-aco-habitat.png",
-              image: "https://aco-habitat.fr/images/charpente-hero.png",
+              url: "https://diag.aco-habitat.fr",
+              logo: "https://diag.aco-habitat.fr/images/logo-aco-habitat.png",
+              image: "https://diag.aco-habitat.fr/images/charpente-hero.png",
               foundingDate: "2006",
               description:
                 "Expert du traitement du bois et de la charpente depuis 2006 : traitement curatif et préventif contre les insectes xylophages (capricorne, vrillette, lyctus), la mérule et les champignons lignivores.",

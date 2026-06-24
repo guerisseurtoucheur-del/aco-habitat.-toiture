@@ -1,5 +1,5 @@
 export function StructuredData() {
-  const SITE = "https://aco-habitat.fr"
+  const SITE = "https://diag.aco-habitat.fr"
 
   const localBusiness = {
     "@context": "https://schema.org",

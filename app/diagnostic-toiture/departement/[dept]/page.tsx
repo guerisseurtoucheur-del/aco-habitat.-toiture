@@ -68,7 +68,7 @@ export async function generateMetadata({
       siteName: "ACO-HABITAT Traitement du Bois",
     },
     alternates: {
-      canonical: `https://aco-habitat.fr/diagnostic-toiture/departement/${deptData.slug}`,
+      canonical: `https://diag.aco-habitat.fr/diagnostic-toiture/departement/${deptData.slug}`,
     },
   }
 }

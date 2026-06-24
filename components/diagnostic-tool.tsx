@@ -2155,7 +2155,7 @@ const fullAddress = clientAddress && clientPostalCode && clientCity
                 </p>
                 <div className="mt-5 flex flex-wrap items-center gap-3">
                   <a
-                    href="https://aco-habitat.fr"
+                    href="https://diag.aco-habitat.fr"
                     target="_blank"
                     rel="noopener noreferrer"
                     className="group flex items-center gap-2 rounded-xl bg-amber-500 px-6 py-3 text-sm font-bold text-black transition-all hover:bg-amber-400 hover:shadow-lg hover:shadow-amber-500/25"

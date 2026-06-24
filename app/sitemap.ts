@@ -6,7 +6,7 @@ import { departmentsData } from "@/lib/departments-data"
 import { getAllArticles } from "@/lib/blog-data"
 
 export default function sitemap(): MetadataRoute.Sitemap {
-  const baseUrl = "https://aco-habitat.fr"
+  const baseUrl = "https://diag.aco-habitat.fr"
 
   const mainPages: MetadataRoute.Sitemap = [
     {

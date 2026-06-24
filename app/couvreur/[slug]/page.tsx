@@ -45,7 +45,7 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
     openGraph: {
       title,
       description,
-      url: `https://aco-habitat.fr/couvreur/${dept.slug}`,
+      url: `https://diag.aco-habitat.fr/couvreur/${dept.slug}`,
       type: "website",
       locale: "fr_FR",
       siteName: "ACO-HABITAT Traitement du Bois",
@@ -123,7 +123,7 @@ export default async function DepartmentPage({ params }: { params: Promise<{ slu
               "@type": "GeneralContractor",
               name: `ACO-HABITAT - Traitement du bois ${dept.nom}`,
               description: `Expert du traitement du bois et de la charpente ${L.dans}. Insectes xylophages, mérule, champignons lignivores.`,
-              url: `https://aco-habitat.fr/couvreur/${dept.slug}`,
+              url: `https://diag.aco-habitat.fr/couvreur/${dept.slug}`,
               telephone: COMPANY.phoneHref,
               email: COMPANY.email,
               areaServed: { "@type": "AdministrativeArea", name: dept.nom },

@@ -30,7 +30,7 @@ export async function generateMetadata({
       type: "website",
       locale: "fr_FR",
       siteName: "ACO-HABITAT",
-      url: `https://aco-habitat.fr/services/${slug}`,
+      url: `https://diag.aco-habitat.fr/services/${slug}`,
     },
   }
 }
@@ -64,7 +64,7 @@ export default async function ServicePage({
               name: "ACO-HABITAT",
               telephone: "+33233311979",
               email: "aco.habitat@orange.fr",
-              url: "https://aco-habitat.fr",
+              url: "https://diag.aco-habitat.fr",
             },
             areaServed: {
               "@type": "Country",
