@@ -29,6 +29,11 @@
   --color-timber: #b04a25;
   --color-pine: #3c5a4a;
   --color-sand: #c9a37a;
+  --color-honey: #c8912f;
+  --color-honey-foreground: #fbf8f2;
+  --color-pine-soft: #e3ebe5;
+  --color-honey-soft: #f5ecd9;
+  --color-timber-soft: #f4e2d8;
 
   --radius-sm: 0.375rem;
   --radius-md: 0.5rem;

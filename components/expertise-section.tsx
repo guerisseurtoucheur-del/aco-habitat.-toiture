@@ -1,10 +1,10 @@
 import { ShieldCheck, Clock, BadgeCheck, Users } from "lucide-react"
 
 const stats = [
-  { value: "2006", label: "Année de création" },
-  { value: "100%", label: "Bois inspecté avant devis" },
-  { value: "5", label: "Départements couverts" },
-  { value: "48h", label: "Délai de réponse moyen" },
+  { value: "2006", label: "Année de création", accent: "#b04a25" },
+  { value: "100%", label: "Bois inspecté avant devis", accent: "#3c5a4a" },
+  { value: "5", label: "Départements couverts", accent: "#c8912f" },
+  { value: "48h", label: "Délai de réponse moyen", accent: "#8a6d3b" },
 ]
 
 const reasons = [
@@ -12,21 +12,25 @@ const reasons = [
     icon: BadgeCheck,
     title: "Produits certifiés",
     description: "Nous utilisons exclusivement des produits homologués et appliqués selon les normes en vigueur.",
+    accent: "#b04a25",
   },
   {
     icon: ShieldCheck,
     title: "Intervention garantie",
     description: "Nos traitements curatifs et préventifs sont garantis. Vous achetez la tranquillité, pas un pari.",
+    accent: "#3c5a4a",
   },
   {
     icon: Clock,
     title: "Réactivité",
     description: "La mérule n'attend pas. Nous intervenons rapidement pour limiter la propagation et les dégâts.",
+    accent: "#c8912f",
   },
   {
     icon: Users,
     title: "Artisan, pas intermédiaire",
     description: "Vous traitez directement avec l'entreprise qui réalise les travaux, de l'inspection à la garantie.",
+    accent: "#8a6d3b",
   },
 ]
 
@@ -55,8 +59,8 @@ export function ExpertiseSection() {
               {stats.map((s) => (
                 <div key={s.label} className="flex flex-col gap-1 bg-card px-5 py-6">
                   <span
-                    className="text-3xl font-semibold text-primary"
-                    style={{ fontFamily: "var(--font-heading)" }}
+                    className="text-3xl font-semibold"
+                    style={{ fontFamily: "var(--font-heading)", color: s.accent }}
                   >
                     {s.value}
                   </span>
@@ -68,9 +72,12 @@ export function ExpertiseSection() {
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             {reasons.map((r) => (
-              <div key={r.title} className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-6">
-                <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-accent/10">
-                  <r.icon size={20} className="text-accent" />
+              <div key={r.title} className="flex flex-col gap-3 rounded-2xl border border-border bg-card p-6 transition-shadow hover:shadow-lg">
+                <div
+                  className="flex h-11 w-11 items-center justify-center rounded-xl"
+                  style={{ backgroundColor: `${r.accent}1a` }}
+                >
+                  <r.icon size={20} style={{ color: r.accent }} />
                 </div>
                 <h3 className="text-base font-semibold text-foreground">{r.title}</h3>
                 <p className="text-sm leading-relaxed text-muted-foreground">{r.description}</p>
