@@ -1,139 +1,66 @@
 import Image from "next/image"
-import { Zap, ExternalLink, Phone, Mail } from "lucide-react"
+import { Phone, Mail, MapPin } from "lucide-react"
 
-interface FooterLink {
-  label: string
-  href: string
-  external?: boolean
-}
-
-const footerLinks: { title: string; links: FooterLink[] }[] = [
+const footerLinks: { title: string; links: { label: string; href: string }[] }[] = [
   {
-    title: "Produit",
+    title: "Traitements",
     links: [
-      { label: "Diagnostic Toiture IA", href: "#diagnostic" },
-      { label: "Comment ca marche", href: "#methode" },
-      { label: "Tarifs", href: "#tarifs" },
-      { label: "Exemple de rapport PDF", href: "#tarifs" },
-      { label: "Immobilier", href: "#immobilier" },
+      { label: "Insectes xylophages", href: "/#traitements" },
+      { label: "Mérule & champignons", href: "/#traitements" },
+      { label: "Traitement préventif", href: "/#traitements" },
+      { label: "Charpente", href: "/#traitements" },
     ],
   },
   {
-    title: "Ressources",
+    title: "L'entreprise",
     links: [
-      { label: "FAQ", href: "#faq" },
-      { label: "Diagnostic immobilier", href: "/guide/diagnostic-toiture-achat-vente-immobilier" },
-      { label: "Glossaire toiture", href: "/guide/glossaire-toiture" },
-      { label: "Degats de grele", href: "/guide/degats-grele-toiture" },
-      { label: "Duree de vie d'une toiture", href: "/guide/duree-de-vie-toiture" },
-      { label: "Signes mauvaise isolation", href: "/guide/signes-mauvaise-isolation-toiture" },
-      { label: "Notre methodologie IA", href: "/guide/methodologie-diagnostic-ia" },
+      { label: "Notre expertise", href: "/#expertise" },
+      { label: "Notre méthode", href: "/#methode" },
+      { label: "Zone d'intervention", href: "/#zone" },
+      { label: "Conseils", href: "/blog" },
     ],
   },
   {
-    title: "Nos autres diagnostics",
+    title: "Départements",
     links: [
-      { label: "Diagnostic Humidite IA", href: "https://humidite.aco-habitat.fr", external: true },
-      { label: "Diagnostic Charpente IA", href: "https://traitement-bois.fr", external: true },
-      { label: "Traitement Merule", href: "https://traitement-bois.fr", external: true },
-      { label: "Traitement Insectes Bois", href: "https://traitement-bois.fr", external: true },
-    ],
-  },
-  {
-    title: "Diagnostic par ville",
-    links: [
-      { label: "Diagnostic toiture Paris", href: "/diagnostic-toiture/paris" },
-      { label: "Diagnostic toiture Lyon", href: "/diagnostic-toiture/lyon" },
-      { label: "Diagnostic toiture Marseille", href: "/diagnostic-toiture/marseille" },
-      { label: "Diagnostic toiture Toulouse", href: "/diagnostic-toiture/toulouse" },
-      { label: "Diagnostic toiture Bordeaux", href: "/diagnostic-toiture/bordeaux" },
-      { label: "Toutes les villes", href: "/diagnostic-toiture" },
+      { label: "Orne (61)", href: "/#zone" },
+      { label: "Sarthe (72)", href: "/#zone" },
+      { label: "Mayenne (53)", href: "/#zone" },
+      { label: "Eure (27)", href: "/#zone" },
+      { label: "Eure-et-Loir (28)", href: "/#zone" },
     ],
   },
 ]
 
 export function Footer() {
   return (
-    <footer className="border-t border-border bg-card/30">
+    <footer className="border-t border-border bg-secondary/50">
       {/* CTA Banner */}
-      <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-16">
-        <div className="relative overflow-hidden rounded-xl border border-primary/20 bg-primary/5 p-6 text-center sm:rounded-2xl sm:p-10">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--color-glow-blue),_transparent_60%)]" />
-          <div className="relative">
-            <h3
-              className="text-balance text-2xl font-bold text-foreground md:text-3xl"
-              style={{ fontFamily: "var(--font-heading)" }}
-            >
-              Pret a analyser votre toiture ?
-            </h3>
-            <p className="mt-3 text-base text-muted-foreground">
-              Diagnostic IA complet pour seulement 19{"\u20AC"}. Resultat en 30 secondes.
-            </p>
-            <div className="mt-8 flex flex-col items-center justify-center gap-4 sm:flex-row">
-              <a
-                href="#diagnostic"
-                className="group flex items-center gap-2 rounded-xl bg-primary px-8 py-4 text-sm font-semibold text-primary-foreground transition-all hover:shadow-lg hover:shadow-primary/25"
-              >
-                <Zap size={16} className="transition-transform group-hover:scale-110" />
-                Analyser ma toiture - 19 EUR
-              </a>
-              <a
-                href="#couvreurs"
-                className="rounded-xl border border-border bg-secondary/50 px-8 py-4 text-sm font-medium text-secondary-foreground transition-colors hover:bg-secondary"
-              >
-                Trouver un couvreur
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Cross-selling autres diagnostics banner */}
-      <div className="border-t border-primary/20 bg-primary/5">
-        <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
-          <p className="mb-4 text-center text-sm font-semibold text-foreground">
-            Decouvrez nos autres diagnostics IA
+      <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16">
+        <div className="rounded-2xl border border-border bg-card p-8 text-center sm:p-12">
+          <h3
+            className="text-balance text-2xl font-semibold text-foreground sm:text-3xl"
+            style={{ fontFamily: "var(--font-heading)" }}
+          >
+            Un doute sur l&apos;état de votre charpente&nbsp;?
+          </h3>
+          <p className="mx-auto mt-3 max-w-md text-base text-muted-foreground">
+            Ne laissez pas la mérule ou les insectes gagner du terrain. Faites-vous conseiller
+            par un expert dès aujourd&apos;hui.
           </p>
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            {/* Diagnostic Humidite */}
+          <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <a
-              href="https://humidite.aco-habitat.fr"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-3 rounded-xl border border-cyan-500/30 bg-cyan-500/10 px-4 py-3 transition-all hover:bg-cyan-500/20"
+              href="/#devis"
+              className="rounded-xl bg-primary px-8 py-4 text-sm font-semibold text-primary-foreground transition-all hover:bg-primary/90"
             >
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-cyan-500/15">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-cyan-400">
-                  <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z" />
-                </svg>
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-semibold text-foreground">Diagnostic Humidite IA</p>
-                <p className="text-xs text-muted-foreground">Analysez les problemes d{"'"}humidite</p>
-              </div>
-              <ExternalLink size={14} className="shrink-0 text-cyan-400" />
+              Demander un devis gratuit
             </a>
-            
-            {/* Diagnostic Charpente */}
             <a
-              href="https://traitement-bois.fr"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center gap-3 rounded-xl border border-amber-500/30 bg-amber-500/10 px-4 py-3 transition-all hover:bg-amber-500/20"
+              href="tel:+33233311979"
+              className="flex items-center gap-2 rounded-xl border border-border bg-background px-8 py-4 text-sm font-semibold text-foreground transition-colors hover:bg-secondary"
             >
-              <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-amber-500/15">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="text-amber-400">
-                  <path d="M3 21h18" />
-                  <path d="M12 2L2 7h20L12 2z" />
-                  <path d="M6 12v7" />
-                  <path d="M18 12v7" />
-                </svg>
-              </div>
-              <div className="flex-1">
-                <p className="text-sm font-semibold text-foreground">Diagnostic Charpente IA</p>
-                <p className="text-xs text-muted-foreground">Merule, insectes xylophages, etat du bois</p>
-              </div>
-              <ExternalLink size={14} className="shrink-0 text-amber-400" />
+              <Phone size={15} className="text-primary" />
+              02 33 31 19 79
             </a>
           </div>
         </div>
@@ -141,12 +68,12 @@ export function Footer() {
 
       {/* Footer links */}
       <div className="border-t border-border">
-        <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 sm:py-14">
-          <div className="grid grid-cols-2 gap-8 sm:grid-cols-2 lg:grid-cols-5">
+        <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6">
+          <div className="grid grid-cols-2 gap-8 lg:grid-cols-4">
             {/* Brand */}
-            <div className="col-span-2 flex flex-col gap-4 sm:col-span-1">
+            <div className="col-span-2 flex flex-col gap-4 lg:col-span-1">
               <div className="flex items-center gap-3">
-                <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full">
+                <div className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full ring-1 ring-border">
                   <Image
                     src="/images/logo-aco-habitat.png"
                     alt="Logo ACO-HABITAT"
@@ -157,34 +84,28 @@ export function Footer() {
                 </div>
                 <div className="flex flex-col">
                   <span className="text-base font-bold text-foreground leading-tight">ACO-HABITAT</span>
-                  <span className="text-[10px] font-medium text-muted-foreground tracking-widest uppercase">
-                    Diagnostic Toiture par IA
+                  <span className="text-[10px] font-medium text-muted-foreground tracking-[0.15em] uppercase">
+                    Traitement du bois
                   </span>
                 </div>
               </div>
               <p className="text-sm leading-relaxed text-muted-foreground">
-                Plateforme de diagnostic de toiture par intelligence artificielle.
-                Analysez l{"'"}etat de votre couverture en 30 secondes. Rapport PDF complet.
+                Spécialiste du traitement des bois et charpentes : insectes xylophages, mérule
+                et champignons lignivores. Expert depuis 2006.
               </p>
               <div className="flex flex-col gap-2 text-sm text-muted-foreground">
-                <a href="tel:+33233311979" className="flex items-center gap-2 hover:text-foreground transition-colors">
-                  <Phone size={14} />
+                <a href="tel:+33233311979" className="flex items-center gap-2 transition-colors hover:text-foreground">
+                  <Phone size={14} className="text-primary" />
                   02 33 31 19 79
                 </a>
-                <a href="mailto:aco.habitat@orange.fr" className="flex items-center gap-2 hover:text-foreground transition-colors">
-                  <Mail size={14} />
+                <a href="mailto:aco.habitat@orange.fr" className="flex items-center gap-2 transition-colors hover:text-foreground">
+                  <Mail size={14} className="text-primary" />
                   aco.habitat@orange.fr
                 </a>
-              </div>
-              <p className="text-xs text-muted-foreground">Expert toiture depuis 2006</p>
-
-              {/* Price badge */}
-              <div className="flex items-center gap-3 rounded-xl border border-primary/20 bg-primary/5 px-4 py-3">
-                <Zap size={16} className="text-primary" />
-                <div className="flex flex-col">
-                  <span className="text-xs font-semibold text-foreground">19 EUR par diagnostic</span>
-                  <span className="text-[10px] text-muted-foreground">Rapport PDF complet inclus</span>
-                </div>
+                <span className="flex items-center gap-2">
+                  <MapPin size={14} className="text-primary" />
+                  Orne · Sarthe · Mayenne · Eure · Eure-et-Loir
+                </span>
               </div>
             </div>
 
@@ -197,11 +118,9 @@ export function Footer() {
                     <li key={link.label}>
                       <a
                         href={link.href}
-                        {...(link.external ? { target: "_blank", rel: "noopener noreferrer" } : {})}
-                        className="flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground"
+                        className="text-sm text-muted-foreground transition-colors hover:text-foreground"
                       >
                         {link.label}
-                        {link.external && <ExternalLink size={11} />}
                       </a>
                     </li>
                   ))}
@@ -212,16 +131,29 @@ export function Footer() {
         </div>
       </div>
 
-      {/* Bottom bar */}
+      {/* Legal info */}
       <div className="border-t border-border">
-          <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 py-6 sm:flex-row sm:px-6">
-          <p className="text-xs text-muted-foreground">
-            {"2026 ACO-HABITAT. Tous droits reserves."}
-          </p>
-          <div className="flex gap-6 text-xs text-muted-foreground">
-            <a href="/mentions-legales" className="hover:text-foreground transition-colors">Mentions legales & CGV</a>
-            <a href="/mentions-legales#donnees" className="hover:text-foreground transition-colors">Confidentialite</a>
-            <a href="/admin" className="hover:text-foreground transition-colors">Espace Pro</a>
+        <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
+              <span>ACO-HABITAT — 18 rue Bernard Palissy, 61000 Alençon</span>
+              <span className="hidden sm:inline" aria-hidden="true">·</span>
+              <span>SIRET&nbsp;: 344 616 412 00062</span>
+              <span className="hidden sm:inline" aria-hidden="true">·</span>
+              <span>TVA&nbsp;: FR65 344 616 412</span>
+            </div>
+            <div className="flex gap-6 text-xs text-muted-foreground">
+              <a href="/mentions-legales" className="transition-colors hover:text-foreground">Mentions légales</a>
+              <a href="/mentions-legales#donnees" className="transition-colors hover:text-foreground">Confidentialité</a>
+              <a href="/admin" className="transition-colors hover:text-foreground">Espace Pro</a>
+            </div>
+          </div>
+          <div className="mt-4 border-t border-border pt-4 text-[11px] leading-relaxed text-muted-foreground">
+            <p>© 2026 ACO-HABITAT — Spécialiste du traitement du bois depuis 2006.</p>
+            <p className="mt-1">
+              ACO-HABITAT · Marque déposée à l&apos;INPI n° 5266768 · Méthode et format de rapport
+              protégés (dépôt e-Soleau INPI).
+            </p>
           </div>
         </div>
       </div>
