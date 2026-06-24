@@ -131,14 +131,29 @@ export function Footer() {
         </div>
       </div>
 
-      {/* Bottom bar */}
+      {/* Legal info */}
       <div className="border-t border-border">
-        <div className="mx-auto flex max-w-7xl flex-col items-center justify-between gap-4 px-4 py-6 sm:flex-row sm:px-6">
-          <p className="text-xs text-muted-foreground">2026 ACO-HABITAT. Tous droits réservés.</p>
-          <div className="flex gap-6 text-xs text-muted-foreground">
-            <a href="/mentions-legales" className="transition-colors hover:text-foreground">Mentions légales & CGV</a>
-            <a href="/mentions-legales#donnees" className="transition-colors hover:text-foreground">Confidentialité</a>
-            <a href="/admin" className="transition-colors hover:text-foreground">Espace Pro</a>
+        <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div className="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground">
+              <span>ACO-HABITAT — 18 rue Bernard Palissy, 61000 Alençon</span>
+              <span className="hidden sm:inline" aria-hidden="true">·</span>
+              <span>SIRET&nbsp;: 344 616 412 00062</span>
+              <span className="hidden sm:inline" aria-hidden="true">·</span>
+              <span>TVA&nbsp;: FR65 344 616 412</span>
+            </div>
+            <div className="flex gap-6 text-xs text-muted-foreground">
+              <a href="/mentions-legales" className="transition-colors hover:text-foreground">Mentions légales</a>
+              <a href="/mentions-legales#donnees" className="transition-colors hover:text-foreground">Confidentialité</a>
+              <a href="/admin" className="transition-colors hover:text-foreground">Espace Pro</a>
+            </div>
+          </div>
+          <div className="mt-4 border-t border-border pt-4 text-[11px] leading-relaxed text-muted-foreground">
+            <p>© 2026 ACO-HABITAT — Spécialiste du traitement du bois depuis 2006.</p>
+            <p className="mt-1">
+              ACO-HABITAT · Marque déposée à l&apos;INPI n° 5266768 · Méthode et format de rapport
+              protégés (dépôt e-Soleau INPI).
+            </p>
           </div>
         </div>
       </div>
