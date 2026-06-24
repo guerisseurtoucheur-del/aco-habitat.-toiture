@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import { isInZone } from "@/lib/wood-treatment"
 
 const serviceLabels: Record<string, string> = {
   insectes: "Insectes xylophages (capricorne, vrillette, lyctus)",
@@ -20,11 +21,16 @@ function escapeHtml(value: string): string {
 export async function POST(request: Request) {
   try {
     const body = await request.json()
-    const { name, phone, email, service, message } = body
+    const { name, phone, email, service, message, postal } = body
 
     if (!name || !phone || !email || !service || !message) {
       return NextResponse.json({ error: "Tous les champs sont requis." }, { status: 400 })
     }
+
+    // Determine la zone a partir du code postal (2 premiers chiffres = departement)
+    const deptCode = String(postal || "").trim().slice(0, 2)
+    const inZone = deptCode.length === 2 && isInZone(deptCode)
+    const zoneTag = inZone ? "EN ZONE" : "HORS ZONE - à revendre"
 
     const apiKey = process.env.RESEND_API_KEY
     if (!apiKey) {
@@ -46,6 +52,12 @@ export async function POST(request: Request) {
         <div style="background: #b04a25; padding: 24px; border-radius: 12px 12px 0 0;">
           <h1 style="color: #ffffff; margin: 0; font-size: 22px;">ACO-HABITAT</h1>
           <p style="color: #f2d9cb; margin: 4px 0 0; font-size: 13px;">Nouvelle demande de devis - Traitement du bois</p>
+        </div>
+        <div style="background: ${inZone ? "#1f7a45" : "#c2410c"}; padding: 12px 24px;">
+          <p style="color: #ffffff; margin: 0; font-size: 14px; font-weight: 700; letter-spacing: 0.5px;">
+            ${inZone ? "DEMANDE EN ZONE - intervention directe" : "DEMANDE HORS ZONE - lead à revendre"}
+            ${deptCode ? ` (dépt. ${deptCode})` : ""}
+          </p>
         </div>
         <div style="background: #ffffff; padding: 24px; border: 1px solid #e7ddcf; border-top: none; border-radius: 0 0 12px 12px;">
           <table style="width: 100%; border-collapse: collapse;">
@@ -88,7 +100,7 @@ export async function POST(request: Request) {
         from: "ACO-HABITAT <devis@aco-habitat.fr>",
         to: ["aco.habitat@orange.fr"],
         reply_to: String(email),
-        subject: `Nouvelle demande - ${serviceLabels[service] || service} - ${name}`,
+        subject: `[${zoneTag}] ${serviceLabels[service] || service} - ${name}`,
         html: htmlContent,
       }),
     })

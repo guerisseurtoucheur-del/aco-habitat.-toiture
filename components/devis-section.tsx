@@ -34,7 +34,7 @@ export function DevisSection() {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, phone, email, service, message }),
+        body: JSON.stringify({ name, phone, email, service, message, postal }),
       })
       if (!res.ok) {
         const d = await res.json().catch(() => ({}))
