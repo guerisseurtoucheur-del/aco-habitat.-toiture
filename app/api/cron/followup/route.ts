@@ -130,7 +130,7 @@ export async function GET(req: Request) {
                 <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
                   <p style="color: #555; font-size: 11px; margin: 0;">
                     ACO-HABITAT - Diagnostic Toiture par IA<br>
-                    aco.habitat@orange.fr | diag.aco-habitat.fr
+                    aco.habitat@orange.fr | aco-habitat.fr
                   </p>
                   <p style="color: #444; font-size: 10px; margin: 10px 0 0;">
                     Si vous ne souhaitez plus recevoir nos emails, repondez a ce message avec "STOP".

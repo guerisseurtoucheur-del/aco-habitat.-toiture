@@ -32,7 +32,7 @@ export const metadata: Metadata = {
     locale: "fr_FR",
   },
   alternates: {
-    canonical: "https://diag.aco-habitat.fr/diagnostic-toiture",
+    canonical: "https://aco-habitat.fr/diagnostic-toiture",
   },
 }
 
@@ -46,14 +46,14 @@ export default function DiagnosticToiturePage() {
     "@type": "CollectionPage",
     "name": "Diagnostic Toiture en France",
     "description": "Trouvez votre diagnostic toiture par ville ou region en France",
-    "url": "https://diag.aco-habitat.fr/diagnostic-toiture",
+    "url": "https://aco-habitat.fr/diagnostic-toiture",
     "mainEntity": {
       "@type": "ItemList",
       "itemListElement": regions.map((region, index) => ({
         "@type": "ListItem",
         "position": index + 1,
         "name": region.name,
-        "url": `https://diag.aco-habitat.fr/diagnostic-toiture/region/${region.slug}`
+        "url": `https://aco-habitat.fr/diagnostic-toiture/region/${region.slug}`
       }))
     }
   }

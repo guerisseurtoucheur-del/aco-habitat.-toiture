@@ -92,7 +92,7 @@ function generateAdminPDF(d: DiagnosticRecord) {
     doc.rect(0, pageH - 12, pageW, 12, "F")
     doc.setFontSize(6)
     doc.setTextColor(100, 100, 100)
-    doc.text("ACO-HABITAT - Expert toiture depuis 2006 | 02 33 31 19 79 | aco.habitat@orange.fr | diag.aco-habitat.fr", margin, pageH - 5)
+    doc.text("ACO-HABITAT - Expert toiture depuis 2006 | 02 33 31 19 79 | aco.habitat@orange.fr | aco-habitat.fr", margin, pageH - 5)
     doc.text(`Page ${pageNum}`, pageW - margin - 10, pageH - 5)
   }
 

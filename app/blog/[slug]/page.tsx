@@ -70,7 +70,7 @@ export default async function ArticlePage({ params }: Props) {
     publisher: {
       "@type": "Organization",
       name: "ACO-HABITAT",
-      url: "https://diag.aco-habitat.fr",
+      url: "https://aco-habitat.fr",
     },
   }
 
