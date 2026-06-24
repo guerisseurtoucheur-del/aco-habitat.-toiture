@@ -70,11 +70,11 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       description,
       type: "website",
       locale: "fr_FR",
-      url: `https://aco-habitat.fr/diagnostic-toiture/${city}`,
+      url: `https://diag.aco-habitat.fr/diagnostic-toiture/${city}`,
       siteName: "ACO-HABITAT Traitement du Bois",
     },
     twitter: { card: "summary_large_image", title, description },
-    alternates: { canonical: `https://aco-habitat.fr/diagnostic-toiture/${city}` },
+    alternates: { canonical: `https://diag.aco-habitat.fr/diagnostic-toiture/${city}` },
   }
 }
 
@@ -137,10 +137,10 @@ export default async function CityPage({ params }: PageProps) {
     "@graph": [
       {
         "@type": "LocalBusiness",
-        "@id": `https://aco-habitat.fr/diagnostic-toiture/${cityData.slug}#business`,
+        "@id": `https://diag.aco-habitat.fr/diagnostic-toiture/${cityData.slug}#business`,
         name: `ACO-HABITAT Traitement du Bois ${cityData.name}`,
         description: `Traitement curatif et préventif des bois (insectes xylophages, mérule, champignons lignivores) ${at}.`,
-        url: `https://aco-habitat.fr/diagnostic-toiture/${cityData.slug}`,
+        url: `https://diag.aco-habitat.fr/diagnostic-toiture/${cityData.slug}`,
         telephone: COMPANY.phoneHref,
         email: COMPANY.email,
         priceRange: "$$",
@@ -176,18 +176,18 @@ export default async function CityPage({ params }: PageProps) {
       {
         "@type": "BreadcrumbList",
         itemListElement: [
-          { "@type": "ListItem", position: 1, name: "Accueil", item: "https://aco-habitat.fr" },
+          { "@type": "ListItem", position: 1, name: "Accueil", item: "https://diag.aco-habitat.fr" },
           {
             "@type": "ListItem",
             position: 2,
             name: cityData.region,
-            item: `https://aco-habitat.fr/diagnostic-toiture/region/${cityData.regionSlug}`,
+            item: `https://diag.aco-habitat.fr/diagnostic-toiture/region/${cityData.regionSlug}`,
           },
           {
             "@type": "ListItem",
             position: 3,
             name: cityData.name,
-            item: `https://aco-habitat.fr/diagnostic-toiture/${cityData.slug}`,
+            item: `https://diag.aco-habitat.fr/diagnostic-toiture/${cityData.slug}`,
           },
         ],
       },

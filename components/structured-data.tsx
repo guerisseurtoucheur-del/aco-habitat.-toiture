@@ -1,90 +1,79 @@
 export function StructuredData() {
+  const SITE = "https://diag.aco-habitat.fr"
+
   const localBusiness = {
     "@context": "https://schema.org",
-    "@type": "RoofingContractor",
+    "@type": "HomeAndConstructionBusiness",
     name: "ACO-HABITAT",
-    alternateName: "ACO-HABITAT Expert Toiture",
-    url: "https://diag.aco-habitat.fr",
+    alternateName: "ACO-HABITAT Traitement du Bois & Charpente",
+    url: SITE,
     telephone: "+33233311979",
     email: "aco.habitat@orange.fr",
     description:
-      "Expert couvreur France entiere. Diagnostic toiture par intelligence artificielle a 19\u20AC. Demoussage, reparation, renovation, charpente et isolation. Devis d'intervention gratuit.",
-    image: "https://diag.aco-habitat.fr/og-image.jpg",
-    logo: "https://diag.aco-habitat.fr/icon-512.png",
+      "Expert du traitement du bois et de la charpente depuis 2006. Traitement curatif et préventif contre les insectes xylophages (capricorne, vrillette, lyctus), la mérule et les champignons lignivores. Diagnostic gratuit et devis sans engagement.",
+    image: `${SITE}/og-image.jpg`,
+    logo: `${SITE}/icon-512.png`,
+    foundingDate: "2006",
     priceRange: "$$",
     currenciesAccepted: "EUR",
     paymentAccepted: "Cash, Credit Card, Bank Transfer",
     areaServed: [
-      {
-        "@type": "Country",
-        name: "France",
-      },
-      {
-        "@type": "AdministrativeArea",
-        name: "Normandie",
-      },
-      {
-        "@type": "City",
-        name: "Alencon",
-      },
+      { "@type": "AdministrativeArea", name: "Orne (61)" },
+      { "@type": "AdministrativeArea", name: "Sarthe (72)" },
+      { "@type": "AdministrativeArea", name: "Mayenne (53)" },
+      { "@type": "AdministrativeArea", name: "Eure (27)" },
+      { "@type": "AdministrativeArea", name: "Eure-et-Loir (28)" },
     ],
     hasOfferCatalog: {
       "@type": "OfferCatalog",
-      name: "Services Toiture",
+      name: "Services de traitement du bois",
       itemListElement: [
         {
           "@type": "Offer",
           itemOffered: {
             "@type": "Service",
-            name: "Diagnostic Toiture IA",
+            name: "Diagnostic de charpente",
             description:
-              "Analyse de votre toiture par intelligence artificielle via image satellite pour 19\u20AC. Detection des problemes de vegetation, structure, etancheite et thermique en 30 secondes.",
+              "Inspection complète des bois : identification de l'agresseur (insecte ou champignon), étendue de l'attaque et mesure d'humidité. Diagnostic gratuit et sans engagement.",
           },
         },
         {
           "@type": "Offer",
           itemOffered: {
             "@type": "Service",
-            name: "Demoussage et Traitement Toiture",
+            name: "Traitement des insectes xylophages",
             description:
-              "Elimination de la mousse, du lichen et des vegetaux parasites sur votre toiture. Traitement preventif longue duree.",
+              "Traitement curatif contre les capricornes, vrillettes et lyctus : bûchage des parties attaquées, injection sous pression et pulvérisation d'un produit certifié.",
           },
         },
         {
           "@type": "Offer",
           itemOffered: {
             "@type": "Service",
-            name: "Reparation et Renovation Toiture",
+            name: "Traitement de la mérule et des champignons lignivores",
             description:
-              "Reparation de tuiles cassees, remplacement de materiaux, renovation complete de couverture. Intervention rapide.",
+              "Éradication des champignons lignivores à la source : suppression des causes d'humidité, dépose des bois contaminés et application d'un fongicide certifié.",
           },
         },
         {
           "@type": "Offer",
           itemOffered: {
             "@type": "Service",
-            name: "Charpente",
+            name: "Traitement de charpente",
             description:
-              "Diagnostic, reparation et renforcement de charpente. Traitement contre les insectes xylophages et champignons.",
+              "Traitement complet de la charpente attaquée et renforcement des pièces de bois ayant perdu leur résistance mécanique.",
           },
         },
         {
           "@type": "Offer",
           itemOffered: {
             "@type": "Service",
-            name: "Isolation Toiture",
+            name: "Traitement préventif du bois",
             description:
-              "Isolation thermique par l'interieur ou l'exterieur. Amelioration du bilan energetique et reduction des pertes de chaleur.",
+              "Protection durable d'une charpente saine, neuve ou rénovée contre les insectes et les champignons lignivores.",
           },
         },
       ],
-    },
-    aggregateRating: {
-      "@type": "AggregateRating",
-      ratingValue: "4.9",
-      reviewCount: "500",
-      bestRating: "5",
-      worstRating: "1",
     },
     sameAs: [],
   }
@@ -95,50 +84,50 @@ export function StructuredData() {
     mainEntity: [
       {
         "@type": "Question",
-        name: "Comment fonctionne le diagnostic IA de toiture ?",
+        name: "Comment savoir si ma charpente est attaquée par des insectes ou des champignons ?",
         acceptedAnswer: {
           "@type": "Answer",
-          text: "Notre intelligence artificielle analyse votre photo satellite ou aerienne en superposant trois calques de diagnostic : vegetal (mousse, lichen), structure (tuiles cassees, deplacees) et etancheite (traces d'humidite, infiltrations). Le resultat est disponible en moins de 30 secondes.",
+          text: "Les signes les plus fréquents sont : des petits trous ronds ou ovales dans le bois, de la sciure (vermoulure) au pied des poutres, un bruit de grignotement, un bois qui s'effrite ou qui sonne creux, et la présence de filaments ou de taches brunes en cas de mérule. Au moindre doute, demandez un diagnostic gratuit.",
         },
       },
       {
         "@type": "Question",
-        name: "Quelle photo dois-je utiliser pour le diagnostic ?",
+        name: "Le diagnostic de charpente est-il vraiment gratuit ?",
         acceptedAnswer: {
           "@type": "Answer",
-          text: "Vous pouvez utiliser une capture d'ecran de Google Maps en vue satellite, une photo prise par drone, ou toute photo aerienne de votre toiture. Plus l'image est nette et recente, plus le diagnostic sera precis.",
+          text: "Oui. ACO-HABITAT réalise un diagnostic gratuit et sans engagement : identification de l'agresseur, évaluation de l'étendue de l'attaque et mesure de l'humidité des bois. Vous recevez ensuite un devis clair et détaillé.",
         },
       },
       {
         "@type": "Question",
-        name: "Combien coute le diagnostic en ligne ?",
+        name: "Qu'est-ce que la mérule et pourquoi est-elle dangereuse ?",
         acceptedAnswer: {
           "@type": "Answer",
-          text: "Le diagnostic IA en ligne coute 19\u20AC. Vous recevez instantanement un rapport detaille avec les zones problematiques identifiees, une analyse thermique, un score d'isolation et des recommandations d'intervention. Le devis d'intervention qui suit est gratuit et sans engagement.",
+          text: "La mérule (Serpula lacrymans) est un champignon lignivore qui se développe dans les bois humides et peu ventilés. Elle digère le bois, le rend cassant et peut compromettre la solidité d'une charpente ou d'un plancher en quelques mois. Son traitement nécessite de supprimer la source d'humidité et d'appliquer un fongicide certifié.",
         },
       },
       {
         "@type": "Question",
-        name: "Dans quelles zones intervenez-vous ?",
+        name: "Dans quelles zones ACO-HABITAT intervient-il ?",
         acceptedAnswer: {
           "@type": "Answer",
-          text: "ACO-HABITAT intervient sur toute la France. Que vous soyez en Ile-de-France, en Normandie, dans le Nord ou partout ailleurs, nous nous deplacons pour diagnostiquer et reparer votre toiture.",
+          text: "ACO-HABITAT intervient directement dans l'Orne (61), la Sarthe (72), la Mayenne (53), l'Eure (27) et l'Eure-et-Loir (28). Pour les demandes situées en dehors de cette zone, nous vous mettons en relation avec un expert qualifié.",
         },
       },
       {
         "@type": "Question",
-        name: "Combien coute une intervention de reparation ?",
+        name: "Quelle est la différence entre un traitement curatif et préventif ?",
         acceptedAnswer: {
           "@type": "Answer",
-          text: "Le cout depend de la nature et de l'etendue des travaux identifies lors du diagnostic. Le diagnostic IA coute 19\u20AC et le devis d'intervention est gratuit et detaille. Nos prix sont transparents et competitifs.",
+          text: "Le traitement curatif s'applique sur un bois déjà attaqué : on élimine les insectes ou champignons en place (bûchage, injection, pulvérisation, fongicide). Le traitement préventif protège un bois sain pour empêcher toute future attaque. Les deux peuvent être combinés lors d'une même intervention.",
         },
       },
       {
         "@type": "Question",
-        name: "Quelle est la precision du diagnostic IA ?",
+        name: "Le traitement du bois est-il garanti ?",
         acceptedAnswer: {
           "@type": "Answer",
-          text: "Notre IA atteint un taux de precision de 98% pour la detection des problemes de vegetation, de structure et d'etancheite. Le diagnostic est ensuite valide par nos experts couvreurs avant toute intervention.",
+          text: "Oui. ACO-HABITAT utilise des produits certifiés et garantit ses interventions de traitement du bois et de la charpente. La durée et les conditions de garantie sont précisées dans le devis.",
         },
       },
     ],
@@ -147,14 +136,14 @@ export function StructuredData() {
   const webSite = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: "ACO-HABITAT Diagnostic Toiture",
-    url: "https://diag.aco-habitat.fr",
+    name: "ACO-HABITAT Traitement du Bois",
+    url: SITE,
     description:
-      "Diagnostic de votre toiture par intelligence artificielle pour 19\u20AC. Analyse satellite en 30 secondes.",
+      "Expert du traitement du bois et de la charpente depuis 2006 : insectes xylophages, mérule et champignons lignivores. Diagnostic gratuit.",
     publisher: {
       "@type": "Organization",
       name: "ACO-HABITAT",
-      url: "https://diag.aco-habitat.fr",
+      url: SITE,
     },
   }
 

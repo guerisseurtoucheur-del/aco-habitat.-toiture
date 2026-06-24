@@ -80,7 +80,7 @@ export async function POST(req: Request) {
             <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #333;">
               <p style="color: #666; font-size: 12px; margin: 0;">
                 ACO-HABITAT - Diagnostic Toiture par IA<br>
-                aco.habitat@orange.fr | diag.aco-habitat.fr
+                aco.habitat@orange.fr | aco-habitat.fr
               </p>
             </div>
           </div>
