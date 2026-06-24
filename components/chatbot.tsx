@@ -119,7 +119,7 @@ export function Chatbot() {
                 </div>
                 <div className="max-w-[85%] rounded-2xl rounded-tl-sm bg-secondary px-3.5 py-2.5">
                   <p className="text-[13px] leading-relaxed text-foreground">
-                    Bonjour ! Je suis l{"'"}expert traitement du bois d{"'"}ACO-HABITAT, specialiste depuis 2006. Insectes xylophages, merule, champignons, charpente... decrivez-moi ce que vous observez, je vous aide a y voir clair et a obtenir un devis gratuit.
+                    Bonjour ! Je suis l{"'"}expert traitement du bois d{"'"}ACO-HABITAT, specialiste depuis 2006. Insectes xylophages, merule, champignons, charpente... decrivez-moi ce que vous observez, je vous aide a y voir clair et a obtenir un diagnostic gratuit.
                   </p>
                 </div>
               </div>
@@ -191,7 +191,7 @@ export function Chatbot() {
                             className="mt-2.5 flex w-full items-center justify-center gap-2 rounded-xl bg-primary px-4 py-2.5 text-[12px] font-semibold text-primary-foreground transition-all hover:bg-primary/90 hover:shadow-md"
                           >
                             <FileText size={14} />
-                            Demander mon devis gratuit
+                            Mon diagnostic gratuit
                           </button>
                         )}
                       </div>

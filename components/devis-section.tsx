@@ -65,7 +65,8 @@ export function DevisSection() {
             </h2>
             <p className="mt-4 max-w-md text-pretty text-base leading-relaxed text-muted-foreground">
               Décrivez votre problème de charpente ou de bois. Nous vous recontactons rapidement
-              pour organiser une inspection et établir un devis clair, gratuit et sans engagement.
+              pour organiser un <span className="font-semibold text-foreground">diagnostic gratuit</span> et
+              établir un devis clair, sans engagement.
             </p>
 
             <div className="mt-8 flex flex-col gap-3">
@@ -175,7 +176,7 @@ export function DevisSection() {
                   )}
                 </button>
                 <p className="text-center text-xs text-muted-foreground">
-                  Gratuit et sans engagement. Réponse sous 48h.
+                  Diagnostic gratuit et sans engagement. Réponse sous 48h.
                 </p>
               </form>
             )}

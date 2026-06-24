@@ -1,5 +1,5 @@
 import Image from "next/image"
-import { Phone, ArrowRight, ShieldCheck, MapPin, Award } from "lucide-react"
+import { Phone, ArrowRight, ShieldCheck, MapPin, Award, Search } from "lucide-react"
 
 export function HeroSection() {
   return (
@@ -25,8 +25,8 @@ export function HeroSection() {
 
           <p className="animate-fade-up-delay-2 mt-6 max-w-xl text-pretty text-base leading-relaxed text-muted-foreground sm:text-lg">
             ACO-HABITAT traite durablement votre charpente : capricornes, vrillettes,
-            lyctus, mérule et champignons lignivores. Inspection sérieuse, traitement
-            certifié et garantie sur nos interventions.
+            lyctus, mérule et champignons lignivores. <span className="font-semibold text-foreground">Diagnostic gratuit</span>,
+            traitement certifié et garantie sur nos interventions.
           </p>
 
           <div className="animate-fade-up-delay-3 mt-8 flex flex-col gap-3 sm:flex-row">
@@ -48,6 +48,10 @@ export function HeroSection() {
 
           {/* Trust row */}
           <div className="animate-fade-up-delay-3 mt-10 flex flex-wrap items-center gap-x-6 gap-y-3 text-sm text-secondary-foreground">
+            <span className="flex items-center gap-2">
+              <Search size={16} className="text-accent" />
+              Diagnostic gratuit
+            </span>
             <span className="flex items-center gap-2">
               <ShieldCheck size={16} className="text-accent" />
               Intervention garantie
