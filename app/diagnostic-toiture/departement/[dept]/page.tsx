@@ -2,23 +2,23 @@ import type { Metadata } from "next"
 import Link from "next/link"
 import { notFound } from "next/navigation"
 import { departmentsData, getDepartmentBySlug, getDepartmentsByRegion } from "@/lib/departments-data"
+import { getWoodProfile, isInZone, riskColor, COMPANY, ZONE_LABEL, deptLabels } from "@/lib/wood-treatment"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { 
-  ArrowRight, 
-  MapPin, 
-  Cloud, 
-  Home,
+import {
+  ArrowRight,
+  MapPin,
+  Cloud,
+  Bug,
   Droplets,
   CheckCircle2,
   Building2,
-  ExternalLink,
   Phone,
   Mail,
-  AlertTriangle,
-  Thermometer,
-  Users
+  ShieldCheck,
+  Hammer,
+  Search,
 } from "lucide-react"
 
 export async function generateStaticParams() {
@@ -27,194 +27,234 @@ export async function generateStaticParams() {
   }))
 }
 
-export async function generateMetadata({ 
-  params 
-}: { 
-  params: Promise<{ dept: string }> 
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ dept: string }>
 }): Promise<Metadata> {
   const { dept } = await params
   const deptData = getDepartmentBySlug(dept)
-  
+
   if (!deptData) {
     return { title: "Departement non trouve" }
   }
 
-  const title = `Diagnostic Toiture ${deptData.name} (${deptData.code}) | Analyse IA | ACO-HABITAT`
-  const description = `Diagnostic toiture par IA dans le ${deptData.name} (${deptData.code}). Analyse des toitures ${deptData.mainRoofTypes.slice(0, 2).join(" et ")} adaptees au climat ${deptData.climate}. Problemes frequents : ${deptData.specificProblems.slice(0, 2).join(", ")}. Rapport PDF a 19 EUR.`
+  const inZone = isInZone(deptData.code)
+  const profile = getWoodProfile(deptData.climate, deptData.averageRoofAge)
+  const L = deptLabels(deptData.name)
+
+  const title = `Traitement du bois & charpente ${deptData.name} (${deptData.code}) | Mérule, insectes | ACO-HABITAT`
+  const description = inZone
+    ? `ACO-HABITAT, expert du traitement du bois depuis 2006, intervient ${L.dans} (${deptData.code}) : traitement curatif et préventif contre les insectes xylophages, la mérule et les champignons lignivores. Diagnostic gratuit et devis sans engagement.`
+    : `Traitement de charpente et du bois ${L.dans} (${deptData.code}) : insectes xylophages (capricorne, vrillette, lyctus), mérule et champignons lignivores. ${profile.meruleLabel}. Diagnostic gratuit, mise en relation avec un expert.`
 
   return {
     title,
     description,
     keywords: [
-      `diagnostic toiture ${deptData.name}`,
-      `diagnostic toiture ${deptData.code}`,
-      `analyse toiture ${deptData.prefecture}`,
-      `couvreur ${deptData.name}`,
-      `inspection toiture ${deptData.code}`,
-      ...deptData.specificProblems.map(p => `${p.toLowerCase()} toiture ${deptData.name}`),
+      `traitement bois ${deptData.name}`,
+      `traitement charpente ${deptData.name}`,
+      `traitement mérule ${deptData.name}`,
+      `traitement mérule ${deptData.code}`,
+      `capricorne vrillette ${deptData.name}`,
+      `traitement charpente ${deptData.prefecture}`,
+      `champignons lignivores ${deptData.name}`,
     ],
     openGraph: {
       title,
       description,
       type: "website",
       locale: "fr_FR",
-      siteName: "ACO-HABITAT Diagnostic Toiture",
+      siteName: "ACO-HABITAT Traitement du Bois",
     },
     alternates: {
-      canonical: `https://diag.aco-habitat.fr/diagnostic-toiture/departement/${deptData.slug}`,
+      canonical: `https://aco-habitat.fr/diagnostic-toiture/departement/${deptData.slug}`,
     },
   }
 }
 
-export default async function DepartmentPage({ 
-  params 
-}: { 
-  params: Promise<{ dept: string }> 
+export default async function DepartmentPage({
+  params,
+}: {
+  params: Promise<{ dept: string }>
 }) {
   const { dept } = await params
   const deptData = getDepartmentBySlug(dept)
-  
+
   if (!deptData) {
     notFound()
   }
 
-  const samRegionDepts = getDepartmentsByRegion(deptData.region)
-    .filter(d => d.slug !== deptData.slug)
+  const inZone = isInZone(deptData.code)
+  const profile = getWoodProfile(deptData.climate, deptData.averageRoofAge)
+  const accent = riskColor(profile.meruleRisk)
+  const L = deptLabels(deptData.name)
+
+  const sameRegionDepts = getDepartmentsByRegion(deptData.region)
+    .filter((d) => d.slug !== deptData.slug)
     .slice(0, 6)
 
-  const climateDescriptions: Record<string, string> = {
-    "oceanique": "Climat doux et humide avec pluies frequentes. Les toitures sont exposees a une humidite constante favorisant le developpement de mousses et lichens.",
-    "continental": "Hivers rigoureux et etes chauds. Les toitures subissent des ecarts de temperature importants et des episodes de gel pouvant fissurer les materiaux.",
-    "mediterraneen": "Soleil intense et periodes de secheresse. Les toitures sont exposees aux UV et aux pluies torrentielles occasionnelles.",
-    "montagnard": "Conditions extremes avec neige abondante et gel severe. Les toitures doivent supporter des charges importantes et resister au gel.",
-    "semi-oceanique": "Climat de transition avec influence oceanique attenuee. Les toitures sont exposees a des conditions variees selon les saisons."
-  }
+  const treatments = [
+    {
+      icon: Bug,
+      title: "Insectes xylophages",
+      desc: "Capricornes, vrillettes et lyctus : traitement curatif par bûchage, injection et pulvérisation.",
+      color: "#b04a25",
+    },
+    {
+      icon: Droplets,
+      title: "Mérule & champignons",
+      desc: "Recherche des causes d'humidité, assainissement et traitement fongicide en profondeur.",
+      color: "#3c5a4a",
+    },
+    {
+      icon: ShieldCheck,
+      title: "Traitement préventif",
+      desc: "Protection longue durée des charpentes saines contre insectes et champignons.",
+      color: "#c8912f",
+    },
+  ]
 
-  // Schema.org structured data
   const schemaData = {
     "@context": "https://schema.org",
     "@graph": [
       {
         "@type": "Service",
-        "name": `Diagnostic Toiture IA dans le ${deptData.name}`,
-        "description": `Service de diagnostic toiture par intelligence artificielle dans le departement ${deptData.name} (${deptData.code}). Analyse adaptee au climat ${deptData.climate}.`,
-        "provider": {
+        name: `Traitement du bois et de la charpente ${L.dans}`,
+        description: `Traitement curatif et préventif des bois (insectes xylophages, mérule, champignons lignivores) ${L.dans} (${deptData.code}).`,
+        provider: {
           "@type": "Organization",
-          "name": "ACO-HABITAT",
-          "telephone": "+33233311979",
-          "email": "aco.habitat@orange.fr",
-          "foundingDate": "2006"
+          name: "ACO-HABITAT",
+          telephone: COMPANY.phoneHref,
+          email: COMPANY.email,
+          foundingDate: "2006",
         },
-        "areaServed": {
+        areaServed: {
           "@type": "AdministrativeArea",
-          "name": deptData.name,
-          "containedIn": deptData.region
+          name: deptData.name,
+          containedIn: deptData.region,
         },
-        "offers": {
+        offers: {
           "@type": "Offer",
-          "price": "19",
-          "priceCurrency": "EUR",
-          "description": "Diagnostic toiture complet par IA avec rapport PDF"
-        }
+          price: "0",
+          priceCurrency: "EUR",
+          description: "Diagnostic gratuit et devis sans engagement",
+        },
       },
       {
         "@type": "FAQPage",
-        "mainEntity": [
+        mainEntity: [
           {
             "@type": "Question",
-            "name": `Quels sont les problemes de toiture courants dans le ${deptData.name} ?`,
-            "acceptedAnswer": {
+            name: `Quels insectes et champignons attaquent les charpentes ${L.dans} ?`,
+            acceptedAnswer: {
               "@type": "Answer",
-              "text": `Dans le ${deptData.name}, les problemes frequents sont : ${deptData.specificProblems.join(", ")}. Ces problemes sont lies au climat ${deptData.climate} de la region.`
-            }
+              text: `${L.dans.charAt(0).toUpperCase() + L.dans.slice(1)}, les bois sont surtout exposés à : ${profile.dominantPests.join(", ")}. ${profile.climateContext}`,
+            },
           },
           {
             "@type": "Question",
-            "name": `Quels types de toiture trouve-t-on dans le ${deptData.name} ?`,
-            "acceptedAnswer": {
+            name: `Le diagnostic de charpente est-il payant ${L.dans} ?`,
+            acceptedAnswer: {
               "@type": "Answer",
-              "text": `Les toitures les plus courantes dans le ${deptData.name} sont : ${deptData.mainRoofTypes.join(", ")}. Ces materiaux sont adaptes aux conditions climatiques locales.`
-            }
-          }
-        ]
-      }
-    ]
+              text: `Non. ACO-HABITAT propose un diagnostic gratuit et un devis sans engagement pour le traitement du bois et de la charpente ${L.dans}.`,
+            },
+          },
+        ],
+      },
+    ],
   }
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }}
-      />
-      
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }} />
+
       <main className="min-h-screen bg-background">
-        {/* Hero Section */}
-        <section className="relative overflow-hidden border-b border-border bg-gradient-to-b from-primary/5 via-background to-background">
-          <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--color-primary)_0%,_transparent_50%)] opacity-5" />
-          <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-20">
-            {/* Breadcrumb */}
+        {/* Hero */}
+        <section className="border-b border-border bg-secondary/40">
+          <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
             <nav className="mb-6 flex items-center gap-2 text-sm text-muted-foreground">
-              <Link href="/" className="hover:text-foreground transition-colors">Accueil</Link>
-              <span>/</span>
-              <Link href="/diagnostic-toiture" className="hover:text-foreground transition-colors">Diagnostic</Link>
+              <Link href="/" className="transition-colors hover:text-foreground">
+                Accueil
+              </Link>
               <span>/</span>
               <span className="text-foreground">{deptData.name}</span>
             </nav>
 
-            <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+            <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between">
               <div className="flex-1">
                 <Badge variant="outline" className="mb-4 gap-2">
                   <MapPin size={12} />
-                  Departement {deptData.code} - {deptData.region}
+                  {inZone ? `Intervention directe — ${deptData.code}` : `${deptData.name} (${deptData.code})`}
                 </Badge>
-                <h1 className="text-3xl font-bold tracking-tight text-foreground sm:text-4xl lg:text-5xl">
-                  Diagnostic Toiture dans le {deptData.name}
+                <h1
+                  className="text-3xl font-semibold tracking-tight text-foreground text-balance sm:text-4xl lg:text-5xl"
+                  style={{ fontFamily: "var(--font-heading)" }}
+                >
+                  Traitement du bois & charpente {L.dans}
                 </h1>
-                <p className="mt-4 max-w-2xl text-lg text-muted-foreground">
-                  Analysez l'etat de votre toiture dans le {deptData.name} grace a notre technologie IA. 
-                  Diagnostic adapte au climat {deptData.climate} et aux specificites locales.
+                <p className="mt-5 max-w-2xl text-pretty text-base leading-relaxed text-muted-foreground sm:text-lg">
+                  {inZone ? (
+                    <>
+                      ACO-HABITAT, expert depuis {COMPANY.since}, intervient {L.dans} contre les insectes
+                      xylophages, la mérule et les champignons lignivores. Diagnostic gratuit et traitement
+                      garanti.
+                    </>
+                  ) : (
+                    <>
+                      Insectes xylophages, mérule, champignons lignivores : obtenez un diagnostic gratuit pour le
+                      traitement de votre charpente {L.dans}. Nous vous mettons en relation avec un expert
+                      qualifié.
+                    </>
+                  )}
                 </p>
 
-                <div className="mt-8 flex flex-wrap gap-4">
+                <div className="mt-8 flex flex-wrap gap-3">
                   <Button asChild size="lg" className="gap-2">
-                    <Link href="/#diagnostic">
-                      Diagnostic IA - 19 EUR
+                    <Link href="/#devis">
+                      Diagnostic gratuit
                       <ArrowRight size={16} />
                     </Link>
                   </Button>
-                  <Button asChild variant="outline" size="lg" className="gap-2">
-                    <Link href="/#methode">
-                      Comment ca marche
-                    </Link>
-                  </Button>
+                  {inZone && (
+                    <Button asChild variant="outline" size="lg" className="gap-2">
+                      <a href={`tel:${COMPANY.phoneHref}`}>
+                        <Phone size={16} />
+                        {COMPANY.phone}
+                      </a>
+                    </Button>
+                  )}
                 </div>
               </div>
 
-              {/* Stats Card */}
+              {/* Stats card */}
               <Card className="w-full lg:w-80">
                 <CardHeader className="pb-2">
                   <CardTitle className="flex items-center gap-2 text-base">
-                    <Building2 size={18} className="text-primary" />
-                    {deptData.name} en chiffres
+                    <Building2 size={18} style={{ color: accent }} />
+                    {deptData.name} en bref
                   </CardTitle>
                 </CardHeader>
                 <CardContent className="grid gap-3">
                   <div className="flex items-center justify-between border-b border-border pb-2">
-                    <span className="text-sm text-muted-foreground">Prefecture</span>
+                    <span className="text-sm text-muted-foreground">Préfecture</span>
                     <span className="font-medium">{deptData.prefecture}</span>
                   </div>
                   <div className="flex items-center justify-between border-b border-border pb-2">
-                    <span className="text-sm text-muted-foreground">Population</span>
-                    <span className="font-medium">{deptData.population.toLocaleString('fr-FR')} hab.</span>
+                    <span className="text-sm text-muted-foreground">Âge moyen du bâti</span>
+                    <span className="font-medium">{deptData.averageRoofAge} ans</span>
                   </div>
                   <div className="flex items-center justify-between border-b border-border pb-2">
                     <span className="text-sm text-muted-foreground">Climat</span>
-                    <Badge variant="secondary" className="capitalize">{deptData.climate}</Badge>
+                    <Badge variant="secondary" className="capitalize">
+                      {deptData.climate}
+                    </Badge>
                   </div>
                   <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Age moyen toitures</span>
-                    <span className="font-medium">{deptData.averageRoofAge} ans</span>
+                    <span className="text-sm text-muted-foreground">Mérule</span>
+                    <span className="font-semibold" style={{ color: accent }}>
+                      {profile.meruleLabel}
+                    </span>
                   </div>
                 </CardContent>
               </Card>
@@ -222,65 +262,72 @@ export default async function DepartmentPage({
           </div>
         </section>
 
-        {/* Climate & Problems Section */}
+        {/* Climate context + pests */}
         <section className="border-b border-border py-12 sm:py-16">
           <div className="mx-auto max-w-6xl px-4 sm:px-6">
             <div className="grid gap-8 md:grid-cols-2">
-              {/* Climate Card */}
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Cloud size={20} className="text-primary" />
-                    Climat {deptData.climate}
+                    <Cloud size={20} style={{ color: accent }} />
+                    Climat {deptData.climate} & risque pour le bois
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-muted-foreground">
-                    {climateDescriptions[deptData.climate]}
+                  <p className="leading-relaxed text-muted-foreground">{profile.climateContext}</p>
+                  <p className="mt-4 rounded-lg bg-secondary/60 p-4 text-sm text-secondary-foreground">
+                    {profile.recommendation}
                   </p>
                 </CardContent>
               </Card>
 
-              {/* Problems Card */}
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <AlertTriangle size={20} className="text-amber-500" />
-                    Problemes frequents
+                    <Bug size={20} style={{ color: accent }} />
+                    Agresseurs fréquents {L.dans}
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <ul className="space-y-2">
-                    {deptData.specificProblems.map((problem, i) => (
-                      <li key={i} className="flex items-center gap-2">
-                        <CheckCircle2 size={16} className="text-primary" />
-                        <span>{problem}</span>
+                    {profile.dominantPests.map((pest) => (
+                      <li key={pest} className="flex items-center gap-2">
+                        <CheckCircle2 size={16} style={{ color: accent }} />
+                        <span>{pest}</span>
                       </li>
                     ))}
                   </ul>
+                  <p className="mt-4 text-sm text-muted-foreground">
+                    Seule une inspection sur place permet de confirmer l&apos;agresseur et l&apos;étendue des
+                    dégâts. C&apos;est l&apos;objet de notre diagnostic gratuit.
+                  </p>
                 </CardContent>
               </Card>
             </div>
           </div>
         </section>
 
-        {/* Roof Types Section */}
+        {/* Treatments */}
         <section className="border-b border-border py-12 sm:py-16">
           <div className="mx-auto max-w-6xl px-4 sm:px-6">
-            <h2 className="mb-8 text-2xl font-bold text-foreground sm:text-3xl">
-              Types de toiture dans le {deptData.name}
+            <h2
+              className="mb-8 text-2xl font-semibold text-foreground sm:text-3xl"
+              style={{ fontFamily: "var(--font-heading)" }}
+            >
+              Nos traitements {L.dans}
             </h2>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {deptData.mainRoofTypes.map((roofType, i) => (
-                <Card key={i} className="transition-shadow hover:shadow-md">
-                  <CardContent className="flex items-center gap-4 p-6">
-                    <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10">
-                      <Home size={24} className="text-primary" />
+            <div className="grid gap-4 sm:grid-cols-3">
+              {treatments.map((t) => (
+                <Card key={t.title} className="transition-all hover:-translate-y-1 hover:shadow-lg" style={{ borderTop: `3px solid ${t.color}` }}>
+                  <CardContent className="flex flex-col gap-3 p-6">
+                    <div
+                      className="flex h-12 w-12 items-center justify-center rounded-xl"
+                      style={{ backgroundColor: `${t.color}1a` }}
+                    >
+                      <t.icon size={22} style={{ color: t.color }} />
                     </div>
-                    <div>
-                      <h3 className="font-semibold text-foreground">{roofType}</h3>
-                      <p className="text-sm text-muted-foreground">Courant dans le {deptData.code}</p>
-                    </div>
+                    <h3 className="font-semibold text-foreground">{t.title}</h3>
+                    <p className="text-sm leading-relaxed text-muted-foreground">{t.desc}</p>
                   </CardContent>
                 </Card>
               ))}
@@ -288,67 +335,99 @@ export default async function DepartmentPage({
           </div>
         </section>
 
-        {/* Benefits Section */}
-        <section className="border-b border-border bg-muted/30 py-12 sm:py-16">
-          <div className="mx-auto max-w-6xl px-4 sm:px-6">
-            <h2 className="mb-8 text-center text-2xl font-bold text-foreground sm:text-3xl">
-              Pourquoi choisir notre diagnostic IA dans le {deptData.name} ?
-            </h2>
-            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-              {[
-                { icon: Thermometer, title: "Adapte au climat", desc: `Analyse specifique au climat ${deptData.climate}` },
-                { icon: Droplets, title: "Detection humidite", desc: "Identification des zones a risque d'infiltration" },
-                { icon: Users, title: "Expert local", desc: `Connaissance des toitures du ${deptData.name}` },
-                { icon: CheckCircle2, title: "Rapport complet", desc: "PDF detaille avec recommandations" },
-              ].map((item, i) => (
-                <div key={i} className="flex flex-col items-center text-center">
-                  <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
-                    <item.icon size={24} className="text-primary" />
-                  </div>
-                  <h3 className="mb-2 font-semibold text-foreground">{item.title}</h3>
-                  <p className="text-sm text-muted-foreground">{item.desc}</p>
+        {/* Zone-aware band */}
+        <section className="border-b border-border bg-secondary/40 py-12 sm:py-16">
+          <div className="mx-auto max-w-4xl px-4 text-center sm:px-6">
+            {inZone ? (
+              <>
+                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+                  <Hammer size={22} className="text-primary" />
                 </div>
-              ))}
+                <h2
+                  className="text-2xl font-semibold text-foreground sm:text-3xl"
+                  style={{ fontFamily: "var(--font-heading)" }}
+                >
+                  Nous intervenons directement {L.dans}
+                </h2>
+                <p className="mx-auto mt-3 max-w-xl text-muted-foreground">
+                  Basés à {COMPANY.addressCity}, nous couvrons {ZONE_LABEL}. Inspection sur place, traitement
+                  certifié et garantie sur nos interventions.
+                </p>
+              </>
+            ) : (
+              <>
+                <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+                  <Search size={22} className="text-primary" />
+                </div>
+                <h2
+                  className="text-2xl font-semibold text-foreground sm:text-3xl"
+                  style={{ fontFamily: "var(--font-heading)" }}
+                >
+                  Un expert pour votre charpente {L.dans}
+                </h2>
+                <p className="mx-auto mt-3 max-w-xl text-muted-foreground">
+                  Décrivez votre situation : nous étudions votre demande et vous mettons en relation avec un
+                  professionnel qualifié du traitement du bois près de chez vous. Diagnostic gratuit et sans
+                  engagement.
+                </p>
+              </>
+            )}
+            <div className="mt-7">
+              <Button asChild size="lg" className="gap-2 px-8">
+                <Link href="/#devis">
+                  Demander mon diagnostic gratuit
+                  <ArrowRight size={16} />
+                </Link>
+              </Button>
             </div>
           </div>
         </section>
 
-        {/* Contact Section */}
-        <section className="border-b border-border/50 bg-primary/5 py-10">
-          <div className="mx-auto max-w-4xl px-4 sm:px-6">
-            <div className="text-center">
-              <h2 className="mb-2 text-xl font-bold text-foreground">ACO-HABITAT - Expert toiture depuis 2006</h2>
-              <p className="mb-6 text-muted-foreground">Une question sur votre toiture dans le {deptData.name} ? Contactez-nous !</p>
-              <div className="flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-8">
-                <a 
-                  href="tel:+33233311979" 
-                  className="flex items-center gap-2 text-lg font-semibold text-primary hover:underline"
-                >
-                  <Phone className="h-5 w-5" />
-                  02 33 31 19 79
-                </a>
-                <a 
-                  href="mailto:aco.habitat@orange.fr" 
-                  className="flex items-center gap-2 text-lg font-semibold text-primary hover:underline"
-                >
-                  <Mail className="h-5 w-5" />
-                  aco.habitat@orange.fr
-                </a>
+        {/* Contact (in-zone only) */}
+        {inZone && (
+          <section className="border-b border-border py-10">
+            <div className="mx-auto max-w-4xl px-4 sm:px-6">
+              <div className="text-center">
+                <h2 className="mb-2 text-xl font-semibold text-foreground" style={{ fontFamily: "var(--font-heading)" }}>
+                  ACO-HABITAT — Expert traitement du bois depuis {COMPANY.since}
+                </h2>
+                <p className="mb-6 text-muted-foreground">
+                  Une question sur votre charpente {L.dans} ? Contactez-nous directement.
+                </p>
+                <div className="flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-8">
+                  <a
+                    href={`tel:${COMPANY.phoneHref}`}
+                    className="flex items-center gap-2 text-lg font-semibold text-primary hover:underline"
+                  >
+                    <Phone className="h-5 w-5" />
+                    {COMPANY.phone}
+                  </a>
+                  <a
+                    href={`mailto:${COMPANY.email}`}
+                    className="flex items-center gap-2 text-lg font-semibold text-primary hover:underline"
+                  >
+                    <Mail className="h-5 w-5" />
+                    {COMPANY.email}
+                  </a>
+                </div>
               </div>
             </div>
-          </div>
-        </section>
+          </section>
+        )}
 
-        {/* Other Departments */}
-        {samRegionDepts.length > 0 && (
-          <section className="border-b border-border py-12 sm:py-16">
+        {/* Other departments */}
+        {sameRegionDepts.length > 0 && (
+          <section className="py-12 sm:py-16">
             <div className="mx-auto max-w-6xl px-4 sm:px-6">
-              <h2 className="mb-8 text-2xl font-bold text-foreground sm:text-3xl">
-                Autres departements en {deptData.region}
+              <h2
+                className="mb-8 text-2xl font-semibold text-foreground sm:text-3xl"
+                style={{ fontFamily: "var(--font-heading)" }}
+              >
+                Autres départements en {deptData.region}
               </h2>
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-                {samRegionDepts.map((d) => (
-                  <Link 
+                {sameRegionDepts.map((d) => (
+                  <Link
                     key={d.code}
                     href={`/diagnostic-toiture/departement/${d.slug}`}
                     className="group flex items-center gap-3 rounded-lg border border-border bg-card p-4 transition-all hover:border-primary/30 hover:shadow-md"
@@ -362,66 +441,6 @@ export default async function DepartmentPage({
             </div>
           </section>
         )}
-
-        {/* Cross-selling */}
-        <section className="py-12 sm:py-16">
-          <div className="mx-auto max-w-6xl px-4 sm:px-6">
-            <h2 className="mb-8 text-center text-2xl font-bold text-foreground sm:text-3xl">
-              Nos autres diagnostics
-            </h2>
-            <div className="grid gap-4 sm:grid-cols-2">
-              <a 
-                href="https://humidite.aco-habitat.fr" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="group flex items-center gap-4 rounded-xl border border-border bg-card p-6 transition-all hover:border-cyan-500/30 hover:shadow-lg"
-              >
-                <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-cyan-500/10">
-                  <Droplets size={28} className="text-cyan-500" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-foreground group-hover:text-cyan-500">Diagnostic Humidite IA</h3>
-                  <p className="text-sm text-muted-foreground">Analysez les problemes d'humidite de votre maison</p>
-                </div>
-                <ExternalLink size={18} className="text-muted-foreground" />
-              </a>
-              <a 
-                href="https://traitement-bois.fr" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="group flex items-center gap-4 rounded-xl border border-border bg-card p-6 transition-all hover:border-amber-500/30 hover:shadow-lg"
-              >
-                <div className="flex h-14 w-14 items-center justify-center rounded-xl bg-amber-500/10">
-                  <Home size={28} className="text-amber-500" />
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-semibold text-foreground group-hover:text-amber-500">Diagnostic Charpente & Bois</h3>
-                  <p className="text-sm text-muted-foreground">Merule, insectes xylophages, etat de la charpente</p>
-                </div>
-                <ExternalLink size={18} className="text-muted-foreground" />
-              </a>
-            </div>
-          </div>
-        </section>
-
-        {/* CTA Section */}
-        <section className="py-12 sm:py-16">
-          <div className="mx-auto max-w-4xl px-4 text-center sm:px-6">
-            <h2 className="mb-4 text-2xl font-bold text-foreground sm:text-3xl">
-              Analysez votre toiture dans le {deptData.name} maintenant
-            </h2>
-            <p className="mx-auto mb-8 max-w-xl text-muted-foreground">
-              Obtenez un diagnostic complet de votre toiture en moins de 30 secondes. 
-              Analyse adaptee au climat {deptData.climate} du departement.
-            </p>
-            <Button asChild size="lg" className="gap-2 px-8">
-              <Link href="/#diagnostic">
-                Lancer mon diagnostic - 19 EUR
-                <ArrowRight size={16} />
-              </Link>
-            </Button>
-          </div>
-        </section>
       </main>
     </>
   )

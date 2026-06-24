@@ -2,28 +2,31 @@ import { Metadata } from "next"
 import { notFound } from "next/navigation"
 import Link from "next/link"
 import { citiesData, getNearbyCities, getCitiesByRegion } from "@/lib/cities-data"
+import {
+  getWoodProfileFromRainfall,
+  isInZone,
+  riskColor,
+  cityAt,
+  COMPANY,
+  ZONE_LABEL,
+} from "@/lib/wood-treatment"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
-import { 
-  MapPin, 
-  Cloud, 
-  Thermometer, 
-  Wind, 
-  Droplets, 
-  Sun,
+import {
+  MapPin,
+  Cloud,
+  Bug,
+  Droplets,
   Home,
-  AlertTriangle,
-  Euro,
   ChevronRight,
-  Building,
   ArrowRight,
-  Snowflake,
-  CloudRain,
-  ExternalLink,
+  ShieldCheck,
+  Hammer,
+  Search,
   Phone,
   Mail,
-  Clock
+  CheckCircle2,
 } from "lucide-react"
 
 interface PageProps {
@@ -31,278 +34,48 @@ interface PageProps {
 }
 
 export async function generateStaticParams() {
-  return Object.keys(citiesData).map((city) => ({
-    city: city,
-  }))
+  return Object.keys(citiesData).map((city) => ({ city }))
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { city } = await params
   const cityData = citiesData[city]
-  
+
   if (!cityData) {
-    return {
-      title: "Page non trouvee",
-    }
+    return { title: "Page non trouvee" }
   }
+
+  const inZone = isInZone(cityData.departmentCode)
+  const profile = getWoodProfileFromRainfall(cityData.climate.annualRainfall, cityData.climate.frostDays)
+  const at = cityAt(cityData.name)
+
+  const title = `Traitement du bois & charpente ${at} (${cityData.departmentCode}) | Mérule, insectes | ACO-HABITAT`
+  const description = inZone
+    ? `ACO-HABITAT, expert du traitement du bois depuis 2006, intervient ${at} : traitement curatif et préventif contre insectes xylophages, mérule et champignons lignivores. Diagnostic gratuit et devis sans engagement.`
+    : `Traitement de charpente et du bois ${at} : insectes xylophages, mérule et champignons lignivores. ${profile.meruleLabel}. Diagnostic gratuit, mise en relation avec un expert qualifié.`
 
   return {
-    title: cityData.seoContent.metaTitle,
-    description: cityData.seoContent.metaDescription,
+    title,
+    description,
     keywords: [
-      `diagnostic toiture ${cityData.name}`,
-      `couvreur ${cityData.name}`,
-      `reparation toiture ${cityData.name}`,
-      `inspection toiture ${cityData.department}`,
-      `toiture ${cityData.name}`,
-      `devis toiture ${cityData.name}`,
-      ...cityData.roofTypes.map(r => `${r.type.toLowerCase()} ${cityData.name}`)
+      `traitement bois ${cityData.name}`,
+      `traitement charpente ${cityData.name}`,
+      `traitement mérule ${cityData.name}`,
+      `capricorne vrillette ${cityData.name}`,
+      `champignons lignivores ${cityData.name}`,
+      `traitement bois ${cityData.department}`,
     ],
     openGraph: {
-      title: cityData.seoContent.metaTitle,
-      description: cityData.seoContent.metaDescription,
+      title,
+      description,
       type: "website",
       locale: "fr_FR",
-      url: `https://diag.aco-habitat.fr/diagnostic-toiture/${city}`,
-      siteName: "ACO-HABITAT Diagnostic Toiture",
+      url: `https://aco-habitat.fr/diagnostic-toiture/${city}`,
+      siteName: "ACO-HABITAT Traitement du Bois",
     },
-    twitter: {
-      card: "summary_large_image",
-      title: cityData.seoContent.metaTitle,
-      description: cityData.seoContent.metaDescription,
-    },
-    alternates: {
-      canonical: `https://diag.aco-habitat.fr/diagnostic-toiture/${city}`,
-    },
+    twitter: { card: "summary_large_image", title, description },
+    alternates: { canonical: `https://aco-habitat.fr/diagnostic-toiture/${city}` },
   }
-}
-
-function CityStructuredData({ city }: { city: typeof citiesData[string] }) {
-  const structuredData = {
-    "@context": "https://schema.org",
-    "@graph": [
-      // LocalBusiness Schema with AggregateRating
-      {
-        "@type": "LocalBusiness",
-        "@id": `https://diag.aco-habitat.fr/diagnostic-toiture/${city.slug}#business`,
-        "name": `ACO-HABITAT Diagnostic Toiture ${city.name}`,
-        "description": city.seoContent.metaDescription,
-        "url": `https://diag.aco-habitat.fr/diagnostic-toiture/${city.slug}`,
-        "telephone": "+33 2 33 31 19 79",
-        "email": "aco.habitat@orange.fr",
-        "priceRange": "$$",
-        "foundingDate": "2006",
-        "image": "https://diag.aco-habitat.fr/og-image.jpg",
-        "address": {
-          "@type": "PostalAddress",
-          "addressLocality": city.name,
-          "addressRegion": city.region,
-          "addressCountry": "FR"
-        },
-        "geo": {
-          "@type": "GeoCoordinates",
-          "addressCountry": "FR"
-        },
-        "areaServed": {
-          "@type": "City",
-          "name": city.name
-        },
-        "serviceArea": {
-          "@type": "GeoCircle",
-          "geoMidpoint": {
-            "@type": "GeoCoordinates"
-          },
-          "geoRadius": "50000"
-        },
-        "aggregateRating": {
-          "@type": "AggregateRating",
-          "ratingValue": "4.8",
-          "reviewCount": "127",
-          "bestRating": "5",
-          "worstRating": "1"
-        },
-        "review": [
-          {
-            "@type": "Review",
-            "reviewRating": {
-              "@type": "Rating",
-              "ratingValue": "5",
-              "bestRating": "5"
-            },
-            "author": {
-              "@type": "Person",
-              "name": "Client verifie"
-            },
-            "reviewBody": `Excellent diagnostic de ma toiture a ${city.name}. Rapport tres complet et professionnel.`
-          },
-          {
-            "@type": "Review",
-            "reviewRating": {
-              "@type": "Rating",
-              "ratingValue": "5",
-              "bestRating": "5"
-            },
-            "author": {
-              "@type": "Person",
-              "name": "Proprietaire"
-            },
-            "reviewBody": "Service rapide et efficace. L'analyse IA a detecte des problemes que je n'avais pas vus."
-          }
-        ]
-      },
-      // Service Schema
-      {
-        "@type": "Service",
-        "@id": `https://diag.aco-habitat.fr/diagnostic-toiture/${city.slug}#service`,
-        "name": `Diagnostic Toiture par IA a ${city.name}`,
-        "description": city.seoContent.introText,
-        "provider": {
-          "@id": `https://diag.aco-habitat.fr/diagnostic-toiture/${city.slug}#business`
-        },
-        "areaServed": {
-          "@type": "City",
-          "name": city.name
-        },
-        "offers": {
-          "@type": "Offer",
-          "price": "19",
-          "priceCurrency": "EUR",
-          "availability": "https://schema.org/InStock"
-        }
-      },
-      // FAQPage Schema
-      {
-        "@type": "FAQPage",
-        "mainEntity": city.faq.map(item => ({
-          "@type": "Question",
-          "name": item.question,
-          "acceptedAnswer": {
-            "@type": "Answer",
-            "text": item.answer
-          }
-        }))
-      },
-      // BreadcrumbList Schema
-      {
-        "@type": "BreadcrumbList",
-        "itemListElement": [
-          {
-            "@type": "ListItem",
-            "position": 1,
-            "name": "Accueil",
-            "item": "https://diag.aco-habitat.fr"
-          },
-          {
-            "@type": "ListItem",
-            "position": 2,
-            "name": "Diagnostic Toiture",
-            "item": "https://diag.aco-habitat.fr/#diagnostic"
-          },
-          {
-            "@type": "ListItem",
-            "position": 3,
-            "name": city.region,
-            "item": `https://diag.aco-habitat.fr/diagnostic-toiture/region/${city.regionSlug}`
-          },
-          {
-            "@type": "ListItem",
-            "position": 4,
-            "name": city.name,
-            "item": `https://diag.aco-habitat.fr/diagnostic-toiture/${city.slug}`
-          }
-        ]
-      },
-      // WebPage Schema
-      {
-        "@type": "WebPage",
-        "@id": `https://diag.aco-habitat.fr/diagnostic-toiture/${city.slug}`,
-        "name": city.seoContent.metaTitle,
-        "description": city.seoContent.metaDescription,
-        "isPartOf": {
-          "@type": "WebSite",
-          "name": "ACO-HABITAT Diagnostic Toiture",
-          "url": "https://diag.aco-habitat.fr"
-        },
-        "about": {
-          "@type": "Thing",
-          "name": `Diagnostic toiture a ${city.name}`
-        },
-        "mentions": [
-          {
-            "@type": "City",
-            "name": city.name,
-            "containedInPlace": {
-              "@type": "AdministrativeArea",
-              "name": city.region
-            }
-          }
-        ]
-      },
-      // Product Schema for rich snippets with price
-      {
-        "@type": "Product",
-        "name": `Diagnostic Toiture IA ${city.name}`,
-        "description": `Analyse complete de votre toiture a ${city.name} par intelligence artificielle. Rapport PDF detaille avec recommandations personnalisees.`,
-        "brand": {
-          "@type": "Brand",
-          "name": "ACO-HABITAT"
-        },
-        "offers": {
-          "@type": "Offer",
-          "url": `https://diag.aco-habitat.fr/diagnostic-toiture/${city.slug}`,
-          "priceCurrency": "EUR",
-          "price": "19",
-          "priceValidUntil": "2027-12-31",
-          "availability": "https://schema.org/InStock",
-          "seller": {
-            "@type": "Organization",
-            "name": "ACO-HABITAT"
-          }
-        },
-        "aggregateRating": {
-          "@type": "AggregateRating",
-          "ratingValue": "4.8",
-          "reviewCount": "127"
-        }
-      },
-      // HowTo Schema for featured snippets
-      {
-        "@type": "HowTo",
-        "name": `Comment faire un diagnostic toiture a ${city.name}`,
-        "description": `Guide etape par etape pour analyser l'etat de votre toiture a ${city.name}`,
-        "step": [
-          {
-            "@type": "HowToStep",
-            "name": "Prendre une photo",
-            "text": "Photographiez votre toiture depuis le sol ou utilisez une image satellite Google Maps"
-          },
-          {
-            "@type": "HowToStep",
-            "name": "Telecharger la photo",
-            "text": "Uploadez votre photo sur notre plateforme de diagnostic IA"
-          },
-          {
-            "@type": "HowToStep",
-            "name": "Analyse automatique",
-            "text": "Notre IA analyse mousse, fissures, tuiles cassees et deperditions thermiques"
-          },
-          {
-            "@type": "HowToStep",
-            "name": "Recevoir le rapport",
-            "text": "Obtenez votre rapport PDF complet avec recommandations en 30 secondes"
-          }
-        ],
-        "totalTime": "PT1M"
-      }
-    ]
-  }
-
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
-    />
-  )
 }
 
 export default async function CityPage({ params }: PageProps) {
@@ -313,47 +86,133 @@ export default async function CityPage({ params }: PageProps) {
     notFound()
   }
 
-  const nearbyCities = getNearbyCities(city, 4)
-  const regionCities = getCitiesByRegion(cityData.regionSlug).filter(c => c.slug !== city).slice(0, 6)
+  const inZone = isInZone(cityData.departmentCode)
+  const profile = getWoodProfileFromRainfall(cityData.climate.annualRainfall, cityData.climate.frostDays)
+  const accent = riskColor(profile.meruleRisk)
+  const at = cityAt(cityData.name)
 
-  const windExposureLabels: Record<string, string> = {
-    faible: "Faible",
-    modere: "Modere",
-    fort: "Fort",
-    tres_fort: "Tres fort"
-  }
+  const nearbyCities = getNearbyCities(city, 6)
+  const regionCities = getCitiesByRegion(cityData.region)
+    .filter((c) => c.slug !== city)
+    .slice(0, 8)
 
-  const frequencyColors: Record<string, string> = {
-    frequent: "bg-red-500/10 text-red-400 border-red-500/20",
-    modere: "bg-amber-500/10 text-amber-400 border-amber-500/20",
-    occasionnel: "bg-green-500/10 text-green-400 border-green-500/20"
+  const treatments = [
+    {
+      icon: Bug,
+      title: "Insectes xylophages",
+      desc: "Capricornes, vrillettes et lyctus : bûchage, injection sous pression et pulvérisation des bois infestés.",
+      color: "#b04a25",
+    },
+    {
+      icon: Droplets,
+      title: "Mérule & champignons",
+      desc: "Recherche des causes d'humidité, assainissement et traitement fongicide en profondeur.",
+      color: "#3c5a4a",
+    },
+    {
+      icon: ShieldCheck,
+      title: "Traitement préventif",
+      desc: "Protection longue durée des charpentes saines contre insectes et champignons lignivores.",
+      color: "#c8912f",
+    },
+  ]
+
+  const faq = [
+    {
+      q: `Quels bois sont menacés ${at} ?`,
+      a: `${at.charAt(0).toUpperCase() + at.slice(1)}, les charpentes et planchers sont surtout exposés à : ${profile.dominantPests.join(", ")}. ${profile.climateContext}`,
+    },
+    {
+      q: `Le diagnostic de charpente est-il gratuit ${at} ?`,
+      a: `Oui. ACO-HABITAT propose un diagnostic gratuit et un devis sans engagement pour le traitement du bois et de la charpente ${at}.`,
+    },
+    {
+      q: `Comment se déroule un traitement du bois ${at} ?`,
+      a: `Après inspection des bois, nous procédons au bûchage des parties attaquées, à l'injection et à la pulvérisation d'un produit certifié, curatif et préventif. ${profile.recommendation}`,
+    },
+  ]
+
+  const schemaData = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "LocalBusiness",
+        "@id": `https://aco-habitat.fr/diagnostic-toiture/${cityData.slug}#business`,
+        name: `ACO-HABITAT Traitement du Bois ${cityData.name}`,
+        description: `Traitement curatif et préventif des bois (insectes xylophages, mérule, champignons lignivores) ${at}.`,
+        url: `https://aco-habitat.fr/diagnostic-toiture/${cityData.slug}`,
+        telephone: COMPANY.phoneHref,
+        email: COMPANY.email,
+        priceRange: "$$",
+        foundingDate: "2006",
+        address: {
+          "@type": "PostalAddress",
+          addressLocality: cityData.name,
+          addressRegion: cityData.region,
+          addressCountry: "FR",
+        },
+        areaServed: { "@type": "City", name: cityData.name },
+      },
+      {
+        "@type": "Service",
+        name: `Traitement du bois et de la charpente ${at}`,
+        description: profile.climateContext,
+        areaServed: { "@type": "City", name: cityData.name },
+        offers: {
+          "@type": "Offer",
+          price: "0",
+          priceCurrency: "EUR",
+          description: "Diagnostic gratuit et devis sans engagement",
+        },
+      },
+      {
+        "@type": "FAQPage",
+        mainEntity: faq.map((item) => ({
+          "@type": "Question",
+          name: item.q,
+          acceptedAnswer: { "@type": "Answer", text: item.a },
+        })),
+      },
+      {
+        "@type": "BreadcrumbList",
+        itemListElement: [
+          { "@type": "ListItem", position: 1, name: "Accueil", item: "https://aco-habitat.fr" },
+          {
+            "@type": "ListItem",
+            position: 2,
+            name: cityData.region,
+            item: `https://aco-habitat.fr/diagnostic-toiture/region/${cityData.regionSlug}`,
+          },
+          {
+            "@type": "ListItem",
+            position: 3,
+            name: cityData.name,
+            item: `https://aco-habitat.fr/diagnostic-toiture/${cityData.slug}`,
+          },
+        ],
+      },
+    ],
   }
 
   return (
     <>
-      <CityStructuredData city={cityData} />
-      
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schemaData) }} />
+
       <main className="min-h-screen bg-background">
         {/* Breadcrumb */}
-        <nav className="border-b border-border/50 bg-card/50" aria-label="Breadcrumb">
-          <div className="mx-auto max-w-7xl px-4 py-3 sm:px-6">
+        <nav className="border-b border-border bg-secondary/40" aria-label="Breadcrumb">
+          <div className="mx-auto max-w-6xl px-4 py-3 sm:px-6">
             <ol className="flex flex-wrap items-center gap-2 text-sm">
               <li>
-                <Link href="/" className="text-muted-foreground hover:text-foreground transition-colors">
+                <Link href="/" className="text-muted-foreground transition-colors hover:text-foreground">
                   Accueil
                 </Link>
               </li>
               <ChevronRight className="h-4 w-4 text-muted-foreground" />
               <li>
-                <Link href="/#diagnostic" className="text-muted-foreground hover:text-foreground transition-colors">
-                  Diagnostic
-                </Link>
-              </li>
-              <ChevronRight className="h-4 w-4 text-muted-foreground" />
-              <li>
-                <Link 
+                <Link
                   href={`/diagnostic-toiture/region/${cityData.regionSlug}`}
-                  className="text-muted-foreground hover:text-foreground transition-colors"
+                  className="text-muted-foreground transition-colors hover:text-foreground"
                 >
                   {cityData.region}
                 </Link>
@@ -366,509 +225,273 @@ export default async function CityPage({ params }: PageProps) {
           </div>
         </nav>
 
-        {/* Hero Section */}
-        <section className="relative overflow-hidden border-b border-border/50 bg-gradient-to-b from-primary/5 via-background to-background">
-          <div className="absolute inset-0 bg-[url('/grid.svg')] bg-center opacity-5" />
-          <div className="relative mx-auto max-w-7xl px-4 py-12 sm:px-6 sm:py-16 lg:py-20">
-            <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:justify-between">
+        {/* Hero */}
+        <section className="border-b border-border bg-secondary/40">
+          <div className="mx-auto max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
+            <div className="flex flex-col gap-8 lg:flex-row lg:items-start lg:justify-between">
               <div className="max-w-2xl">
                 <div className="mb-4 flex flex-wrap items-center gap-2">
-                  <Badge variant="outline" className="border-primary/30 bg-primary/10 text-primary">
-                    <MapPin className="mr-1 h-3 w-3" />
+                  <Badge variant="outline" className="gap-1">
+                    <MapPin className="h-3 w-3" />
                     {cityData.department} ({cityData.departmentCode})
                   </Badge>
-                  <Badge variant="outline" className="border-muted-foreground/30">
-                    {cityData.population.toLocaleString("fr-FR")} habitants
-                  </Badge>
+                  {inZone && <Badge variant="secondary">Intervention directe</Badge>}
                 </div>
-                
-                <h1 className="mb-4 text-3xl font-bold tracking-tight text-foreground sm:text-4xl lg:text-5xl">
-                  {cityData.seoContent.h1}
+
+                <h1
+                  className="mb-4 text-3xl font-semibold tracking-tight text-foreground text-balance sm:text-4xl lg:text-5xl"
+                  style={{ fontFamily: "var(--font-heading)" }}
+                >
+                  Traitement du bois & charpente {at}
                 </h1>
-                
-                <p className="mb-6 text-lg leading-relaxed text-muted-foreground">
-                  {cityData.seoContent.introText}
+
+                <p className="mb-6 text-pretty text-base leading-relaxed text-muted-foreground sm:text-lg">
+                  {inZone ? (
+                    <>
+                      ACO-HABITAT, expert depuis {COMPANY.since}, traite {at} les insectes xylophages, la mérule et
+                      les champignons lignivores. Diagnostic gratuit et traitement garanti.
+                    </>
+                  ) : (
+                    <>
+                      Insectes xylophages, mérule, champignons lignivores : obtenez un diagnostic gratuit pour le
+                      traitement de votre charpente {at}. Nous vous mettons en relation avec un expert qualifié.
+                    </>
+                  )}
                 </p>
 
                 <div className="flex flex-col gap-3 sm:flex-row">
                   <Button asChild size="lg" className="gap-2">
-                    <Link href="/#diagnostic">
-                      {cityData.seoContent.ctaText}
+                    <Link href="/#devis">
+                      Diagnostic gratuit
                       <ArrowRight className="h-4 w-4" />
                     </Link>
                   </Button>
-                  <Button asChild variant="outline" size="lg">
-                    <Link href="/#tarifs">
-                      Voir les tarifs - 19 EUR
-                    </Link>
-                  </Button>
-                </div>
-              </div>
-
-              {/* Quick Stats Card */}
-              <Card className="w-full lg:w-80 border-primary/20 bg-card/80 backdrop-blur-sm">
-                <CardHeader className="pb-3">
-                  <CardTitle className="flex items-center gap-2 text-base">
-                    <Cloud className="h-4 w-4 text-primary" />
-                    Climat a {cityData.name}
-                  </CardTitle>
-                </CardHeader>
-                <CardContent className="grid grid-cols-2 gap-3 text-sm">
-                  <div className="flex items-center gap-2">
-                    <CloudRain className="h-4 w-4 text-blue-400" />
-                    <span>{cityData.climate.annualRainfall}mm/an</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Droplets className="h-4 w-4 text-blue-400" />
-                    <span>{cityData.climate.rainyDays} jours pluie</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Snowflake className="h-4 w-4 text-cyan-400" />
-                    <span>{cityData.climate.frostDays} jours gel</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Sun className="h-4 w-4 text-amber-400" />
-                    <span>{cityData.climate.sunHours}h soleil</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <Wind className="h-4 w-4 text-gray-400" />
-                    <span>Vent {windExposureLabels[cityData.climate.windExposure]}</span>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    <AlertTriangle className="h-4 w-4 text-amber-400" />
-                    <span>Grele {cityData.climate.hailRisk}</span>
-                  </div>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </section>
-
-        {/* Climate Section */}
-        <section className="border-b border-border/50 py-12 sm:py-16">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6">
-            <h2 className="mb-4 text-2xl font-bold text-foreground sm:text-3xl">
-              Climat et impact sur les toitures a {cityData.name}
-            </h2>
-            <p className="mb-8 max-w-3xl text-muted-foreground leading-relaxed">
-              {cityData.seoContent.climateText}
-            </p>
-            
-            <div className="grid gap-6 md:grid-cols-3">
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="flex items-center gap-2 text-base">
-                    <Thermometer className="h-4 w-4 text-blue-400" />
-                    Temperature et gel
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">
-                    Avec <strong>{cityData.climate.frostDays} jours de gel</strong> et <strong>{cityData.climate.snowDays} jours de neige</strong> par an, 
-                    les toitures de {cityData.name} doivent resister aux cycles gel/degel qui fragilisent les materiaux.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="flex items-center gap-2 text-base">
-                    <CloudRain className="h-4 w-4 text-blue-400" />
-                    Precipitations
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">
-                    Les <strong>{cityData.climate.annualRainfall}mm de pluie</strong> repartis sur <strong>{cityData.climate.rainyDays} jours</strong> necessitent 
-                    une etancheite parfaite et des gouttieres bien dimensionnees.
-                  </p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="pb-3">
-                  <CardTitle className="flex items-center gap-2 text-base">
-                    <Sun className="h-4 w-4 text-amber-400" />
-                    Ensoleillement
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-sm text-muted-foreground">
-                    Avec <strong>{cityData.climate.sunHours} heures de soleil</strong> par an, les UV peuvent 
-                    {cityData.climate.sunHours > 2500 ? " accelerer significativement" : " contribuer au"} vieillissement des materiaux de couverture.
-                  </p>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </section>
-
-        {/* Roof Types Section */}
-        <section className="border-b border-border/50 bg-card/30 py-12 sm:py-16">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6">
-            <h2 className="mb-4 text-2xl font-bold text-foreground sm:text-3xl">
-              Types de toitures a {cityData.name}
-            </h2>
-            <p className="mb-8 max-w-3xl text-muted-foreground leading-relaxed">
-              {cityData.seoContent.roofTypesText}
-            </p>
-
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              {cityData.roofTypes.map((roof, index) => (
-                <Card key={index} className="relative overflow-hidden">
-                  <div 
-                    className="absolute inset-x-0 top-0 h-1 bg-primary" 
-                    style={{ width: `${roof.percentage}%` }}
-                  />
-                  <CardHeader className="pb-2">
-                    <CardTitle className="flex items-center justify-between text-base">
-                      <span className="flex items-center gap-2">
-                        <Home className="h-4 w-4 text-primary" />
-                        {roof.type}
-                      </span>
-                      <Badge variant="secondary">{roof.percentage}%</Badge>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground">{roof.description}</p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Common Problems Section */}
-        <section className="border-b border-border/50 py-12 sm:py-16">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6">
-            <h2 className="mb-4 text-2xl font-bold text-foreground sm:text-3xl">
-              Problemes courants des toitures a {cityData.name}
-            </h2>
-            <p className="mb-8 max-w-3xl text-muted-foreground leading-relaxed">
-              {cityData.seoContent.problemsText}
-            </p>
-
-            <div className="grid gap-4 md:grid-cols-2">
-              {cityData.commonProblems.map((problem, index) => (
-                <Card key={index}>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="flex items-center justify-between text-base">
-                      <span className="flex items-center gap-2">
-                        <AlertTriangle className="h-4 w-4 text-amber-400" />
-                        {problem.problem}
-                      </span>
-                      <Badge className={frequencyColors[problem.frequency]}>
-                        {problem.frequency === "frequent" ? "Frequent" : problem.frequency === "modere" ? "Modere" : "Occasionnel"}
-                      </Badge>
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="space-y-2">
-                    <p className="text-sm text-muted-foreground">{problem.description}</p>
-                    <p className="text-xs text-muted-foreground/70">
-                      <strong>Cause :</strong> {problem.cause}
-                    </p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Pricing Section */}
-        <section className="border-b border-border/50 bg-card/30 py-12 sm:py-16">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6">
-            <h2 className="mb-4 text-2xl font-bold text-foreground sm:text-3xl">
-              Prix des travaux de toiture a {cityData.name}
-            </h2>
-            <p className="mb-8 max-w-3xl text-muted-foreground leading-relaxed">
-              Estimations moyennes des couts de diagnostic et travaux de toiture dans le {cityData.department} ({cityData.departmentCode}).
-            </p>
-
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-              <Card className="border-primary/30 bg-primary/5">
-                <CardHeader className="pb-2">
-                  <CardTitle className="text-base">Diagnostic IA</CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-2xl font-bold text-primary">19 EUR</p>
-                  <p className="text-xs text-muted-foreground">Rapport PDF en 30 secondes</p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="flex items-center gap-2 text-base">
-                    <Euro className="h-4 w-4" />
-                    Petite reparation
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-xl font-bold">
-                    {cityData.pricing.repairSmall[0]} - {cityData.pricing.repairSmall[1]} EUR
-                  </p>
-                  <p className="text-xs text-muted-foreground">Tuiles cassees, petites fuites</p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="flex items-center gap-2 text-base">
-                    <Euro className="h-4 w-4" />
-                    Reparation moyenne
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-xl font-bold">
-                    {cityData.pricing.repairMedium[0]} - {cityData.pricing.repairMedium[1]} EUR
-                  </p>
-                  <p className="text-xs text-muted-foreground">Faitage, noue, cheneaux</p>
-                </CardContent>
-              </Card>
-
-              <Card>
-                <CardHeader className="pb-2">
-                  <CardTitle className="flex items-center gap-2 text-base">
-                    <Euro className="h-4 w-4" />
-                    Renovation complete
-                  </CardTitle>
-                </CardHeader>
-                <CardContent>
-                  <p className="text-xl font-bold">
-                    {(cityData.pricing.renovation[0] / 1000).toFixed(0)}k - {(cityData.pricing.renovation[1] / 1000).toFixed(0)}k EUR
-                  </p>
-                  <p className="text-xs text-muted-foreground">Refection totale couverture</p>
-                </CardContent>
-              </Card>
-            </div>
-          </div>
-        </section>
-
-        {/* Architecture Section */}
-        <section className="border-b border-border/50 py-12 sm:py-16">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6">
-            <h2 className="mb-4 text-2xl font-bold text-foreground sm:text-3xl">
-              Patrimoine architectural de {cityData.name}
-            </h2>
-            <p className="mb-8 max-w-3xl text-muted-foreground leading-relaxed">
-              Decouvrez les styles architecturaux caracteristiques de {cityData.name} et leurs specificites en matiere de toiture.
-            </p>
-
-            <div className="grid gap-4 md:grid-cols-3">
-              {cityData.architecture.map((arch, index) => (
-                <Card key={index}>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="flex items-center gap-2 text-base">
-                      <Building className="h-4 w-4 text-primary" />
-                      {arch.style}
-                    </CardTitle>
-                    <Badge variant="outline" className="w-fit text-xs">{arch.period}</Badge>
-                  </CardHeader>
-                  <CardContent>
-                    <ul className="space-y-1">
-                      {arch.characteristics.map((char, i) => (
-                        <li key={i} className="flex items-center gap-2 text-sm text-muted-foreground">
-                          <div className="h-1 w-1 rounded-full bg-primary" />
-                          {char}
-                        </li>
-                      ))}
-                    </ul>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* FAQ Section */}
-        <section className="border-b border-border/50 bg-card/30 py-12 sm:py-16">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6">
-            <h2 className="mb-8 text-2xl font-bold text-foreground sm:text-3xl">
-              Questions frequentes sur les toitures a {cityData.name}
-            </h2>
-
-            <div className="grid gap-4 lg:grid-cols-2">
-              {cityData.faq.map((item, index) => (
-                <Card key={index}>
-                  <CardHeader className="pb-2">
-                    <CardTitle className="text-base font-semibold leading-tight">
-                      {item.question}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-sm text-muted-foreground leading-relaxed">
-                      {item.answer}
-                    </p>
-                  </CardContent>
-                </Card>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* Nearby Cities Section */}
-        <section className="border-b border-border/50 py-12 sm:py-16">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6">
-            <h2 className="mb-4 text-2xl font-bold text-foreground sm:text-3xl">
-              Diagnostic toiture dans la region {cityData.region}
-            </h2>
-            <p className="mb-8 text-muted-foreground">
-              Notre service de diagnostic IA est disponible dans toute la region {cityData.region}.
-            </p>
-
-            <div className="grid gap-3 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-              {regionCities.map((nearbyCity) => (
-                <Link
-                  key={nearbyCity.slug}
-                  href={`/diagnostic-toiture/${nearbyCity.slug}`}
-                  className="flex items-center justify-between rounded-lg border border-border/50 bg-card/50 px-4 py-3 transition-colors hover:border-primary/30 hover:bg-card"
-                >
-                  <span className="flex items-center gap-2 text-sm">
-                    <MapPin className="h-3 w-3 text-primary" />
-                    {nearbyCity.name}
-                  </span>
-                  <Badge variant="outline" className="text-xs">
-                    {nearbyCity.departmentCode}
-                  </Badge>
-                </Link>
-              ))}
-            </div>
-
-            <div className="mt-6 text-center">
-              <Button asChild variant="outline">
-                <Link href={`/diagnostic-toiture/region/${cityData.regionSlug}`}>
-                  Voir toutes les villes de {cityData.region}
-                  <ChevronRight className="ml-1 h-4 w-4" />
-                </Link>
-              </Button>
-            </div>
-          </div>
-        </section>
-
-        {/* Local Info Section */}
-        <section className="border-b border-border/50 bg-card/30 py-12 sm:py-16">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6">
-            <h2 className="mb-6 text-2xl font-bold text-foreground sm:text-3xl">
-              Zones desservies a {cityData.name}
-            </h2>
-
-            <div className="grid gap-6 md:grid-cols-3">
-              <div>
-                <h3 className="mb-3 font-semibold text-foreground">Codes postaux</h3>
-                <div className="flex flex-wrap gap-2">
-                  {cityData.localInfo.zipCodes.slice(0, 8).map((zip) => (
-                    <Badge key={zip} variant="secondary">{zip}</Badge>
-                  ))}
-                  {cityData.localInfo.zipCodes.length > 8 && (
-                    <Badge variant="outline">+{cityData.localInfo.zipCodes.length - 8}</Badge>
+                  {inZone && (
+                    <Button asChild variant="outline" size="lg" className="gap-2">
+                      <a href={`tel:${COMPANY.phoneHref}`}>
+                        <Phone className="h-4 w-4" />
+                        {COMPANY.phone}
+                      </a>
+                    </Button>
                   )}
                 </div>
               </div>
 
-              <div>
-                <h3 className="mb-3 font-semibold text-foreground">Quartiers</h3>
-                <div className="flex flex-wrap gap-2">
-                  {cityData.localInfo.neighborhoods.slice(0, 6).map((neighborhood) => (
-                    <Badge key={neighborhood} variant="outline">{neighborhood}</Badge>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <h3 className="mb-3 font-semibold text-foreground">Communes voisines</h3>
-                <div className="flex flex-wrap gap-2">
-                  {cityData.localInfo.nearbyCommunes.slice(0, 6).map((commune) => (
-                    <Badge key={commune} variant="outline">{commune}</Badge>
-                  ))}
-                </div>
-              </div>
+              {/* Risk card */}
+              <Card className="w-full lg:w-80">
+                <CardHeader className="pb-2">
+                  <CardTitle className="flex items-center gap-2 text-base">
+                    <Cloud className="h-4 w-4" style={{ color: accent }} />
+                    Risque bois {at}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent className="grid gap-3 text-sm">
+                  <div className="flex items-center justify-between border-b border-border pb-2">
+                    <span className="text-muted-foreground">Pluviométrie</span>
+                    <span className="font-medium">{cityData.climate.annualRainfall} mm/an</span>
+                  </div>
+                  <div className="flex items-center justify-between border-b border-border pb-2">
+                    <span className="text-muted-foreground">Jours de pluie</span>
+                    <span className="font-medium">{cityData.climate.rainyDays} j/an</span>
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <span className="text-muted-foreground">Mérule</span>
+                    <span className="font-semibold" style={{ color: accent }}>
+                      {profile.meruleLabel}
+                    </span>
+                  </div>
+                </CardContent>
+              </Card>
             </div>
           </div>
         </section>
 
-        {/* Contact Section */}
-        <section className="border-t border-border/50 bg-primary/5 py-10">
+        {/* Context + pests */}
+        <section className="border-b border-border py-12 sm:py-16">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6">
+            <h2
+              className="mb-6 text-2xl font-semibold text-foreground sm:text-3xl"
+              style={{ fontFamily: "var(--font-heading)" }}
+            >
+              Pourquoi les bois sont exposés {at}
+            </h2>
+            <div className="grid gap-8 md:grid-cols-2">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-base">
+                    <Cloud className="h-5 w-5" style={{ color: accent }} />
+                    Contexte local
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="leading-relaxed text-muted-foreground">{profile.climateContext}</p>
+                  <p className="mt-4 rounded-lg bg-secondary/60 p-4 text-sm text-secondary-foreground">
+                    {profile.recommendation}
+                  </p>
+                </CardContent>
+              </Card>
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2 text-base">
+                    <Bug className="h-5 w-5" style={{ color: accent }} />
+                    Agresseurs fréquents {at}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ul className="space-y-2">
+                    {profile.dominantPests.map((pest) => (
+                      <li key={pest} className="flex items-center gap-2">
+                        <CheckCircle2 className="h-4 w-4" style={{ color: accent }} />
+                        <span>{pest}</span>
+                      </li>
+                    ))}
+                  </ul>
+                  <p className="mt-4 text-sm text-muted-foreground">
+                    Seule une inspection sur place confirme l&apos;agresseur et l&apos;étendue des dégâts : c&apos;est
+                    l&apos;objet de notre diagnostic gratuit.
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+          </div>
+        </section>
+
+        {/* Treatments */}
+        <section className="border-b border-border py-12 sm:py-16">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6">
+            <h2
+              className="mb-8 text-2xl font-semibold text-foreground sm:text-3xl"
+              style={{ fontFamily: "var(--font-heading)" }}
+            >
+              Nos traitements {at}
+            </h2>
+            <div className="grid gap-4 sm:grid-cols-3">
+              {treatments.map((t) => (
+                <Card key={t.title} className="transition-all hover:-translate-y-1 hover:shadow-lg" style={{ borderTop: `3px solid ${t.color}` }}>
+                  <CardContent className="flex flex-col gap-3 p-6">
+                    <div
+                      className="flex h-12 w-12 items-center justify-center rounded-xl"
+                      style={{ backgroundColor: `${t.color}1a` }}
+                    >
+                      <t.icon size={22} style={{ color: t.color }} />
+                    </div>
+                    <h3 className="font-semibold text-foreground">{t.title}</h3>
+                    <p className="text-sm leading-relaxed text-muted-foreground">{t.desc}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Zone-aware band */}
+        <section className="border-b border-border bg-secondary/40 py-12 sm:py-16">
+          <div className="mx-auto max-w-4xl px-4 text-center sm:px-6">
+            <div className="mx-auto mb-4 flex h-12 w-12 items-center justify-center rounded-full bg-primary/10">
+              {inZone ? <Hammer size={22} className="text-primary" /> : <Search size={22} className="text-primary" />}
+            </div>
+            <h2
+              className="text-2xl font-semibold text-foreground sm:text-3xl"
+              style={{ fontFamily: "var(--font-heading)" }}
+            >
+              {inZone ? `Nous intervenons directement ${at}` : `Un expert pour votre charpente ${at}`}
+            </h2>
+            <p className="mx-auto mt-3 max-w-xl text-muted-foreground">
+              {inZone
+                ? `Basés à ${COMPANY.addressCity}, nous couvrons ${ZONE_LABEL}. Inspection sur place, traitement certifié et garantie sur nos interventions.`
+                : `Décrivez votre situation : nous étudions votre demande et vous mettons en relation avec un professionnel qualifié du traitement du bois près de chez vous. Diagnostic gratuit et sans engagement.`}
+            </p>
+            <div className="mt-7">
+              <Button asChild size="lg" className="gap-2 px-8">
+                <Link href="/#devis">
+                  Demander mon diagnostic gratuit
+                  <ArrowRight size={16} />
+                </Link>
+              </Button>
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ */}
+        <section className="border-b border-border py-12 sm:py-16">
           <div className="mx-auto max-w-4xl px-4 sm:px-6">
-            <div className="text-center">
-              <h2 className="mb-2 text-xl font-bold text-foreground">ACO-HABITAT - Expert toiture depuis 2006</h2>
-              <p className="mb-6 text-muted-foreground">Une question sur votre toiture a {cityData.name} ? Contactez-nous !</p>
+            <h2
+              className="mb-8 text-center text-2xl font-semibold text-foreground sm:text-3xl"
+              style={{ fontFamily: "var(--font-heading)" }}
+            >
+              Questions fréquentes {at}
+            </h2>
+            <div className="space-y-4">
+              {faq.map((item) => (
+                <Card key={item.q}>
+                  <CardHeader>
+                    <CardTitle className="text-lg">{item.q}</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <p className="text-muted-foreground">{item.a}</p>
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Contact (in-zone only) */}
+        {inZone && (
+          <section className="border-b border-border py-10">
+            <div className="mx-auto max-w-4xl px-4 text-center sm:px-6">
+              <h2 className="mb-2 text-xl font-semibold text-foreground" style={{ fontFamily: "var(--font-heading)" }}>
+                ACO-HABITAT — Expert traitement du bois depuis {COMPANY.since}
+              </h2>
+              <p className="mb-6 text-muted-foreground">Une question sur votre charpente {at} ? Contactez-nous.</p>
               <div className="flex flex-col items-center justify-center gap-4 sm:flex-row sm:gap-8">
-                <a 
-                  href="tel:+33233311979" 
+                <a
+                  href={`tel:${COMPANY.phoneHref}`}
                   className="flex items-center gap-2 text-lg font-semibold text-primary hover:underline"
                 >
                   <Phone className="h-5 w-5" />
-                  02 33 31 19 79
+                  {COMPANY.phone}
                 </a>
-                <a 
-                  href="mailto:aco.habitat@orange.fr" 
+                <a
+                  href={`mailto:${COMPANY.email}`}
                   className="flex items-center gap-2 text-lg font-semibold text-primary hover:underline"
                 >
                   <Mail className="h-5 w-5" />
-                  aco.habitat@orange.fr
+                  {COMPANY.email}
                 </a>
               </div>
             </div>
-          </div>
-        </section>
+          </section>
+        )}
 
-        {/* CTA Section */}
-        <section className="py-12 sm:py-16">
-          <div className="mx-auto max-w-4xl px-4 text-center sm:px-6">
-            <h2 className="mb-4 text-2xl font-bold text-foreground sm:text-3xl">
-              Analysez votre toiture a {cityData.name} maintenant
-            </h2>
-            <p className="mb-8 text-muted-foreground">
-              Notre IA analyse votre toiture en 30 secondes et detecte les problemes specifiques au climat de {cityData.name} : 
-              {cityData.climate.frostDays > 40 ? " gel intense," : ""}
-              {cityData.climate.windExposure === "tres_fort" || cityData.climate.windExposure === "fort" ? " exposition au vent," : ""}
-              {cityData.climate.rainyDays > 100 ? " humidite importante," : ""}
-              {cityData.climate.sunHours > 2500 ? " degradation UV," : ""}
-              {" "}et bien plus encore.
-            </p>
-            <div className="flex flex-col justify-center gap-4 sm:flex-row">
-              <Button asChild size="lg" className="gap-2">
-                <Link href="/#diagnostic">
-                  Analyser ma toiture - 19 EUR
-                  <ArrowRight className="h-4 w-4" />
-                </Link>
-              </Button>
-              <Button asChild variant="outline" size="lg">
-                <Link href="/#methode">
-                  Comment ca marche
-                </Link>
-              </Button>
-            </div>
-          </div>
-        </section>
-
-        {/* Other Diagnostics Banner */}
-        <section className="border-t border-border/50 bg-card/50 py-8">
-          <div className="mx-auto max-w-7xl px-4 sm:px-6">
-            <p className="mb-4 text-center text-sm font-medium text-muted-foreground">
-              Nos autres diagnostics IA disponibles a {cityData.name}
-            </p>
-            <div className="flex flex-col justify-center gap-3 sm:flex-row">
-              <a
-                href="https://humidite.aco-habitat.fr"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 rounded-lg border border-cyan-500/30 bg-cyan-500/10 px-4 py-2 text-sm font-medium text-cyan-400 transition-colors hover:bg-cyan-500/20"
+        {/* Nearby cities */}
+        {(nearbyCities.length > 0 || regionCities.length > 0) && (
+          <section className="py-12 sm:py-16">
+            <div className="mx-auto max-w-6xl px-4 sm:px-6">
+              <h2
+                className="mb-8 text-2xl font-semibold text-foreground sm:text-3xl"
+                style={{ fontFamily: "var(--font-heading)" }}
               >
-                <Droplets className="h-4 w-4" />
-                Diagnostic Humidite IA
-              </a>
-              <a
-                href="https://traitement-bois.fr"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 px-4 py-2 text-sm font-medium text-amber-400 transition-colors hover:bg-amber-500/20"
-              >
-                <Home className="h-4 w-4" />
-                Diagnostic Charpente IA
-              </a>
+                Traitement du bois autour de {cityData.name}
+              </h2>
+              <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                {(nearbyCities.length > 0 ? nearbyCities : regionCities).map((c) => (
+                  <Link
+                    key={c.slug}
+                    href={`/diagnostic-toiture/${c.slug}`}
+                    className="group flex items-center justify-between rounded-lg border border-border bg-card p-3 transition-all hover:border-primary/30 hover:shadow-md"
+                  >
+                    <span className="flex items-center gap-2">
+                      <MapPin className="h-4 w-4 text-muted-foreground group-hover:text-primary" />
+                      <span className="font-medium text-foreground group-hover:text-primary">{c.name}</span>
+                    </span>
+                    <ArrowRight className="h-4 w-4 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
+                  </Link>
+                ))}
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
+        )}
       </main>
     </>
   )
