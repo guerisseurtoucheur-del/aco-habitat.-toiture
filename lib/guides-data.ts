@@ -32,7 +32,7 @@ export const guidesData: GuideData[] = [
     slug: "diagnostic-toiture-satellite",
     title: "Reconnaître une attaque de charpente",
     metaTitle:
-      "Comment reconnaître une attaque d'insectes ou de champignons dans sa charpente ? | Guide ACO-HABITAT",
+      "Reconnaître une attaque d'insectes ou de champignons dans sa charpente",
     metaDescription:
       "Trous, sciure, galeries, mycélium : apprenez à reconnaître une attaque de votre charpente par les insectes xylophages ou les champignons. Guide complet : indices, identification et bons réflexes.",
     heroTitle: "Comment reconnaître une attaque de votre charpente ?",
@@ -111,7 +111,7 @@ export const guidesData: GuideData[] = [
     slug: "quand-renover-toiture",
     title: "Quand faut-il traiter sa charpente",
     metaTitle:
-      "Quand faut-il traiter sa charpente ? Les 7 signes à surveiller | ACO-HABITAT",
+      "Quand faut-il traiter sa charpente ? Les 7 signes à surveiller",
     metaDescription:
       "Découvrez les 7 signes qui indiquent que votre charpente doit être traitée. Trous, sciure, humidité, mérule : guide complet pour savoir quand agir avant que le bois ne soit détruit.",
     heroTitle: "Quand faut-il traiter sa charpente ? Les 7 signes qui ne trompent pas",
@@ -190,7 +190,7 @@ export const guidesData: GuideData[] = [
     slug: "prix-renovation-toiture",
     title: "Prix d'un traitement du bois 2026",
     metaTitle:
-      "Prix d'un traitement de charpente et du bois en 2026 : tarifs et devis | ACO-HABITAT",
+      "Prix d'un traitement de charpente et du bois en 2026 : tarifs et devis",
     metaDescription:
       "Guide complet des prix de traitement du bois en 2026. Tarifs par type d'attaque (insectes, mérule, humidité), facteurs de prix et conseils pour obtenir le bon devis.",
     heroTitle:
@@ -290,7 +290,7 @@ export const guidesData: GuideData[] = [
     slug: "mousse-toiture-dangers",
     title: "Les dangers de la mérule",
     metaTitle:
-      "Mérule : quels dangers pour votre maison et comment la traiter ? | ACO-HABITAT",
+      "Mérule : quels dangers pour votre maison et comment la traiter ?",
     metaDescription:
       "La mérule, surnommée la lèpre des maisons, détruit charpentes et planchers en quelques mois. Découvrez ses dangers réels, comment la reconnaître et les solutions professionnelles pour l'éliminer.",
     heroTitle:
@@ -372,7 +372,7 @@ export const guidesData: GuideData[] = [
   {
     slug: "diagnostic-toiture-avant-achat",
     title: "État parasitaire avant achat immobilier",
-    metaTitle: "État parasitaire avant achat immobilier : ce qu'il faut vérifier | ACO-HABITAT",
+    metaTitle: "État parasitaire avant achat immobilier : ce qu'il faut vérifier",
     metaDescription: "Vous achetez une maison ? Découvrez pourquoi et comment faire contrôler l'état des bois (insectes, mérule, humidité) avant de signer. Évitez les mauvaises surprises et négociez en connaissance de cause.",
     heroTitle: "Pourquoi faire contrôler les bois avant d'acheter une maison ?",
     heroDescription: "Une charpente attaquée par les insectes ou un plancher rongé par la mérule peut coûter des milliers d'euros de travaux. Ces dégâts sont souvent invisibles lors d'une simple visite. Voici comment vérifier l'état des bois avant de signer le compromis et éviter une mauvaise surprise financière.",
@@ -436,7 +436,7 @@ export const guidesData: GuideData[] = [
   {
     slug: "glossaire-toiture",
     title: "Glossaire du traitement du bois",
-    metaTitle: "Glossaire du traitement du bois : tous les termes expliqués | ACO-HABITAT",
+    metaTitle: "Glossaire du traitement du bois : tous les termes expliqués",
     metaDescription:
       "Dictionnaire complet des termes du traitement du bois et de la charpente : capricorne, vrillette, mérule, vermoulure, bûchage, injection, classe d'emploi et 40+ définitions expliquées simplement.",
     heroTitle: "Glossaire du traitement du bois : tous les termes expliqués",
@@ -556,7 +556,7 @@ export const guidesData: GuideData[] = [
     slug: "degats-grele-toiture",
     title: "Le capricorne des maisons",
     metaTitle:
-      "Capricorne des maisons : reconnaître, traiter et prévenir | ACO-HABITAT",
+      "Capricorne des maisons : reconnaître, traiter et prévenir",
     metaDescription:
       "Le capricorne des maisons est le plus destructeur des insectes xylophages. Découvrez comment le reconnaître, évaluer les dégâts et traiter durablement votre charpente. Guide complet d'experts.",
     heroTitle:
@@ -654,7 +654,7 @@ export const guidesData: GuideData[] = [
     slug: "duree-de-vie-toiture",
     title: "Durée de vie d'une charpente",
     metaTitle:
-      "Durée de vie d'une charpente : combien de temps dure le bois ? | ACO-HABITAT",
+      "Durée de vie d'une charpente : combien de temps dure le bois ?",
     metaDescription:
       "Combien de temps dure une charpente en bois ? Découvrez les facteurs qui réduisent sa longévité (insectes, champignons, humidité), les signes d'usure et comment prolonger sa durée de vie.",
     heroTitle:
@@ -893,7 +893,7 @@ export const guidesData: GuideData[] = [
     slug: "diagnostic-toiture-achat-vente-immobilier",
     title: "Traitement du bois et transaction immobilière",
     metaTitle:
-      "Traitement du bois avant achat ou vente de maison | ACO-HABITAT",
+      "Traitement du bois avant achat ou vente de maison",
     metaDescription:
       "Pourquoi contrôler l'état des bois avant d'acheter ou vendre une maison ? Insectes, mérule, humidité : découvrez comment protéger votre transaction immobilière et éviter les litiges.",
     heroTitle:

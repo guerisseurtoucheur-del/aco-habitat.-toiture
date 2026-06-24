@@ -13,289 +13,209 @@ export interface BlogArticle {
 export const blogArticles: BlogArticle[] = [
   {
     slug: "prix-refection-toiture-2026",
-    title: "Prix refection toiture 2026 : tarifs par materiau et surface",
-    description: "Decouvrez les prix moyens pour refaire votre toiture en 2026. Comparatif des couts par type de couverture (tuiles, ardoise, zinc) et surface. Guide complet avec estimations.",
+    title: "Prix d'un traitement de la mérule en 2026 : tarifs et prise en charge",
+    description:
+      "Combien coûte un traitement contre la mérule en 2026 ? Tarifs selon l'étendue, coût du traitement des maçonneries, remplacement des bois et conseils pour obtenir un devis juste.",
     date: "2026-03-10",
     author: "Expert ACO-HABITAT",
     readTime: "8 min",
     category: "Prix & Devis",
-    image: "/images/blog/prix-toiture.jpg",
+    image: "/images/blog/prix-toiture.png",
     content: `
-## Combien coute une refection de toiture en 2026 ?
+## Combien coûte un traitement de la mérule en 2026 ?
 
-Le prix d'une refection de toiture varie considerablement selon plusieurs facteurs : le type de couverture, la surface, l'etat de la charpente et votre region. En 2026, comptez en moyenne **entre 180 et 300 euros par m2** pour une renovation complete.
+La mérule est le plus destructeur des champignons lignivores, et son traitement est plus complexe que celui des insectes : il faut éliminer le champignon, traiter les maçonneries qu'il a colonisées et, surtout, supprimer la source d'humidité. En 2026, comptez en moyenne **entre 40 et 120 euros par m² traité**, selon l'étendue de la contamination.
 
-### Prix par type de couverture
+### Prix selon le type d'intervention
 
-| Type de couverture | Prix au m2 (pose comprise) |
-|-------------------|---------------------------|
-| Tuiles en terre cuite | 50 - 120 EUR |
-| Tuiles beton | 40 - 80 EUR |
-| Ardoise naturelle | 100 - 200 EUR |
-| Ardoise synthetique | 60 - 100 EUR |
-| Zinc | 80 - 150 EUR |
-| Bac acier | 40 - 70 EUR |
-| Tuiles photovoltaiques | 800 - 1500 EUR |
+| Type d'intervention | Prix moyen |
+|--------------------|-----------|
+| Diagnostic et recherche d'humidité | Gratuit chez ACO-HABITAT |
+| Traitement curatif des insectes xylophages | 20 - 45 EUR/m² |
+| Traitement préventif du bois | 12 - 25 EUR/m² |
+| Traitement de la mérule (bois) | 40 - 120 EUR/m² |
+| Traitement fongicide des maçonneries | 50 - 100 EUR/m² |
+| Remplacement de pièces de charpente | 80 - 180 EUR/m² |
 
-### Prix selon la surface de toiture
+### Pourquoi le traitement de la mérule coûte-t-il plus cher ?
 
-Pour vous donner une idee plus concrete, voici les budgets moyens selon la taille de votre maison :
+Contrairement à une attaque d'insectes, la mérule impose plusieurs opérations :
 
-- **Maison 80 m2 au sol** (environ 100 m2 de toiture) : 15 000 - 25 000 EUR
-- **Maison 100 m2 au sol** (environ 130 m2 de toiture) : 20 000 - 35 000 EUR
-- **Maison 150 m2 au sol** (environ 180 m2 de toiture) : 30 000 - 50 000 EUR
+- **La dépose des bois contaminés** : les pièces envahies par le mycélium doivent souvent être retirées et remplacées.
+- **Le traitement des maçonneries** : la mérule traverse les murs ; il faut injecter un fongicide dans la maçonnerie contaminée.
+- **L'assèchement** : sans suppression de l'humidité, le champignon revient. C'est l'étape la plus importante.
+- **La ventilation** : remettre de l'air dans les zones confinées empêche la réapparition.
 
 ### Les facteurs qui influencent le prix
 
-**1. L'etat de la charpente**
-Si votre charpente necessite des reparations ou un traitement, ajoutez 50 a 150 EUR/m2 supplementaires.
+**1. L'étendue de la contamination**
+Une mérule détectée tôt, sur quelques mètres carrés, coûte bien moins cher qu'une attaque qui a déjà gagné planchers, murs et charpente.
 
-**2. L'accessibilite du chantier**
-Une toiture difficile d'acces (etage eleve, acces etroit) peut augmenter le devis de 10 a 20%.
+**2. L'accessibilité des zones touchées**
+Une cave, un vide sanitaire ou des combles difficiles d'accès augmentent le temps d'intervention.
 
-**3. La complexite de la toiture**
-Les toitures avec de nombreuses pentes, lucarnes, velux ou cheminees coutent plus cher a refaire.
+**3. L'ampleur des bois à remplacer**
+Si des pièces porteuses ont perdu leur résistance, leur remplacement pèse sur le devis.
 
-**4. Votre region**
-Les prix varient selon les regions : +15% en Ile-de-France, -10% en zones rurales.
+**4. La cause de l'humidité**
+Une simple fuite à réparer ne coûte pas la même chose qu'un problème de remontées capillaires nécessitant une barrière étanche.
 
-### Les couts annexes a prevoir
+### Prise en charge et aides possibles
 
-- **Echafaudage** : 15 - 30 EUR/m2
-- **Depose de l'ancienne couverture** : 10 - 25 EUR/m2
-- **Ecran sous-toiture** : 10 - 20 EUR/m2
-- **Isolation par l'exterieur (sarking)** : 100 - 250 EUR/m2
+- **Assurance habitation** : si la mérule résulte d'un dégât des eaux couvert, une partie des travaux peut être prise en charge. Vérifiez vos garanties.
+- **Vice caché** : une mérule non déclarée lors d'une vente peut engager la responsabilité du vendeur.
+- **TVA réduite** : les travaux dans un logement de plus de 2 ans bénéficient souvent d'un taux réduit.
+- **Copropriété** : pour une charpente ou des parties communes touchées, le coût est réparti entre copropriétaires.
 
-### Comment reduire le cout de votre toiture ?
+### Comment obtenir le meilleur prix ?
 
-1. **Comparez plusieurs devis** - Demandez au moins 3 devis a des couvreurs differents
-2. **Profitez des aides** - MaPrimeRenov peut financer une partie des travaux d'isolation
-3. **Choisissez le bon moment** - Les prix sont souvent plus bas en automne/hiver
-4. **Groupez les travaux** - Associez toiture et isolation pour optimiser les couts
+1. **Faites un diagnostic dès les premiers signes** - plus la mérule est détectée tôt, moins le traitement est lourd.
+2. **Méfiez-vous des devis qui ignorent l'humidité** - un traitement sans suppression de la cause est voué à l'échec.
+3. **Exigez un applicateur certifié** et des produits homologués.
+4. **Comparez des devis détaillés** décrivant chaque prestation (bois, maçonnerie, assèchement, garantie).
 
-### Avant de demander un devis, faites un diagnostic
+### Un doute sur une mérule ? Faites un diagnostic gratuit
 
-Avant de contacter des couvreurs, il est essentiel de connaitre l'etat reel de votre toiture. Un diagnostic vous permet de :
-- Identifier les zones problematiques
-- Estimer l'urgence des travaux
-- Negocier avec des informations precises
-
-**Notre diagnostic IA analyse votre toiture en 30 secondes** et vous fournit un rapport detaille pour mieux preparer vos demandes de devis.
+Au moindre indice (filaments blancs, plaques brunes, odeur de moisi, bois qui s'effrite), il faut agir vite. **Le diagnostic ACO-HABITAT est gratuit et sans engagement** : nous identifions le champignon, mesurons l'humidité et vous remettons un devis clair avant tout engagement.
     `,
   },
   {
     slug: "aides-maprimenov-toiture-2026",
-    title: "Aides MaPrimeRenov toiture 2026 : comment en beneficier",
-    description: "Guide complet sur MaPrimeRenov pour la renovation de toiture en 2026. Montants, conditions d'eligibilite, demarches et cumul avec d'autres aides. Tout savoir pour financer vos travaux.",
+    title: "Mérule : obligations légales, vente immobilière et assurance en 2026",
+    description:
+      "Mérule et obligations légales : zones à risque, information lors d'une vente, garantie des vices cachés et rôle de l'assurance. Tout ce qu'un propriétaire doit savoir en 2026.",
     date: "2026-03-08",
     author: "Expert ACO-HABITAT",
     readTime: "10 min",
-    category: "Aides & Subventions",
-    image: "/images/blog/aides-toiture.jpg",
+    category: "Réglementation",
+    image: "/images/blog/aides-toiture.png",
     content: `
-## MaPrimeRenov toiture : le guide complet 2026
+## Mérule et obligations légales : le guide complet 2026
 
-MaPrimeRenov est la principale aide de l'Etat pour financer vos travaux de renovation energetique, y compris l'isolation de votre toiture. En 2026, les montants ont ete revus et les conditions simplifiees.
+La mérule n'est pas qu'un problème technique : c'est aussi un sujet juridique encadré par le Code de la construction et de l'habitation. Que vous soyez vendeur, acheteur ou propriétaire, voici ce que dit la loi en 2026.
 
-### Quels travaux de toiture sont eligibles ?
+### Les zones à risque de mérule
 
-MaPrimeRenov finance principalement les travaux d'**isolation thermique** de la toiture :
+Depuis la loi ALUR, les préfets peuvent délimiter par **arrêté préfectoral** les zones où la mérule est présente ou susceptible de l'être. Dans ces zones :
 
-- **Isolation des combles perdus** : la plus rentable, jusqu'a 25 EUR/m2 d'aide
-- **Isolation des combles amenages** : jusqu'a 25 EUR/m2
-- **Isolation par l'exterieur (sarking)** : jusqu'a 75 EUR/m2
-- **Isolation des toitures-terrasses** : jusqu'a 75 EUR/m2
+- L'occupant ou le propriétaire qui constate la présence de mérule doit en faire la **déclaration en mairie**.
+- Cette information alimente la connaissance du risque à l'échelle de la commune.
+- En cas de démolition, les bois et matériaux contaminés doivent être traités pour éviter la propagation.
 
-**Attention** : La simple refection de couverture (changement de tuiles) n'est PAS eligible si elle n'inclut pas d'isolation.
+### L'obligation d'information lors d'une vente
 
-### Les montants MaPrimeRenov 2026
+Lors de la vente d'un bien situé dans une zone à risque délimitée par arrêté :
 
-Les montants varient selon vos revenus (4 categories) :
+- Le vendeur doit **informer l'acheteur** de la situation au regard du risque mérule, via une déclaration annexée à l'acte de vente.
+- Cette information fait partie des éléments portés à la connaissance de l'acquéreur, au même titre que d'autres risques.
+- L'absence d'information sur une mérule connue peut être lourde de conséquences pour le vendeur.
 
-| Profil | Combles perdus/m2 | Rampants/m2 | Sarking/m2 |
-|--------|------------------|-------------|------------|
-| MaPrimeRenov Bleu (tres modeste) | 25 EUR | 25 EUR | 75 EUR |
-| MaPrimeRenov Jaune (modeste) | 20 EUR | 20 EUR | 60 EUR |
-| MaPrimeRenov Violet (intermediaire) | 15 EUR | 15 EUR | 40 EUR |
-| MaPrimeRenov Rose (superieur) | 7 EUR | 7 EUR | 15 EUR |
+### La garantie des vices cachés
 
-### Les plafonds de revenus 2026
+C'est le point le plus important pour les transactions :
 
-**Pour un foyer en Ile-de-France :**
-- Bleu : jusqu'a 23 541 EUR (1 personne) / 34 551 EUR (2 personnes)
-- Jaune : jusqu'a 28 657 EUR (1 personne) / 42 058 EUR (2 personnes)
-- Violet : jusqu'a 40 018 EUR (1 personne) / 58 827 EUR (2 personnes)
-- Rose : au-dessus
+- Une mérule présente et **non révélée** lors de la vente peut constituer un **vice caché**.
+- L'acheteur qui la découvre après l'achat peut, sous conditions, se retourner contre le vendeur.
+- Il peut demander une réduction du prix, voire l'annulation de la vente et des dommages-intérêts.
+- Le vendeur de bonne foi qui ignorait la présence de mérule n'est pas pour autant systématiquement exonéré.
 
-**Pour le reste de la France :** les plafonds sont environ 15% plus bas.
+**Conseil :** avant de vendre ou d'acheter une maison ancienne, surtout en zone humide, faites contrôler l'état parasitaire des bois. Cela protège le vendeur comme l'acheteur.
 
-### Les conditions d'eligibilite
+### Le rôle de l'assurance
 
-Pour beneficier de MaPrimeRenov :
+La prise en charge par l'assurance dépend de l'origine de l'attaque :
 
-1. **Etre proprietaire** du logement (occupant ou bailleur)
-2. **Logement de plus de 15 ans** (construit avant 2011)
-3. **Residence principale** (occupee au moins 8 mois/an)
-4. **Faire appel a un artisan RGE** (Reconnu Garant de l'Environnement)
-5. **Performance minimale** : R >= 7 m2.K/W pour les combles
+- **Dégât des eaux couvert** : si la mérule résulte d'une fuite ou d'un sinistre garanti, une partie du traitement peut être prise en charge. Tout dépend des clauses de votre contrat.
+- **Défaut d'entretien** : une humidité chronique non traitée est généralement exclue des garanties.
+- **Déclaration rapide** : déclarez tout dégât des eaux sans tarder, car c'est souvent l'humidité non traitée qui mène à la mérule.
 
-### Comment faire la demande ?
+### Copropriété : qui paie ?
 
-**Etape 1 : Avant les travaux**
-- Creez votre compte sur maprimerenov.gouv.fr
-- Renseignez votre situation et votre projet
-- Obtenez une estimation du montant
+Lorsque la mérule touche la **charpente, les planchers ou les murs porteurs** (parties communes), les travaux relèvent de la copropriété et le coût est réparti entre copropriétaires selon le règlement. Quand elle se limite à une partie privative, c'est au copropriétaire concerné d'agir, tout en informant le syndic si la propagation menace l'immeuble.
 
-**Etape 2 : Choisir un artisan RGE**
-- Demandez plusieurs devis
-- Verifiez la certification RGE de l'artisan
-- Ne signez pas avant d'avoir depose votre demande
+### Que faire si vous découvrez une mérule ?
 
-**Etape 3 : Deposer la demande**
-- Telechargez votre devis sur la plateforme
-- Attendez la validation (environ 15 jours)
+1. **Faites établir un diagnostic** par un professionnel pour confirmer et mesurer l'étendue.
+2. **Conservez les preuves** (photos, rapport) utiles pour l'assurance ou une éventuelle action.
+3. **Déclarez en mairie** si vous êtes en zone à risque délimitée.
+4. **Faites traiter rapidement** : la mérule se propage vite, et plus on attend, plus c'est coûteux.
 
-**Etape 4 : Apres les travaux**
-- Telechargez la facture acquittee
-- Recevez le virement sous 4 a 6 semaines
+### Un diagnostic gratuit pour y voir clair
 
-### Cumuler MaPrimeRenov avec d'autres aides
-
-Vous pouvez cumuler MaPrimeRenov avec :
-
-- **CEE (Certificats d'Economie d'Energie)** : jusqu'a 10-15 EUR/m2 supplementaires
-- **Eco-PTZ** : pret a taux zero jusqu'a 50 000 EUR
-- **TVA reduite a 5,5%** : sur la main d'oeuvre et les materiaux
-- **Aides locales** : certaines regions/departements ajoutent des aides
-
-**Exemple concret :**
-Pour 100 m2 d'isolation de combles perdus (profil Jaune) :
-- MaPrimeRenov : 2 000 EUR
-- CEE : 1 000 EUR
-- Cout total travaux : 4 000 EUR
-- **Reste a charge : 1 000 EUR seulement !**
-
-### Evaluez d'abord l'etat de votre toiture
-
-Avant de vous lancer dans les demarches, faites un diagnostic de votre toiture pour :
-- Verifier que l'isolation est vraiment necessaire
-- Identifier d'eventuels problemes (infiltrations, mousse)
-- Avoir un rapport a presenter aux artisans
-
-**Notre diagnostic IA vous donne en 30 secondes** une analyse complete de votre toiture et des recommandations personnalisees.
+Que vous soyez sur le point d'acheter, de vendre, ou simplement inquiet pour votre maison, **ACO-HABITAT réalise un diagnostic gratuit et sans engagement** de vos bois. Nous identifions le champignon ou les insectes, mesurons l'humidité et vous indiquons précisément la marche à suivre.
     `,
   },
   {
     slug: "toiture-apres-grele-tempete-que-faire",
-    title: "Toiture apres grele ou tempete : que faire ?",
-    description: "Votre toiture a subi une tempete ou de la grele ? Decouvrez les etapes essentielles : securisation, declaration sinistre, expertise et reparations. Guide pratique pour reagir efficacement.",
+    title: "Dégât des eaux : comment protéger votre charpente du champignon",
+    description:
+      "Après une fuite ou une inondation, le bois humide devient une cible pour la mérule et les champignons. Découvrez les étapes pour réagir vite, assécher et protéger votre charpente.",
     date: "2026-03-05",
     author: "Expert ACO-HABITAT",
     readTime: "7 min",
     category: "Urgence & Sinistre",
-    image: "/images/blog/tempete-toiture.jpg",
+    image: "/images/blog/tempete-toiture.png",
     content: `
-## Que faire apres une tempete ou de la grele sur votre toiture ?
+## Dégât des eaux : protégez votre charpente avant l'apparition du champignon
 
-Les intemperies peuvent causer des degats importants a votre toiture : tuiles cassees, infiltrations, gouttiere arrachee... Voici les etapes a suivre pour reagir efficacement et etre correctement indemnise.
+Une fuite de toiture, une canalisation percée ou une inondation laissent le bois gorgé d'eau. Or l'humidité est la condition n°1 du développement des champignons lignivores, à commencer par la mérule. Voici comment réagir pour éviter qu'un dégât des eaux ne se transforme en attaque destructrice du bois.
 
-### Etape 1 : Securisez immediatement
+### Étape 1 : Stoppez la source d'humidité
 
-**Dans les premieres heures :**
+**Dans les premières heures :**
 
-- **Ne montez PAS sur le toit** - C'est dangereux, surtout apres une tempete
-- **Protegez l'interieur** - Placez des seaux sous les fuites, deplacez les meubles
-- **Bachez si possible** - Depuis l'exterieur, sans monter sur le toit
-- **Coupez l'electricite** si l'eau s'infiltre pres des installations
+- **Coupez l'arrivée d'eau** si la fuite vient d'une canalisation.
+- **Bâchez ou réparez** la cause de l'infiltration (toiture, mur) sans prendre de risque.
+- **Épongez et évacuez l'eau** stagnante au plus vite.
+- **Coupez l'électricité** si l'eau s'infiltre près des installations.
 
-**Signes de degats a surveiller :**
-- Tuiles ou ardoises au sol dans le jardin
-- Taches d'humidite au plafond ou sur les murs
-- Bruit de goutte a goutte dans les combles
-- Gouttiere tordue ou decrochee
-- Faitage endommage
+Plus le bois reste humide longtemps, plus le risque fongique augmente.
 
-### Etape 2 : Documentez les degats
+### Étape 2 : Faites sécher en profondeur
 
-**C'est CRUCIAL pour votre assurance :**
+Le bois et les maçonneries doivent retrouver un taux d'humidité bas (idéalement sous 20 % pour le bois) :
 
-1. **Prenez des photos** de tous les degats visibles
-   - Vue d'ensemble de la toiture
-   - Gros plans sur les zones endommagees
-   - Photos de l'interieur (infiltrations, degats d'eau)
+- **Ventilez** largement les pièces et les combles touchés.
+- **Utilisez des déshumidificateurs** dans les zones confinées.
+- **Dégagez les bois** : retirez l'isolant gorgé d'eau qui maintient l'humidité contre la charpente.
+- **Surveillez les zones cachées** : vide sanitaire, sous-face de plancher, derrière les doublages.
 
-2. **Notez la date et l'heure** de la tempete/grele
+### Étape 3 : Surveillez les signes d'attaque
 
-3. **Conservez les preuves** : tuiles cassees, morceaux de gouttiere
+Dans les semaines qui suivent un dégât des eaux, restez attentif :
 
-4. **Listez tous les degats** meme les plus petits
+- Filaments blancs cotonneux sur le bois ou les murs (mérule).
+- Plaques brunâtres bordées de blanc.
+- Odeur de moisi ou de champignon persistante.
+- Bois qui se ramollit, noircit ou se fend en cubes.
 
-### Etape 3 : Declarez le sinistre a votre assurance
+L'apparition d'un seul de ces signes impose un diagnostic rapide.
 
-**Delai legal : 5 jours** apres la tempete (10 jours pour une catastrophe naturelle)
+### Étape 4 : Déclarez le sinistre à votre assurance
 
-**Votre declaration doit contenir :**
-- Date et heure du sinistre
-- Description des degats
-- Photos et preuves
-- Estimation des dommages si possible
+**Déclarez sans tarder** (souvent dans les 5 jours) tout dégât des eaux :
 
-**Comment declarer ?**
-- Par telephone au numero sinistre de votre assurance
-- En ligne sur l'espace client
-- Par courrier recommande avec AR
+- Décrivez l'origine et les dégâts.
+- Prenez des photos des zones touchées, bois compris.
+- Conservez les factures d'intervention d'urgence.
 
-**Conseil** : Si un arrete de catastrophe naturelle est publie, attendez-le avant de declarer pour beneficier d'une meilleure couverture.
+C'est souvent l'humidité d'un sinistre mal séché qui mène, des mois plus tard, à une attaque de mérule. Un dossier bien documenté facilite la prise en charge si un traitement devient nécessaire.
 
-### Etape 4 : Faites intervenir un professionnel
+### Étape 5 : Faites contrôler vos bois
 
-**En urgence (bachage) :**
-- Appelez un couvreur pour une intervention de mise hors d'eau
-- Gardez la facture pour remboursement
-- Cette intervention d'urgence est generalement prise en charge
+Même si tout semble sec, l'humidité a pu pénétrer profondément dans la charpente. Un contrôle professionnel permet de :
 
-**Pour les reparations :**
-- Attendez le passage de l'expert de l'assurance
-- Demandez 2-3 devis a des couvreurs
-- Ne commencez pas les travaux avant l'accord de l'assurance
+- Mesurer le taux d'humidité réel des bois et des murs.
+- Détecter un début de développement fongique invisible à l'œil.
+- Appliquer un **traitement préventif** sur des bois sains exposés à un risque.
 
-### Etape 5 : L'expertise d'assurance
+### Pourquoi agir vite change tout
 
-**L'expert va :**
-- Evaluer l'etendue des degats
-- Verifier que les dommages sont bien lies a la tempete
-- Chiffrer le montant des reparations
+Un dégât des eaux traité et séché rapidement n'a souvent aucune conséquence sur le bois. Le même dégât laissé en l'état pendant des mois peut déboucher sur une attaque de mérule coûteuse, touchant charpente et planchers. La rapidité est votre meilleure protection.
 
-**Preparez-vous :**
-- Ayez vos photos et preuves prets
-- Montrez tous les degats, meme mineurs
-- Presentez les devis des couvreurs
+### Un doute après un dégât des eaux ? Diagnostic gratuit
 
-**Si vous n'etes pas d'accord** avec l'expertise, vous pouvez demander une contre-expertise (a vos frais).
-
-### Combien rembourse l'assurance ?
-
-**Garantie tempete (incluse dans multirisque habitation) :**
-- Generalement : valeur a neuf ou valeur de remplacement
-- Franchise : souvent 300-500 EUR
-
-**Garantie catastrophe naturelle :**
-- Franchise legale : 380 EUR minimum
-- Declenchee par arrete ministeriel
-
-**Attention aux exclusions :**
-- Defaut d'entretien de la toiture
-- Toiture vetuste non declaree
-- Travaux non conformes
-
-### Avant les travaux, faites un diagnostic complet
-
-Meme si les degats visibles semblent limites, la tempete a pu fragiliser d'autres zones de votre toiture. Un diagnostic complet permet de :
-- Detecter les dommages non visibles
-- Eviter des problemes futurs
-- Avoir un etat des lieux precis pour l'assurance
-
-**Notre diagnostic IA analyse votre toiture en 30 secondes** et detecte les zones fragilisees, les risques d'infiltration et les tuiles deplacees. Un rapport ideal a joindre a votre dossier d'assurance.
+Si votre charpente a été exposée à l'humidité, ne prenez pas de risque. **ACO-HABITAT réalise un diagnostic gratuit et sans engagement** : nous mesurons l'humidité, vérifions l'état des bois et vous conseillons sur le traitement préventif ou curatif adapté.
     `,
   },
 ]
