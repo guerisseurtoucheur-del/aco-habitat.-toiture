@@ -27,8 +27,11 @@ export function DevisSection() {
     const email = String(data.get("email") || "")
     const service = String(data.get("service") || "")
     const postal = String(data.get("postal") || "")
+    const street = String(data.get("street") || "")
+    const city = String(data.get("city") || "")
     const details = String(data.get("message") || "")
-    const message = `Code postal : ${postal}\n\n${details}`
+    const fullAddress = [street, `${postal} ${city}`.trim()].filter(Boolean).join(", ")
+    const message = `Adresse : ${fullAddress || "non renseignée"}\n\n${details}`
 
     try {
       const res = await fetch("/api/contact", {
@@ -116,8 +119,12 @@ export function DevisSection() {
                   <Field label="Nom complet" name="name" type="text" placeholder="Jean Dupont" required />
                   <Field label="Téléphone" name="phone" type="tel" placeholder="06 12 34 56 78" required />
                 </div>
+                <Field label="Email" name="email" type="email" placeholder="jean@email.fr" required />
+
+                <Field label="Adresse (rue)" name="street" type="text" placeholder="12 rue des Tilleuls" />
+
                 <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-                  <Field label="Email" name="email" type="email" placeholder="jean@email.fr" required />
+                  <Field label="Ville" name="city" type="text" placeholder="Alençon" />
                   <Field label="Code postal" name="postal" type="text" placeholder="61000" required />
                 </div>
 
