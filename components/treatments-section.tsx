@@ -13,9 +13,9 @@ const treatments = [
     tag: "Curatif",
   },
   {
-    title: "Mérule & champignons",
+    title: "Mérule",
     image: "/images/merule.png",
-    alt: "Mérule (Serpula lacrymans) se développant sur du bois humide",
+    alt: "Mérule (Serpula lacrymans) se développant sur une charpente en bois",
     description:
       "La mérule est le pire ennemi du bâti : elle se propage vite et fragilise toute la structure. Diagnostic, assèchement et traitement en profondeur.",
     points: ["Recherche des causes d'humidité", "Traitement des maçonneries", "Remplacement des bois détruits"],
