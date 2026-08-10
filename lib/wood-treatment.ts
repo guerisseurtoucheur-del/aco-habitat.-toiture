@@ -3,9 +3,9 @@
 // climat / age du bati deja presentes dans departments-data / cities-data.
 
 // Departements ou ACO-HABITAT intervient directement (artisan local)
-export const ZONE_DEPARTMENTS = ["61", "72", "53", "27", "28"] as const
+export const ZONE_DEPARTMENTS = ["61", "72", "53", "27", "28", "14", "50"] as const
 
-export const ZONE_LABEL = "Orne, Sarthe, Mayenne, Eure et Eure-et-Loir"
+export const ZONE_LABEL = "Orne, Sarthe, Mayenne, Eure, Eure-et-Loir, Calvados et Manche"
 
 // Coordonnees entreprise
 export const COMPANY = {

@@ -30,7 +30,11 @@ export async function POST(request: Request) {
     // Determine la zone a partir du code postal (2 premiers chiffres = departement)
     const deptCode = String(postal || "").trim().slice(0, 2)
     const inZone = deptCode.length === 2 && isInZone(deptCode)
-    const zoneTag = inZone ? "EN ZONE" : "HORS ZONE - à revendre"
+    // Marqueurs SANS ambiguite ni accent, concus pour l'automatisation :
+    // - INTERNE  = lead a garder (activite ACO-HABITAT), a NE JAMAIS revendre
+    // - REVENTE  = lead hors zone, a revendre a un partenaire
+    const routeCode = inZone ? "INTERNE" : "REVENTE"
+    const zoneTag = `LEAD-${routeCode}`
 
     const apiKey = process.env.RESEND_API_KEY
     if (!apiKey) {
@@ -86,6 +90,11 @@ export async function POST(request: Request) {
             <p style="color: #8a7a66; font-size: 13px; margin: 0 0 8px;">Message</p>
             <p style="color: #2a2117; font-size: 14px; line-height: 1.6; margin: 0; white-space: pre-wrap;">${safeMessage}</p>
           </div>
+          <div style="margin-top: 16px; padding-top: 16px; border-top: 1px dashed #e7ddcf;">
+            <p style="color: #b5a68f; font-size: 12px; font-family: monospace; margin: 0;">
+              ROUTAGE=${routeCode} | ZONE=${inZone ? "OUI" : "NON"} | DEPARTEMENT=${deptCode || "??"}
+            </p>
+          </div>
         </div>
       </div>
     `
@@ -98,9 +107,9 @@ export async function POST(request: Request) {
       },
       body: JSON.stringify({
         from: "ACO-HABITAT <devis@aco-habitat.fr>",
-        to: ["aco.habitat@orange.fr"],
+        to: ["aco.habitat.contact@gmail.com"],
         reply_to: String(email),
-        subject: `[${zoneTag}] ${serviceLabels[service] || service} - ${name}`,
+        subject: `[${zoneTag}][DEPT-${deptCode || "??"}] ${serviceLabels[service] || service} - ${name}`,
         html: htmlContent,
       }),
     })
