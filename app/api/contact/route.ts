@@ -98,7 +98,7 @@ export async function POST(request: Request) {
       },
       body: JSON.stringify({
         from: "ACO-HABITAT <devis@aco-habitat.fr>",
-        to: ["aco.habitat@orange.fr"],
+        to: ["aco.habitat.contact@gmail.com"],
         reply_to: String(email),
         subject: `[${zoneTag}] ${serviceLabels[service] || service} - ${name}`,
         html: htmlContent,
