@@ -4,7 +4,7 @@ import { ShieldCheck, Clock, BadgeCheck, Users } from "lucide-react"
 const stats = [
   { value: "2006", label: "Année de création", accent: "#b04a25" },
   { value: "100%", label: "Bois inspecté avant devis", accent: "#3c5a4a" },
-  { value: "5", label: "Départements couverts", accent: "#c8912f" },
+  { value: "7", label: "Départements couverts", accent: "#c8912f" },
   { value: "48h", label: "Délai de réponse moyen", accent: "#8a6d3b" },
 ]
 

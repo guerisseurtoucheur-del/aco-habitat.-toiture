@@ -24,7 +24,7 @@ export function ZoneSection() {
               Présents dans votre département
             </h2>
             <p className="mt-4 max-w-xl text-pretty text-base leading-relaxed text-muted-foreground">
-              ACO-HABITAT intervient sur 5 départements du Grand Ouest. Vous êtes situé en
+              ACO-HABITAT intervient sur 7 départements du Grand Ouest. Vous êtes situé en
               dehors de cette zone&nbsp;? Contactez-nous quand même, nous vous orienterons vers
               une solution adaptée.
             </p>
