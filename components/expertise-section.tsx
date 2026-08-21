@@ -1,9 +1,10 @@
+import Image from "next/image"
 import { ShieldCheck, Clock, BadgeCheck, Users } from "lucide-react"
 
 const stats = [
   { value: "2006", label: "Année de création", accent: "#b04a25" },
   { value: "100%", label: "Bois inspecté avant devis", accent: "#3c5a4a" },
-  { value: "5", label: "Départements couverts", accent: "#c8912f" },
+  { value: "7", label: "Départements couverts", accent: "#c8912f" },
   { value: "48h", label: "Délai de réponse moyen", accent: "#8a6d3b" },
 ]
 
@@ -68,6 +69,22 @@ export function ExpertiseSection() {
                 </div>
               ))}
             </div>
+
+            <figure className="mt-8 overflow-hidden rounded-2xl border border-border bg-card">
+              <div className="relative aspect-[4/3] w-full">
+                <Image
+                  src="/images/fondateur-aco-habitat.png"
+                  alt="Le fondateur d'ACO-HABITAT inspectant un bois à la loupe dans son atelier"
+                  fill
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  className="object-cover"
+                />
+              </div>
+              <figcaption className="border-t border-border px-5 py-4 text-sm leading-relaxed text-muted-foreground">
+                <span className="font-semibold text-foreground">Votre interlocuteur unique</span> — de
+                l&apos;inspection du bois jusqu&apos;à la garantie du traitement.
+              </figcaption>
+            </figure>
           </div>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
