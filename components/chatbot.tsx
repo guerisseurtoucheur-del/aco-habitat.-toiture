@@ -1,9 +1,24 @@
 "use client"
 
 import { useState, useRef, useEffect } from "react"
+import Image from "next/image"
 import { useChat } from "@ai-sdk/react"
 import { DefaultChatTransport } from "ai"
-import { MessageSquare, X, Send, Bot, User, FileText } from "lucide-react"
+import { X, Send, User, FileText } from "lucide-react"
+
+function ExpertAvatar({ className }: { className?: string }) {
+  return (
+    <div className={`relative shrink-0 overflow-hidden rounded-full ring-2 ring-primary/20 ${className ?? ""}`}>
+      <Image
+        src="/images/fondateur-aco-habitat.png"
+        alt="Expert ACO-HABITAT"
+        fill
+        sizes="40px"
+        className="object-cover"
+      />
+    </div>
+  )
+}
 
 const SUGGESTED_QUESTIONS = [
   "J'ai des petits trous dans mes poutres, c'est grave ?",
@@ -65,14 +80,21 @@ export function Chatbot() {
       {/* Floating button - plus petit sur mobile */}
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className={`fixed z-50 flex items-center justify-center rounded-full shadow-lg transition-all duration-300 ${
+        className={`fixed z-50 flex items-center justify-center overflow-hidden rounded-full shadow-lg ring-2 ring-primary transition-all duration-300 ${
           isOpen
             ? "scale-0 opacity-0"
-            : "scale-100 bg-primary opacity-100 hover:bg-primary/90 hover:shadow-xl hover:shadow-primary/25"
-        } bottom-3 right-3 h-11 w-11 sm:bottom-5 sm:right-5 sm:h-14 sm:w-14`}
+            : "scale-100 opacity-100 hover:shadow-xl hover:shadow-primary/25"
+        } bottom-3 right-3 h-12 w-12 sm:bottom-5 sm:right-5 sm:h-14 sm:w-14`}
         aria-label="Ouvrir le chat"
       >
-        <MessageSquare className="h-5 w-5 sm:h-6 sm:w-6 text-primary-foreground" />
+        <Image
+          src="/images/fondateur-aco-habitat.png"
+          alt="Discuter avec l'expert ACO-HABITAT"
+          fill
+          sizes="56px"
+          className="object-cover"
+        />
+        <span className="absolute bottom-0 right-0 h-3.5 w-3.5 rounded-full border-2 border-card bg-emerald-500 sm:h-4 sm:w-4" />
       </button>
 
 
@@ -88,11 +110,9 @@ export function Chatbot() {
         {/* Header */}
         <div className="flex items-center justify-between border-b border-border bg-secondary/50 px-4 py-3">
           <div className="flex items-center gap-3">
-            <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/15">
-              <Bot size={18} className="text-primary" />
-            </div>
+            <ExpertAvatar className="h-9 w-9" />
             <div>
-              <p className="text-sm font-semibold text-foreground">Expert Traitement du Bois</p>
+              <p className="text-sm font-semibold text-foreground">Votre expert ACO-HABITAT</p>
               <div className="flex items-center gap-1.5">
                 <span className="h-2 w-2 rounded-full bg-emerald-500" />
                 <span className="text-[11px] text-muted-foreground">En ligne</span>
@@ -114,9 +134,7 @@ export function Chatbot() {
           {messages.length === 0 && (
             <div className="space-y-4">
               <div className="flex gap-2.5">
-                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/15">
-                  <Bot size={14} className="text-primary" />
-                </div>
+                <ExpertAvatar className="h-7 w-7" />
                 <div className="max-w-[85%] rounded-2xl rounded-tl-sm bg-secondary px-3.5 py-2.5">
                   <p className="text-[13px] leading-relaxed text-foreground">
                     Bonjour ! Je suis l{"'"}expert traitement du bois d{"'"}ACO-HABITAT, specialiste depuis 2006. Insectes xylophages, merule, champignons, charpente... decrivez-moi ce que vous observez, je vous aide a y voir clair et a obtenir un diagnostic gratuit.
@@ -150,19 +168,13 @@ export function Chatbot() {
                 message.role === "user" ? "flex-row-reverse" : ""
               }`}
             >
-              <div
-                className={`flex h-7 w-7 shrink-0 items-center justify-center rounded-full ${
-                  message.role === "user"
-                    ? "bg-accent/15"
-                    : "bg-primary/15"
-                }`}
-              >
-                {message.role === "user" ? (
+              {message.role === "user" ? (
+                <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-accent/15">
                   <User size={14} className="text-accent" />
-                ) : (
-                  <Bot size={14} className="text-primary" />
-                )}
-              </div>
+                </div>
+              ) : (
+                <ExpertAvatar className="h-7 w-7" />
+              )}
               <div
                 className={`max-w-[80%] rounded-2xl px-3.5 py-2.5 ${
                   message.role === "user"
@@ -206,9 +218,7 @@ export function Chatbot() {
           {/* Loading indicator */}
           {isLoading && messages.length > 0 && messages[messages.length - 1]?.role === "user" && (
             <div className="mb-3 flex gap-2.5">
-              <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-primary/15">
-                <Bot size={14} className="text-primary" />
-              </div>
+              <ExpertAvatar className="h-7 w-7" />
               <div className="rounded-2xl rounded-tl-sm bg-secondary px-4 py-3">
                 <div className="flex gap-1">
                   <span className="h-2 w-2 animate-bounce rounded-full bg-muted-foreground/50 [animation-delay:0ms]" />
