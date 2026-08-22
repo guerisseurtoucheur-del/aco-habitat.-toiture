@@ -61,11 +61,11 @@ export function Chatbot() {
 
   return (
     <>
-      {/* Speech bubble with question - CACHE SUR MOBILE, visible sur desktop seulement */}
+      {/* Speech bubble with question - visible sur mobile ET desktop */}
       {!isOpen && (
         <div 
           onClick={() => setIsOpen(true)}
-          className="fixed bottom-20 right-5 z-50 max-w-[200px] cursor-pointer animate-in fade-in slide-in-from-bottom-2 duration-500 hidden sm:block"
+          className="fixed bottom-16 right-3 z-50 max-w-[180px] cursor-pointer animate-in fade-in slide-in-from-bottom-2 duration-500 block sm:bottom-20 sm:right-5 sm:max-w-[200px]"
         >
           <div className="rounded-xl bg-card border border-border px-3 py-2 shadow-lg hover:shadow-xl transition-shadow">
             <p className="text-xs font-medium text-foreground">Un doute sur votre charpente ?</p>
