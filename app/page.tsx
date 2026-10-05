@@ -1,6 +1,7 @@
 import { Navbar } from "@/components/navbar"
 import { HeroSection } from "@/components/hero-section"
 import { TreatmentsSection } from "@/components/treatments-section"
+import { VideosSection } from "@/components/videos-section"
 import { ExpertiseSection } from "@/components/expertise-section"
 import { MethodSection } from "@/components/method-section"
 import { ZoneSection } from "@/components/zone-section"
@@ -16,6 +17,7 @@ export default function HomePage() {
       <main>
         <HeroSection />
         <TreatmentsSection />
+        <VideosSection />
         <ExpertiseSection />
         <MethodSection />
         <ZoneSection />
